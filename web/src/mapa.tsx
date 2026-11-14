@@ -49,7 +49,7 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
         style: {
           version: 8,
           sources: {
-            osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' },
+            osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' },
             ...Object.fromEntries(CAPAS.filter((c) => c.capa).map((c) => [c.id, {
               type: 'raster' as const, tileSize: 256, maxzoom: c.nivel, attribution: 'NASA GIBS',
               tiles: [`${GIBS}/${c.capa}/default/default/GoogleMapsCompatible_Level${c.nivel}/{z}/{y}/{x}.${c.ext}`],
