@@ -232,7 +232,7 @@ function Bienvenida({ empezar }: { empezar: () => void }) {
         <h1>{L("El año de tu suelo, mes por mes", "Your soil through the year, month by month")}</h1>
         <p>{L("Compara maneras de sembrar tu patio según cuánto tiempo dejan el suelo desnudo. Con datos de la NASA y lo que ves tú.", "Compare ways to plant your plot by how long they leave the soil bare. Using NASA data and what you see.")}</p>
         <button className="boton grande" onClick={empezar}>{L("Empezar", "Start")}</button>
-        <p className="nota">{L("Siete pasos cortos. Funciona sin señal y tus fotos no salen del celular.", "Seven short steps. Works offline. Your photos stay on your phone.")}</p>
+        <p className="nota">{L("Ocho pasos cortos. Funciona sin señal. La foto se mide en tu celular; con señal, el asistente la mira para describirla y no se guarda.", "Eight short steps. Works offline. Photos are measured on your phone; when online, the assistant looks at them to describe them, and they are not stored.")}</p>
       </motion.div>
     </main>
   )
