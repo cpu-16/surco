@@ -4,7 +4,7 @@ import { Registro } from './registro'
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
-import { EJEMPLO, local, pedir, sinImagenes, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
+import { EJEMPLO, enPanama, local, pedir, sinImagenes, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
 import { Agua, Fotos, fotosDe, Importa, nombreDe, Patio } from './pasos'
 import Cielo from './cielo'
 import Anio, { type Comparacion } from './anio'
@@ -121,7 +121,7 @@ export default function App() {
       .catch((e) => {
         if (!vivo) return
         const c = local.leer<CacheLugar>(LLAVES.lugar)
-        if (cerca(c, exp)) { setLugar(c!.datos); setLugarViejo(true) } else setError(e.message)
+        if (cerca(c, exp)) { setLugar(c!.datos); setLugarViejo(true) } else { setError(e.message); t = window.setTimeout(traer, 20000) }
       })
     traer()
     return () => { vivo = false; clearTimeout(t) }
@@ -189,7 +189,7 @@ export default function App() {
             {p.id === 'fotos' && <Fotos exp={exp} cambiar={cambiar} sub={subFoto} setSub={setSubFoto} />}
             {p.id === 'agua' && <Agua exp={exp} cambiar={cambiar} />}
             {p.id === 'importa' && <Importa exp={exp} cambiar={cambiar} />}
-            {p.id === 'anio' && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} enLinea={enLinea} />}
+            {p.id === 'anio' && !(error && !lugar) && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} enLinea={enLinea} panama={enPanama(exp)} />}
             {p.id === 'conversa' && <Suspense fallback={<Cargando texto={L("Abriendo…", "Opening…")} />}><Conversa exp={exp} lugar={lugar} comp={comp} cambiar={cambiar} enLinea={enLinea} /></Suspense>}
             {p.id === 'registro' && <Registro exp={exp} cambiar={cambiar} comp={comp} lugar={lugar} enLinea={enLinea} nombreCultivo={nombreDe} />}
           </motion.section>

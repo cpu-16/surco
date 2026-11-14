@@ -60,6 +60,7 @@ export const EJEMPLO: Expediente = {
 
 export async function pedir<T>(ruta: string, init?: RequestInit): Promise<T> {
   const r = await fetch(ruta, { ...init, headers: { 'Content-Type': 'application/json', ...init?.headers } })
+    .catch(() => { throw new Error(L('no hubo conexión. Lo intento otra vez solo en un rato.', 'no connection. I will try again by myself shortly.')) })
   if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? L(`El servidor respondió ${r.status}`, `The server returned ${r.status}`))
   return r.json()
 }

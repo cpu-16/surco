@@ -20,7 +20,7 @@ const PASO_DE: Record<string, number> = { parcela: 1, foto_cama: 3, foto_perenne
 
 export const COLOR = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)', desnudo: 'var(--laterita)' }
 
-export default function Anio({ comp, desde, viejo, irA, enLinea }: { comp: Comparacion | null; desde: number; viejo: boolean; irA: (clave: string) => void; enLinea: boolean }) {
+export default function Anio({ comp, desde, viejo, irA, enLinea, panama }: { comp: Comparacion | null; desde: number; viejo: boolean; irA: (clave: string) => void; enLinea: boolean; panama: boolean }) {
   const [sel, setSel] = useState<Estrategia | null>(null)
   const [abierta, setAbierta] = useState(false)
   const cerrar = useCallback(() => setAbierta(false), [])
@@ -66,7 +66,7 @@ export default function Anio({ comp, desde, viejo, irA, enLinea }: { comp: Compa
           ))}
         </div>
       )}
-      <p className="nota pie">{L('Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico agrícola de tu zona (en Panamá, el MIDA o el IDIAP).', 'This shows patterns and possibilities. The decision is yours, and it is worth going over it with a local farm advisor or extension officer.')}</p>
+      <p className="nota pie">{L(`Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico agrícola de tu zona${panama ? ' (el MIDA o el IDIAP)' : ''}.`, 'This shows patterns and possibilities. The decision is yours, and it is worth going over it with a local farm advisor or extension officer.')}</p>
 
       <Hoja abierta={abierta} cerrar={cerrar} titulo={sel?.nombre ?? ''}>
         {sel && <Detalle e={sel} orden={orden} />}
