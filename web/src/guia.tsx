@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
+import { Icono } from './ui'
 
 /* La prueba de la lata en dibujos: una tarjeta por paso, se desliza con el dedo.
    Medidas de la guía del USDA (anillo de 6 pulgadas enterrado 3) y del ejercicio P05 de la FAO (444 mL). */
@@ -42,11 +43,11 @@ const PASOS: { dibujo: ReactNode; texto: ReactNode }[] = [
       <>
         {SUELO}{LATA}
         <rect x="46" y="36" width="68" height="8" rx="2" fill="var(--rastrojo)" />
-        <g transform="rotate(-28 122 26)">
+        <g transform="translate(-4 10) rotate(-28 122 26)">
           <path d="M122 26h34" strokeWidth="4" />
           <rect x="112" y="14" width="12" height="24" rx="2" fill="var(--tinta-2)" />
         </g>
-        <path d="M100 22q4-6 10-6M96 16q5-8 13-8" strokeWidth="1.5" opacity="0.6" />
+        <path d="M98 30q4-6 10-6M94 24q5-8 13-8" strokeWidth="1.5" opacity="0.6" />
         <path d="M118 70v20M114 70h8M114 90h8" strokeWidth="1.5" />
         <text x="124" y="84">7–8 cm</text>
       </>
@@ -100,15 +101,36 @@ const PASOS: { dibujo: ReactNode; texto: ReactNode }[] = [
   },
 ]
 
+/** Con el dedo se desliza; con mouse, las flechas. El contador sigue al scroll, no al revés. */
 export function GuiaLata() {
+  const lista = useRef<HTMLOListElement>(null)
+  const [i, setI] = useState(0)
+  const ir = (n: number) => {
+    const el = lista.current?.children[Math.max(0, Math.min(PASOS.length - 1, n))] as HTMLElement | undefined
+    el?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', inline: 'center', block: 'nearest' })
+  }
+  const alDeslizar = () => {
+    const g = lista.current
+    if (!g) return
+    const centro = g.scrollLeft + g.clientWidth / 2
+    const hijos = [...g.children] as HTMLElement[]
+    setI(hijos.reduce((m, h, k) => Math.abs(h.offsetLeft + h.offsetWidth / 2 - centro) < Math.abs(hijos[m].offsetLeft + hijos[m].offsetWidth / 2 - centro) ? k : m, 0))
+  }
   return (
-    <ol className="guia" aria-label="La prueba de la lata, paso a paso">
-      {PASOS.map((p, i) => (
-        <li key={i}>
-          <svg viewBox="0 0 160 110" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{p.dibujo}</svg>
-          <p><span className="guia-n">{i + 1}</span>{p.texto}</p>
-        </li>
-      ))}
-    </ol>
+    <div className="guia-marco">
+      <ol className="guia" ref={lista} onScroll={alDeslizar} aria-label="La prueba de la lata, paso a paso">
+        {PASOS.map((p, k) => (
+          <li key={k} aria-current={k === i ? 'step' : undefined}>
+            <svg viewBox="0 0 160 110" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{p.dibujo}</svg>
+            <p><span className="guia-n">{k + 1}</span>{p.texto}</p>
+          </li>
+        ))}
+      </ol>
+      <div className="guia-control">
+        <button className="icono-btn" onClick={() => ir(i - 1)} disabled={i === 0} aria-label="Paso anterior"><Icono n="atras" /></button>
+        <span className="guia-puntos" aria-live="polite">{PASOS.map((_, k) => <i key={k} data-activo={k === i} />)}<span className="sr">Paso {i + 1} de {PASOS.length}</span></span>
+        <button className="icono-btn derecha" onClick={() => ir(i + 1)} disabled={i === PASOS.length - 1} aria-label="Paso siguiente"><Icono n="atras" /></button>
+      </div>
+    </div>
   )
 }

@@ -39,10 +39,10 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
                 <span className="e-nombre">{e.nombre}</span>
                 {hayMejor && total(e) === mejor && <span className="sello">Menos suelo desnudo</span>}
               </span>
-              <Tira etq="Cama" fila={e.tira} orden={orden} retraso={fila * 0.12} />
+              <Tira etq="Huerto" fila={e.tira} orden={orden} retraso={fila * 0.12} />
               <Tira etq="Árboles" fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />
               <span className="e-pie">
-                <span>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} la cama, <b>{e.desnudo_arboles}</b> bajo los árboles</span>
+                <span>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto, <b>{e.desnudo_arboles}</b> bajo los árboles</span>
                 <span className="ver">Ver por qué</span>
               </span>
             </button>
@@ -114,7 +114,7 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
         })}
       </div>
       <p className="nota" aria-live="polite">
-        {mes ? `En ${MESES_LARGOS[mes - 1]}: la cama con ${nombre(e.tira, mes)}; debajo de los árboles, ${nombre(e.arboles, mes)}.` : 'Toca un mes para ver qué hay sembrado.'}
+        {mes ? `En ${MESES_LARGOS[mes - 1]}: el huerto con ${nombre(e.tira, mes)}; debajo de los árboles, ${nombre(e.arboles, mes)}.` : 'Toca un mes para ver qué hay sembrado.'}
       </p>
 
       <p className="razon">{e.razon}</p>
@@ -123,7 +123,7 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
       )}
 
       <div className="numeros">
-        <div><span className="cifra">{e.desnudo_cama + e.desnudo_arboles}</span><span>{e.desnudo_cama + e.desnudo_arboles === 1 ? 'mes' : 'meses'} de suelo desnudo, sumando cama y árboles</span></div>
+        <div><span className="cifra">{e.desnudo_cama + e.desnudo_arboles}</span><span>{e.desnudo_cama + e.desnudo_arboles === 1 ? 'mes' : 'meses'} de suelo desnudo, sumando huerto y árboles</span></div>
         <div><span className="cifra">{e.agua.deficit_normal_mm}<small> mm</small></span><span>de agua que falta en la seca de un año normal</span></div>
         <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>si llueve como en los Niños</span></div>
         {e.n_kg_ha && <div><span className="cifra">{e.n_kg_ha[0]}–{e.n_kg_ha[1]}</span><span>kg de nitrógeno por hectárea que dejan las leguminosas</span></div>}

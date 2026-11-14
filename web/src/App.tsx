@@ -1,3 +1,4 @@
+import { Escena, useMes } from './escena'
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
@@ -208,13 +209,15 @@ function Marca({ t = 22 }: { t?: number }) {
 /** Primera vez: un año de suelo que se va cubriendo, mes por mes. Es toda la idea en un segundo. */
 const AÑO = ['alta', 'alta', 'media', 'baja', 'alta', 'alta', 'alta', 'media', 'media', 'alta', 'alta', 'media'] as const
 function Bienvenida({ empezar }: { empezar: () => void }) {
+  const mes = useMes()
   const color = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)' }
   return (
     <main className="bienvenida">
       <div className="bienvenida-marca"><Marca t={30} /><span>{NOMBRE}</span></div>
+      <Escena mes={mes} />
       <div className="bienvenida-tira" aria-hidden="true">
         {AÑO.map((c, i) => (
-          <span key={i} className="muestra">
+          <span key={i} className="muestra" data-actual={i === mes}>
             <motion.span className="tapa" style={{ background: color[c] }} initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
               transition={{ type: 'spring', bounce: 0.2, duration: 0.6, delay: 0.5 + i * 0.07 }} />
           </span>

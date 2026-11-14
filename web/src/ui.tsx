@@ -15,6 +15,7 @@ const TRAZOS = {
   gota: 'M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11Z',
   cerrar: 'M6 6l12 12M18 6 6 18',
   enviar: 'M4 12 20 4l-6 16-2.5-6.5L4 12Z',
+  galeria: 'M4 5h16v14H4ZM4 16l4.5-4.5 4 4 3-3L20 17M15.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z',
   altavoz: 'M4 9v6h4l5 4V5L8 9H4ZM16.5 8.5a5 5 0 0 1 0 7',
 } as const
 

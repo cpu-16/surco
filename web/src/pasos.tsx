@@ -12,6 +12,10 @@ export const CULTIVOS: [string, string][] = [
   ['maiz', 'Maíz'], ['frijol', 'Frijol'], ['guandu', 'Guandú'], ['otoe', 'Otoe'], ['name', 'Ñame'], ['zapallo', 'Zapallo'],
 ]
 
+/** Los que duran años: no se les pregunta la fecha de siembra. */
+const ARBOLES = new Set(['cacao', 'naranja', 'toronja', 'platano', 'mango', 'aguacate', 'limón', 'limon', 'coco', 'guanábana', 'café', 'cafe', 'marañón', 'nance'])
+const nombreDe = (c: string) => CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
+
 /* ---------------- Paso 1: el patio ---------------- */
 
 export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) {
@@ -20,6 +24,7 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
   const alternar = (v: string) => cambiar({ cultivos: exp.cultivos.includes(v) ? exp.cultivos.filter((x) => x !== v) : [...exp.cultivos, v] })
   const [otro, setOtro] = useState('')
   const propios = exp.cultivos.filter((c) => !CULTIVOS.some(([k]) => k === c))
+  const cortos = exp.cultivos.filter((c) => !ARBOLES.has(c))
   const agregar = (e: FormEvent) => {
     e.preventDefault()
     const v = otro.trim().toLowerCase()
@@ -68,8 +73,14 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
         <button className="boton claro" disabled={!otro.trim()}>Agregar</button>
       </form>
 
-      {exp.cultivos.includes('yuca') && (
-        <Siembra valor={exp.siembras.yuca ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, yuca: v } })} />
+      {cortos.length > 0 && (
+        <fieldset className="campo siembra">
+          <legend>¿Cuándo los sembraste?</legend>
+          {cortos.map((c) => (
+            <Siembra key={c} nombre={nombreDe(c)} valor={exp.siembras[c] ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, [c]: v } })} />
+          ))}
+          <small className="nota">Los árboles no hacen falta.{exp.cultivos.includes('yuca') && !exp.siembras.yuca ? ' Si no pones la yuca, calculo como si fuera en mayo.' : ''}</small>
+        </fieldset>
       )}
       <label className="campo">
         <span>Nombre del patio</span>
@@ -82,37 +93,37 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
 const MESES_N = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
 /** Mes y año con dos listas: más claro que el selector de fecha en cualquier celular. */
-function Siembra({ valor, poner }: { valor: string; poner: (v: string) => void }) {
+function Siembra({ nombre, valor, poner }: { nombre: string; valor: string; poner: (v: string) => void }) {
   const hoy = new Date()
   const [a, m] = valor ? valor.split('-').map(Number) : [0, 0]
-  const anos = [hoy.getFullYear(), hoy.getFullYear() - 1, hoy.getFullYear() - 2]
+  const anos = [hoy.getFullYear(), hoy.getFullYear() - 1, hoy.getFullYear() - 2, hoy.getFullYear() - 3]
   const fijar = (na: number, nm: number) => poner(na && nm ? `${na}-${String(nm).padStart(2, '0')}` : '')
   return (
-    <fieldset className="campo siembra">
-      <legend>¿Cuándo sembraste la yuca?</legend>
-      <div className="dos-listas">
-        <select aria-label="Mes" value={m || ''} onChange={(e) => fijar(a || anos[0], Number(e.target.value))}>
-          <option value="">Mes</option>
-          {MESES_N.map((n, i) => <option key={n} value={i + 1}>{n[0].toUpperCase() + n.slice(1)}</option>)}
-        </select>
-        <select aria-label="Año" value={a || ''} onChange={(e) => fijar(Number(e.target.value), m || 5)}>
-          <option value="">Año</option>
-          {anos.map((y) => <option key={y} value={y}>{y}</option>)}
-        </select>
-      </div>
-      {!valor && <small className="nota">Si no lo pones, calculo como si fuera en mayo.</small>}
-    </fieldset>
+    <div className="fila-siembra">
+      <span>{nombre}</span>
+      <select aria-label={`Mes en que sembraste ${nombre}`} value={m || ''} onChange={(e) => fijar(a || anos[0], Number(e.target.value))}>
+        <option value="">Mes</option>
+        {MESES_N.map((n, i) => <option key={n} value={i + 1}>{n[0].toUpperCase() + n.slice(1)}</option>)}
+      </select>
+      <select aria-label={`Año en que sembraste ${nombre}`} value={a || ''} onChange={(e) => fijar(Number(e.target.value), m || 5)}>
+        <option value="">Año</option>
+        {anos.map((y) => <option key={y} value={y}>{y}</option>)}
+      </select>
+    </div>
   )
 }
 
 /* ---------------- Paso 3: las fotos, una por una ---------------- */
 
 export const FOTOS: { tipo: TipoFoto; corto: string; titulo: string; como: string }[] = [
-  { tipo: 'cama', corto: 'La cama', titulo: 'El suelo de la cama de yuca y piña', como: 'De pie, con el celular a la altura del pecho, mirando hacia abajo.' },
+  { tipo: 'cama', corto: 'El huerto', titulo: 'El suelo del huerto (yuca, piña…)', como: 'De pie, con el celular a la altura del pecho, mirando hacia abajo.' },
   { tipo: 'perennes', corto: 'Bajo los árboles', titulo: 'El suelo debajo del cacao o los cítricos', como: 'Igual, pero debajo de la copa. El satélite no puede ver esto.' },
   { tipo: 'pina', corto: 'Una piña', titulo: 'Una piña completa', como: 'La planta entera con su base, para ver cómo está.' },
   { tipo: 'general', corto: 'El patio', titulo: 'El patio entero', como: 'Desde una esquina, para ver si hay pendiente.' },
 ]
+
+/** En el celular la cámara abre directo; en la computadora solo tiene sentido elegir una foto guardada. */
+const TACTIL = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches
 
 export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setSub: (n: number) => void }) {
   const [midiendo, setMidiendo] = useState(false)
@@ -187,9 +198,15 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
           )}
 
           <div className="acciones">
-            <label className="boton grande">
-              <Icono n="camara" />{midiendo ? 'Midiendo…' : foto ? 'Tomar otra' : 'Tomar foto'}
-              <input type="file" accept="image/*" capture="environment" hidden disabled={midiendo} onChange={(e) => { tomar(e.target.files?.[0]); e.target.value = '' }} />
+            {TACTIL && (
+              <label className="boton grande">
+                <Icono n="camara" />{midiendo ? 'Midiendo…' : foto ? 'Tomar otra' : 'Tomar foto'}
+                <input type="file" accept="image/*" capture="environment" hidden disabled={midiendo} onChange={(e) => { tomar(e.target.files?.[0]); e.target.value = '' }} />
+              </label>
+            )}
+            <label className={TACTIL ? 'boton claro' : 'boton grande'}>
+              <Icono n="galeria" />{TACTIL ? 'De la galería' : midiendo ? 'Midiendo…' : 'Elegir una foto'}
+              <input type="file" accept="image/*" hidden disabled={midiendo} onChange={(e) => { tomar(e.target.files?.[0]); e.target.value = '' }} />
             </label>
             {sub < FOTOS.length - 1 && <button className="boton fantasma" onClick={() => irSub(sub + 1)}>{foto ? 'Siguiente foto' : 'Saltar'}</button>}
           </div>
@@ -267,7 +284,7 @@ export function Agua({ exp, cambiar }: Props) {
 
   return (
     <>
-      <p className="pregunta-grande">Al día siguiente de un aguacero fuerte, ¿quedan charcos en la cama?</p>
+      <p className="pregunta-grande">Al día siguiente de un aguacero fuerte, ¿quedan charcos en el huerto?</p>
       <div className="chips">
         {CHARCOS.map(([k, n]) => <button key={k} className="chip" aria-pressed={exp.charcos === k} onClick={() => cambiar({ charcos: exp.charcos === k ? null : k })}>{n}</button>)}
       </div>
@@ -281,7 +298,7 @@ export function Agua({ exp, cambiar }: Props) {
           <motion.div key="lata" className="lata" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
       <GuiaLata />
-      <p className="nota desliza">Desliza para ver los 6 pasos · <button className="enlace" onClick={() => setComo(true)}>Más detalles</button></p>
+      <p className="nota desliza"><button className="enlace" onClick={() => setComo(true)}>Los 7 pasos en texto, con más detalle</button></p>
       <Reloj inicio={inicio} />
       <div className="acciones centro">
         {inicio
@@ -303,12 +320,12 @@ export function Agua({ exp, cambiar }: Props) {
       <Hoja abierta={como} cerrar={() => setComo(false)} titulo="La prueba de la lata">
         <ol className="receta larga">
           <li><b>La lata.</b> Una de unos 15 cm de ancho, como la de leche en polvo grande o la de pintura de un galón. Quítale el fondo y la tapa con abrelatas y pásale una lima o una piedra por la orilla para no cortarte.</li>
-          <li><b>Dónde.</b> En la cama de yuca, donde no hayas pisado ni cavado hoy. Quita las hojas sueltas, sin arrancar las raíces.</li>
+          <li><b>Dónde.</b> En el huerto, donde no hayas pisado ni cavado hoy. Quita las hojas sueltas, sin arrancar las raíces.</li>
           <li><b>Enterrarla.</b> Marca la lata a 7 u 8 cm del borde. Pon una tablita encima y golpéala con un martillo o una piedra, parejo, hasta la marca. Aprieta con el dedo la tierra pegada a la orilla por dentro, para que el agua no se escape por el lado.</li>
           <li><b>El agua.</b> Mide 450 mL: casi dos tazas. Pon una bolsa plástica dentro de la lata, echa el agua encima de la bolsa y saca la bolsa con cuidado. Así no se revuelve la tierra.</li>
           <li><b>La primera vez</b> solo moja el suelo. Espera a que se vaya toda el agua, no hace falta medirla.</li>
           <li><b>La segunda vez es la que cuenta.</b> Repite con otros 450 mL y toca «Empezar a medir». Cuando ya no quede agua y la tierra deje de brillar, toca «Listo».</li>
-          <li><b>Si puedes,</b> hazla también en otro punto, por ejemplo debajo de un árbol. Pon el tiempo de la cama aquí.</li>
+          <li><b>Si puedes,</b> hazla también en otro punto, por ejemplo debajo de un árbol. Pon aquí el tiempo del huerto.</li>
         </ol>
         <p className="nota">Es la prueba de infiltración de la guía del USDA (Soil Quality Test Kit, 1999), hecha con una lata en vez del anillo de metal. <a href="https://www.fao.org/fileadmin/user_upload/GSP/GSDP/Field_exercises/New_Format_ES/P04-Infiltration-ES.pdf" target="_blank" rel="noreferrer">La FAO la explica con fotos</a> (Doctores de Suelos, ejercicio P05).</p>
       </Hoja>

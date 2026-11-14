@@ -6,7 +6,17 @@ import { Cargando, fecha, Fuente, rango } from './ui'
 
 const Mapa = lazy(() => import('./mapa'))
 
-const PESTANAS = [['lluvia', 'Lluvia'], ['nino', 'El Niño'], ['verdor', 'Verdor'], ['pixeles', 'Píxeles']] as const
+/** De dónde sale cada dato, en palabras. El nombre técnico del producto queda en el título (al tocar o pasar el mouse). */
+const FUENTE: Record<string, string> = {
+  power: 'NASA POWER: clima de cada día, en un cuadro de 55 km',
+  imerg: 'Satélite GPM de la NASA: lluvia de cada día, en un cuadro de 10 km',
+  ndvi: 'Satélite MODIS de la NASA: verdor, en un cuadro de 250 m',
+}
+
+/** El número de verdor dicho en palabras. */
+const verdor = (v: number) => v >= 0.7 ? 'Muy verde' : v >= 0.5 ? 'Verde' : v >= 0.3 ? 'Poco verde' : 'Casi sin plantas'
+
+const PESTANAS = [['lluvia', 'Lluvia'], ['nino', 'El Niño'], ['verdor', 'Verdor'], ['pixeles', 'Mapa']] as const
 type Pestana = (typeof PESTANAS)[number][0]
 
 export default function Cielo({ lugar, desde }: { lugar: Lugar | null; desde: number }) {
@@ -49,7 +59,7 @@ function Lluvia({ lugar }: { lugar: Lugar }) {
       <p className="nota">
         {im ? `En los últimos 30 días cayeron ${im.lluvia_30d} mm en tu zona.` : 'La lluvia diaria del satélite GPM está en camino; esto es NASA POWER, que reparte la lluvia en 55 km.'}
       </p>
-      {f && <Fuente titulo={`Consultado ${f.consultado}`}>{f.producto}, celda {f.celda}</Fuente>}
+      {f && <Fuente titulo={`${f.producto}, consultado ${f.consultado}`}>{FUENTE[im ? 'imerg' : 'power']}</Fuente>}
     </>
   )
 }
@@ -82,7 +92,7 @@ function Nino({ lugar, desde }: { lugar: Lugar; desde: number }) {
         <span><i style={{ background: 'var(--seco)', height: '0.25em' }} />Lo que el sol le saca al suelo</span>
       </div>
       <p className="nota">Es la memoria de tu zona, no un pronóstico.</p>
-      {f && <Fuente titulo={`Consultado ${f.consultado}`}>{f.producto}, normales 1991–2020</Fuente>}
+      {f && <Fuente titulo={`${f.producto}, normales 1991–2020, consultado ${f.consultado}`}>{FUENTE.power}</Fuente>}
     </>
   )
 }
@@ -93,12 +103,12 @@ function Verdor({ lugar, desde }: { lugar: Lugar; desde: number }) {
   const f = lugar.fuentes.ndvi
   return (
     <>
-      {u && <p className="titular"><span className="cifra">{u.valor.toFixed(2)}</span><span>de verdor (NDVI) el {fecha(u.fecha)}. De 0 a 1: más alto, más verde.</span></p>}
+      {u && <p className="titular"><span className="cifra palabra">{verdor(u.valor)}</span><span>se veía tu zona desde el satélite el {fecha(u.fecha)}.</span></p>}
       <NdviMeses meses={lugar.ndvi.meses} desde={desde} />
       {lugar.ndvi.progreso
         ? <p className="nota" role="status">Ya llegaron {lugar.ndvi.n_total} imágenes, las más nuevas primero ({Math.round(100 * lugar.ndvi.progreso[0] / lugar.ndvi.progreso[1])} % de 26 años). El promedio se completa solo.</p>
-        : <p className="nota">Promedio de cada mes desde el año 2000, con {lugar.ndvi.n_validos} imágenes sin nubes. Ese píxel de 250 m mezcla techos, calles y árboles: el suelo bajo tu cacao lo ve tu foto, no el satélite.</p>}
-      {f && <Fuente titulo={`Consultado ${f.consultado}`}>{f.producto}</Fuente>}
+        : <p className="nota">Así cambia el verdor de tu zona en el año: baja en el verano y sube con las lluvias. Es el promedio de {lugar.ndvi.n_validos} fotos del satélite sin nubes, desde el año 2000. El satélite ve un cuadro de 250 m con techos, calles y árboles; el suelo debajo de tu cacao lo ve tu foto.</p>}
+      {f && <Fuente titulo={`${f.producto}, consultado ${f.consultado}`}>{FUENTE.ndvi}</Fuente>}
     </>
   )
 }
