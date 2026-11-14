@@ -99,7 +99,7 @@
       ],
       "huecos": "acolchado",
       "arboles": "acolchado",
-      "razon": "En el verano se tapa con hojas igual que en la anterior. En mayo se siembra canavalia, una mata de frijol grande que aguanta la sequía y hace mucha hoja. A los dos o tres meses se corta y se deja encima como abono, y en agosto se siembra maíz sobre esa cama.",
+      "razon": "En el verano se tapa con hojas igual que en la anterior. En mayo se siembra canavalia, una mata de frijol grande que aguanta la sequía y hace mucha hoja. A los dos o tres meses se corta y se deja encima como abono, y en agosto se siembra maíz sobre ese pedazo.",
       "beneficios": [
         "La canavalia deja mucha hoja que se vuelve tierra buena.",
         "Aguanta el verano mejor que el frijol de bejuco.",
@@ -123,7 +123,7 @@
     },
     {
       "id": "guandu_mani",
-      "nombre": "Guandú en la cama y maní forrajero bajo los árboles",
+      "nombre": "Guandú en el huerto y maní forrajero bajo los árboles",
       "cama": [
         {
           "cultivo": "yuca",

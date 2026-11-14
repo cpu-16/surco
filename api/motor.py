@@ -248,7 +248,7 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
                            "Tapar el suelo pesa más en el verano: por cada 10 % de suelo tapado con hojas se seca ~5 % menos (FAO-56).")
         evid = e["evidencia"] + (["USDA"] if infil is not None else []) + (["F56M"] if e["huecos"] == "acolchado" else [])
         res.append({
-            "id": e["id"], "nombre": e["nombre"], "aplica_a": "cama y árboles",
+            "id": e["id"], "nombre": e["nombre"], "aplica_a": "huerto y árboles",
             "tira": tira, "arboles": arboles, "meses_desnudo": desn_cama + desn_arb,
             "desnudo_cama": desn_cama, "desnudo_arboles": desn_arb,
             "n_kg_ha": [sum(x[0] for x in n_fij), sum(x[1] for x in n_fij)] if n_fij else None,
@@ -297,11 +297,11 @@ def faltan(exp):
         out.append({"clave": "foto_perennes", "texto": "Foto del suelo debajo del cacao o los cítricos",
                     "cambia": "El satélite ve la copa verde de los árboles, no el suelo de abajo. Tu foto dice si ahí hay suelo desnudo."})
     if "cama" not in f:
-        out.append({"clave": "foto_cama", "texto": "Foto del suelo de la cama de yuca", "cambia": "Mide cuánto suelo está tapado este mes."})
+        out.append({"clave": "foto_cama", "texto": "Foto del suelo del huerto", "cambia": "Mide cuánto suelo está tapado este mes."})
     if exp.get("infiltracion_min") is None and not exp.get("charcos"):
         out.append({"clave": "infiltracion", "texto": "Si quedan charcos después de un aguacero", "cambia": "Dice si el agua entra o se queda arriba; eso decide entre raíz honda y tapar con hojas."})
     if not exp.get("siembras", {}).get("yuca"):
-        out.append({"clave": "parcela", "texto": "Cuándo sembraste la yuca", "cambia": "Mueve el mes en que la cama queda libre para lo siguiente."})
+        out.append({"clave": "parcela", "texto": "Cuándo sembraste la yuca", "cambia": "Mueve el mes en que el huerto queda libre para lo siguiente."})
     if not exp.get("prioridades"):
         out.append({"clave": "prioridades", "texto": "Qué te importa más", "cambia": "Ordena las estrategias según lo tuyo."})
     return out
