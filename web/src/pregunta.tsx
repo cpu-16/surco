@@ -1,3 +1,4 @@
+import { idioma } from './i18n'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { pedir, sinImagenes, type Expediente, type Lugar } from './api'
@@ -35,7 +36,7 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
     const historia = [...msgs, { de: 'tu' as const, texto: t }]
     setMsgs(historia); setTexto(''); setOcupado(true)
     try {
-      const r = await pedir<Respuesta>('/api/ia/pregunta', { method: 'POST', body: JSON.stringify({ historia, expediente: { ...sinImagenes(exp), pais: region() }, comparacion: comp, lugar: resumenLugar(lugar) }) })
+      const r = await pedir<Respuesta>('/api/ia/pregunta', { method: 'POST', body: JSON.stringify({ historia, expediente: { ...sinImagenes(exp), pais: region() }, comparacion: comp, lugar: resumenLugar(lugar), lang: idioma }) })
       setMsgs([...historia, { de: 'surco', texto: r.respuesta, fuentes: r.fuentes }])
       if (r.propuesta && Object.keys(r.propuesta).length) setPropuesta(r.propuesta)
     } catch (e) {

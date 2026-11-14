@@ -1,4 +1,5 @@
 import { Escena, useMes } from './escena'
+import { cambiarIdioma, idioma, L } from './i18n'
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
@@ -131,7 +132,7 @@ export default function App() {
   useEffect(() => {
     if (!lugar) return
     let vivo = true
-    pedir<Comparacion>('/api/comparar', { method: 'POST', body: JSON.stringify({ expediente: sinImagenes(exp) }) })
+    pedir<Comparacion>('/api/comparar', { method: 'POST', body: JSON.stringify({ expediente: sinImagenes(exp), lang: idioma }) })
       .then((c) => { if (!vivo) return; setComp(c); setCompViejo(false); local.poner(L.comp, { clave: claveComp, datos: c }) })
       .catch(() => vivo && setCompViejo(local.leer<{ clave: string }>(L.comp)?.clave !== claveComp))
     return () => { vivo = false }
@@ -153,6 +154,7 @@ export default function App() {
           </AnimatePresence>
           <span className="espacio" />
           <Instalar />
+          <button className="icono-btn idioma" onClick={() => cambiarIdioma(idioma === 'en' ? 'es' : 'en')} aria-label={L('Switch to English', 'Cambiar a español')}>{idioma === 'en' ? 'ES' : 'EN'}</button>
           <BotonTema />
         </div>
         <nav className="surco" aria-label="Pasos">

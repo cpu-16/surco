@@ -3,6 +3,7 @@ import { animate, AnimatePresence, motion, useReducedMotion } from 'motion/react
 import { local, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
 import { medir } from './canopeo'
 import { GuiaLata } from './guia'
+import { idioma } from './i18n'
 import { Fuente, Hoja, Icono } from './ui'
 
 type Props = { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }
@@ -144,7 +145,7 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
       navigator.vibrate?.(15)
       // la IA describe la foto; la cobertura ya está medida en el celular y no la toca
       if (navigator.onLine) {
-        const fd = new FormData(); fd.append('foto', r.jpeg, 'foto.jpg'); fd.append('tipo', f.tipo)
+        const fd = new FormData(); fd.append('foto', r.jpeg, 'foto.jpg'); fd.append('tipo', f.tipo); fd.append('lang', idioma)
         fetch('/api/ia/foto', { method: 'POST', body: fd }).then((x) => x.ok ? x.json() : null).then((j) => {
           if (j?.descripcion) window.dispatchEvent(new CustomEvent('surco-foto', { detail: { tipo: f.tipo, extra: { descripcion: j.descripcion, hojarasca: j.hojarasca } } }))
         }).catch(() => { /* sin IA queda la medición */ })

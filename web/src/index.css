@@ -458,3 +458,4 @@ fieldset.campo legend { padding: 0; margin-bottom: 0.35rem; }
 .bienvenida-tira .muestra { position: relative; transition: transform 250ms var(--ease-out), box-shadow 250ms ease; }
 .bienvenida-tira .muestra[data-actual='true'] { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--fondo), 0 0 0 3.5px var(--tinta); }
 @media (prefers-reduced-motion: reduce) { .satelite, .rayos, .lluvia-cae path, .salpica circle, .arrastre, .entra path { animation: none; } .satelite { transform: translate(250px, 14px); } }
+.icono-btn.idioma { font: 700 0.95rem/1 var(--display); letter-spacing: 0.04em; }
