@@ -52,7 +52,7 @@ export default function Pregunta({ exp, lugar, comp }: { exp: Expediente; lugar:
       <p>Cuéntale de tu patio con tus palabras, o pregunta «¿y si llueve menos?» o «¿por qué no frijol?». Responde con los números de arriba y te dice cuándo no sabe.</p>
       <div aria-live="polite" style={{ display: 'grid', gap: '0.8rem', margin: '1rem 0' }}>
         {msgs.map((m, i) => (
-          <div key={i} style={{ justifySelf: m.de === 'tu' ? 'end' : 'start', maxWidth: '90%', background: m.de === 'tu' ? 'var(--papel-2)' : 'transparent', borderLeft: m.de === 'surco' ? '3px solid var(--hoja)' : 0, padding: '0.5rem 0.8rem', borderRadius: 8 }}>
+          <div key={i} style={{ justifySelf: m.de === 'tu' ? 'end' : 'start', maxWidth: '90%', background: m.de === 'tu' ? 'var(--papel-2)' : 'transparent', padding: '0.5rem 0.8rem', borderRadius: 8 }}>
             <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{m.texto}</p>
             {m.fuentes?.length ? <p className="nota" style={{ margin: '0.3rem 0 0' }}>Datos: {m.fuentes.join('; ')}</p> : null}
             {m.de === 'surco' && 'speechSynthesis' in window && <button className="fuente" onClick={() => leer(m.texto)}>Escuchar</button>}

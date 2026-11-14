@@ -91,7 +91,7 @@ details[open] .abrir::before { content: '− '; }
 .leyenda i.medido::after { content: ''; position: absolute; top: 2px; right: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--papel); box-shadow: 0 0 0 1px var(--tinta); }
 .estrategia > summary { list-style: none; cursor: pointer; }
 .estrategia > summary::-webkit-details-marker { display: none; }
-.campos { display: grid; gap: 0.9rem; margin-top: 0.9rem; padding-left: 0.9rem; border-left: 3px solid var(--linea); }
+.campos { display: grid; gap: 0.9rem; margin-top: 0.9rem; padding: 1rem; background: var(--papel-2); border-radius: var(--radio); }
 .campos h4 { margin: 0; font: 700 1rem/1.2 var(--texto); }
 .campos ul { margin: 0.2em 0 0; padding-left: 1.1em; }
 
