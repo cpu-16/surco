@@ -92,12 +92,17 @@ def _ae_cabecera():
     return {"Authorization": f"Bearer {r.json()['token']}"}
 
 
-def appeears(lat: float, lon: float, desde="2015-04-01") -> dict | None:
+def appeears(lat: float, lon: float, desde=f"{dt.date.today().year - 2}-01-01") -> dict | None:
+    # ponytail: 2 años y no desde 2015: la serie larga de HLS tardó horas en la cola de AppEEARS (14-nov); el pedido de Santiago desde 2015 sigue valiendo
     """Series del punto si el pedido ya terminó; si no, lo lanza (o lo sigue esperando) y devuelve None."""
     clave = f"appeears:{lat},{lon},{desde}"
     with _db() as c:
         c.execute("create table if not exists tareas(clave text primary key, id text, estado text, cuerpo text, t real)")
         row = c.execute("select id, estado, cuerpo from tareas where clave=?", (clave,)).fetchone()
+        # un pedido viejo del mismo punto (con otra fecha de inicio) sirve igual: no lanzar otro detrás en la cola
+        row = row or c.execute("select id, estado, cuerpo, clave from tareas where clave like ?", (f"appeears:{lat},{lon},%",)).fetchone()
+        if row and len(row) == 4:
+            clave, row = row[3], row[:3]
     if row and row[1] == "done":
         return json.loads(row[2])
     h = _ae_cabecera()

@@ -1,0 +1,16 @@
+[Unit]
+Description=Surco API (FastAPI)
+After=network-online.target
+
+[Service]
+User=surco
+WorkingDirectory=/opt/surco/api
+EnvironmentFile=/etc/claude-oauth.env
+Environment=CLAUDE_BIN=/home/surco/.local/bin/claude
+Environment=HOME=/home/surco
+ExecStart=/usr/local/bin/uv run --frozen uvicorn app:app --host 127.0.0.1 --port 8787
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
