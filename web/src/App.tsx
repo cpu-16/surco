@@ -5,7 +5,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEve
 import { flushSync } from 'react-dom'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
 import { EJEMPLO, local, pedir, sinImagenes, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
-import { Agua, FOTOS, Fotos, Importa, nombreDe, Patio } from './pasos'
+import { Agua, Fotos, fotosDe, Importa, nombreDe, Patio } from './pasos'
 import Cielo from './cielo'
 import Anio, { type Comparacion } from './anio'
 import { Cargando, Hoja, Icono } from './ui'
@@ -22,7 +22,7 @@ const PASOS: Paso[] = [
   { id: 'agua', corto: L('El agua', "Water"), titulo: L('¿El agua entra o se queda arriba?', "Does water soak in or stay on top?"), listo: (e) => e.infiltracion_min != null || !!e.charcos },
   { id: 'importa', corto: L('Lo tuyo', "Your needs"), titulo: L('¿Qué te importa más?', "What matters most to you?"), listo: (e) => e.prioridades.length > 0 },
   { id: 'anio', corto: L('Tu año', "Your year"), titulo: L('Así le iría a tu suelo', "How your soil could do"), listo: () => true },
-  { id: 'conversa', corto: L('Conversa', "Chat"), titulo: L('Pregunta o compártelo', "Ask or share"), listo: () => true },
+  { id: 'conversa', corto: L('Conversa', "Chat"), titulo: L('Pregúntale al asistente', 'Ask the assistant'), listo: () => true },
   { id: 'registro', corto: L('Registro', 'Record'), titulo: L('Tu registro del patio', 'Your yard record'), listo: (e) => !!e.id },
 ]
 const IDS = PASOS.map((p) => p.id)
@@ -31,7 +31,7 @@ const DONDE: Record<string, [number, TipoFoto?]> = { foto_cama: [2, 'cama'], fot
 
 const LLAVES = { exp: 'surco-expediente', lugar: 'surco-lugar', comp: 'surco-comp', vistos: 'surco-vistos', visto: 'surco-bienvenida' }
 type CacheLugar = { lat: number; lon: number; datos: Lugar }
-const cerca = (c: CacheLugar | null, e: Expediente) => !!c && Math.abs(c.lat - e.lat) < 0.005 && Math.abs(c.lon - e.lon) < 0.005
+const cerca = (c: { lat: number; lon: number } | null, e: Expediente) => !!c && Math.abs(c.lat - e.lat) < 0.005 && Math.abs(c.lon - e.lon) < 0.005
 
 function useEnLinea() {
   const [v, setV] = useState(navigator.onLine)
@@ -83,7 +83,7 @@ export default function App() {
     titulo.current?.focus({ preventScroll: true })
   }, [paso])
   useEffect(() => local.poner(LLAVES.vistos, vistos), [vistos])
-  const irA = (clave: string) => { const d = DONDE[clave]; if (d) ir(d[0], d[1] ? FOTOS.findIndex((f) => f.tipo === d[1]) : undefined) }
+  const irA = (clave: string) => { const d = DONDE[clave]; if (d) ir(d[0], d[1] ? fotosDe(exp).findIndex((f) => f.tipo === d[1]) : undefined) }
 
   /* ---------- el expediente vive en el celular ---------- */
   useEffect(() => local.poner(LLAVES.exp, exp), [exp])
@@ -129,14 +129,17 @@ export default function App() {
 
   /* ---------- la comparación se recalcula con cada dato de campo; sin señal queda la última ---------- */
   const claveComp = JSON.stringify({ ...sinImagenes(exp), nombre: '', id: '' })
-  const [comp, setComp] = useState<Comparacion | null>(() => local.leer<{ clave: string; datos: Comparacion }>(LLAVES.comp)?.datos ?? null)
+  // el cálculo guardado dice de qué punto es: sin señal nunca se muestra ni se guarda el de otro patio
+  type CacheComp = { clave: string; lat: number; lon: number; datos: Comparacion }
+  const [compGuardada, setComp] = useState<CacheComp | null>(() => local.leer<CacheComp>(LLAVES.comp))
+  const comp = cerca(compGuardada, exp) ? compGuardada!.datos : null
   const [compViejo, setCompViejo] = useState(false)
   useEffect(() => {
     if (!lugar) return
     let vivo = true
     pedir<Comparacion>('/api/comparar', { method: 'POST', body: JSON.stringify({ expediente: sinImagenes(exp), lang: idioma }) })
-      .then((c) => { if (!vivo) return; setComp(c); setCompViejo(false); local.poner(LLAVES.comp, { clave: claveComp, datos: c }) })
-      .catch(() => vivo && setCompViejo(local.leer<{ clave: string }>(LLAVES.comp)?.clave !== claveComp))
+      .then((c) => { if (!vivo) return; const g = { clave: claveComp, lat: exp.lat, lon: exp.lon, datos: c }; setComp(g); setCompViejo(false); local.poner(LLAVES.comp, g) })
+      .catch(() => vivo && setCompViejo(local.leer<CacheComp>(LLAVES.comp)?.clave !== claveComp))
     return () => { vivo = false }
   }, [claveComp, lugar?.punto.lat, lugar?.punto.lon, enLinea]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -186,7 +189,7 @@ export default function App() {
             {p.id === 'fotos' && <Fotos exp={exp} cambiar={cambiar} sub={subFoto} setSub={setSubFoto} />}
             {p.id === 'agua' && <Agua exp={exp} cambiar={cambiar} />}
             {p.id === 'importa' && <Importa exp={exp} cambiar={cambiar} />}
-            {p.id === 'anio' && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} />}
+            {p.id === 'anio' && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} enLinea={enLinea} />}
             {p.id === 'conversa' && <Suspense fallback={<Cargando texto={L("Abriendo…", "Opening…")} />}><Conversa exp={exp} lugar={lugar} comp={comp} cambiar={cambiar} enLinea={enLinea} /></Suspense>}
             {p.id === 'registro' && <Registro exp={exp} cambiar={cambiar} comp={comp} lugar={lugar} enLinea={enLinea} nombreCultivo={nombreDe} />}
           </motion.section>

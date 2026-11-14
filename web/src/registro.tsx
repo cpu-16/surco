@@ -30,8 +30,12 @@ function resultadoDe(comp: Comparacion | null, lugar: Lugar | null): Resultado |
 function linea(e: ExpRegistro, nombreCultivo: (c: string) => string, ajeno = false) {
   const items: { fecha: string; texto: string; quien?: string }[] = []
   for (const [c, m] of Object.entries(e.siembras ?? {})) if (m) items.push({ fecha: m, texto: L(`Sembraste ${nombreCultivo(c).toLowerCase()} (${MES(m)})`, `You planted ${nombreCultivo(c).toLowerCase()} (${MES(m)})`) })
-  const LUGAR: Record<string, string> = { cama: L('el huerto', 'the garden plot'), perennes: L('debajo de los árboles', 'under the trees'), pina: L('una piña', 'a pineapple'), general: L('el patio entero', 'the whole yard') }
-  for (const f of e.fotos ?? []) items.push({ fecha: f.fecha, texto: L(`Foto de ${LUGAR[f.tipo]}: ${f.cobertura} % del suelo tapado por planta verde`, `Photo of ${LUGAR[f.tipo]}: ${f.cobertura}% of the soil covered by green plants`) })
+  const LUGAR: Record<string, string> = { cama: L('el huerto', 'the garden plot'), perennes: L('debajo de los árboles', 'under the trees'), pina: L('una planta', 'a plant'), general: L('el patio entero', 'the whole yard') }
+  for (const f of e.fotos ?? []) {
+    const suelo = f.tipo === 'cama' || f.tipo === 'perennes' // las otras son de consulta: lo verde de la foto no es suelo tapado
+    items.push({ fecha: f.fecha, texto: suelo ? L(`Foto de ${LUGAR[f.tipo]}: ${f.cobertura} % del suelo tapado por planta verde`, `Photo of ${LUGAR[f.tipo]}: ${f.cobertura}% of the soil covered by green plants`)
+      : L(`Foto de ${LUGAR[f.tipo]}${f.descripcion ? `: ${f.descripcion}` : ''}`, `Photo of ${LUGAR[f.tipo]}${f.descripcion ? `: ${f.descripcion}` : ''}`) })
+  }
   for (const n of e.notas ?? []) items.push({ fecha: n.fecha.slice(0, 10), texto: n.texto, quien: n.quien === 'tecnico' ? (n.nombre || L('Técnico', 'Advisor')) : ajeno ? L('Productor', 'Grower') : L('Tú', 'You') })
   if (e.resultado) items.push({ fecha: e.resultado.fecha, texto: L('Guardaste la comparación de ese día', 'You saved that day’s comparison') })
   return items.sort((a, b) => b.fecha.localeCompare(a.fecha))
@@ -48,6 +52,12 @@ export function Registro({ exp, cambiar, comp, lugar, enLinea, nombreCultivo }: 
   const [estado, setEstado] = useState<'' | 'guardando' | 'listo' | string>('')
   const enlace = exp.id ? `${location.origin}/?e=${exp.id}` : ''
   const mio = !exp.id || !!claveDe(exp.id)
+  // las notas que deja el técnico por el enlace viven en el servidor: se traen al abrir el registro
+  const traerNotas = () => exp.id && pedir<{ datos: Expediente }>(`/api/expediente/${encodeURIComponent(exp.id)}`).then((r) => {
+    const mias = exp.notas ?? [], nuevas = (r.datos.notas ?? []).filter((n) => !mias.some((m) => m.fecha === n.fecha && m.texto === n.texto))
+    if (nuevas.length) cambiar({ notas: [...mias, ...nuevas].sort((x, y) => x.fecha.localeCompare(y.fecha)) })
+  }).catch(() => { /* sin señal: quedan las de este celular */ })
+  useEffect(() => { if (enLinea) traerNotas() }, [exp.id, enLinea]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const guardar = async () => {
     setEstado('guardando')
@@ -185,7 +195,7 @@ export function VistaRegistro({ id, nombreCultivo }: { id: string; nombreCultivo
           {r.lectura.map((t, i) => <p key={i} className={i ? 'nota' : ''}>{t}</p>)}
           <table className="tabla-reg">
             <thead><tr><th>{L('Opción', 'Option')}</th><th>{L('Meses pelado: huerto / árboles', 'Bare months: plot / trees')}</th><th>{L('Agua que falta en la seca', 'Water short in the dry season')}</th></tr></thead>
-            <tbody>{r.estrategias.map((e) => <tr key={e.id} data-elegida={e.id === exp.ficha?.decision}><td>{e.nombre}</td><td>{e.desnudo_cama} / {e.desnudo_arboles}</td><td>{e.deficit_normal_mm} mm ({L('Niño', 'El Niño')}: {e.deficit_nino_mm})</td></tr>)}</tbody>
+            <tbody>{r.estrategias.map((e) => <tr key={e.id} data-elegida={e.id === exp.ficha?.decision}><td>{e.nombre}</td><td>{e.desnudo_cama ?? '—'} / {e.desnudo_arboles}</td><td>{e.deficit_normal_mm === null ? L('No aplica', 'N/A') : <>{e.deficit_normal_mm} mm ({L('Niño', 'El Niño')}: {e.deficit_nino_mm})</>}</td></tr>)}</tbody>
           </table>
           <p className="nota">{L('Datos:', 'Data:')} {r.fuentes.join('; ')}.{r.version && ` ${L('Reglas', 'Rules')} ${r.version}.`}</p>
         </>

@@ -150,7 +150,7 @@ NOMBRES_EN = {"yuca": "Cassava", "caupi": "Cowpea", "camote": "Sweet potato", "c
 CLASES_INFIL_EN = ["very rapid", "rapid", "moderately rapid", "moderate", "moderately slow", "slow", "very slow"]
 
 
-VERSION_CALCULO = "2026-11-15a"  # se guarda en cada registro: dice con qué reglas salió la comparación
+VERSION_CALCULO = "2026-11-15b"  # se guarda en cada registro: dice con qué reglas salió la comparación
 
 
 def _texto(es, en, lang):
@@ -252,8 +252,8 @@ def _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang):
         beneficio = t('Las hojas protegen el suelo y ayudan a conservar la humedad en los meses secos.', 'Leaves protect the soil and help retain moisture during dry months.')
     elif id == 'rotar':
         otros = _lista([nom(o) for _,_,o,s2 in siguientes if s2 is not None], lang)
-        secuencia = nom(leg) + (t(f' y luego {otros}', f' and then {otros}') if otros else '')
-        nombre = t(f'Rotar: {secuencia} después de {cosecha}', f'Rotate: {secuencia} after {cosecha}') if cortos else t('Conservar los perennes y tapar el suelo', 'Keep perennials and cover the soil')
+        secuencia = nom(leg) + (t(f', luego {otros}', f', then {otros}') if otros else '')
+        nombre = t(f'Rotar: {secuencia}', f'Rotate: {secuencia}') if cortos else t('Conservar los perennes y tapar el suelo', 'Keep perennials and cover the soil')
         razon = t(f'Después de cosechar {cosecha}, esperar las lluvias para cambiar de familia. Mientras el terreno está libre, {hojas}.', f'After harvesting {cosecha}, wait for rain before changing crop families. While the ground is free, {hojas}.') if cortos else t(f'No hay cultivos de ciclo corto para rotar; se propone {hojas}, sin cambiar los perennes.', f'There are no short-cycle crops to rotate; {hojas}, keeping the perennials.')
         # Agrupa siembras iguales por cultivo y fecha aunque ocupen varias camas.
         eventos = sorted({(s,l) for l,s,_,_ in siguientes} | {(s2,o) for _,_,o,s2 in siguientes if s2 is not None})
@@ -323,11 +323,11 @@ def _generar(exp, normales, i0, lang):
                 'Water is the average of equal-area short-cycle beds; it excludes trees, perennials, irrigation and water savings from leaves. It is not an irrigation dose.'),
               t('Sin análisis de suelo no se conoce el nitrógeno disponible; la fijación publicada no equivale a fertilizante disponible.',
                 'Without a soil test, available nitrogen is unknown; published fixation is not equivalent to available fertilizer.')]
-    vacios += [t(f'{x}: cultivo sin datos; se conserva en plantas pero no entra en los cálculos.',
-                 f'{x}: crop without data; retained in plants but excluded from calculations.') for x in desconocidos]
+    vacios += [t(f'{x}: cultivo sin datos, sin cálculo; se conserva en plantas pero no entra en los cálculos.',
+                 f'{x}: crop without data, not calculated; retained in plants but excluded from calculations.') for x in desconocidos]
     if not conocidos:
-        vacios.append(t('No hay cultivos reconocidos: los ceros no significan ausencia de necesidad de agua.',
-                        'No crops were recognized: zeros do not mean there is no need for water.'))
+        vacios.append(t('No hay cultivos reconocidos: sin cálculo de agua.',
+                        'No crops were recognized: water is not calculated.'))
     if perennes:
         vacios.append(t('Se conservan los perennes; la tira muestra las camas de ciclo corto y arboles muestra solo el suelo bajo las copas.',
                         'Perennials are retained; the strip shows short-cycle beds and arboles shows only the ground beneath canopies.'))
@@ -370,7 +370,11 @@ def _generar(exp, normales, i0, lang):
                 s = _ventana(fin, temporada)
                 if s is not None and s < i0 + 12:
                     cultivo = _ocupa(leg, s, 80 if leg == 'canavalia' else None, lang)
-                    cama.update(cultivo); pasos.append({'cultivo': leg, 'siembra': s})
+                    cama.update(cultivo)
+                    paso = {'cultivo': leg, 'siembra': s}
+                    if AGRO['cultivos'][leg]['tipo'] == 'cobertura':
+                        paso.update(corte=max(cultivo) + 1, abono_verde=True)
+                    pasos.append(paso)
                     # Otra familia tanto respecto a la leguminosa como al cultivo anterior.
                     otro = next(x for x in cortos + ['camote', 'maiz', 'zapallo']
                                 if AGRO['cultivos'][x]['familia'] not in {AGRO['cultivos'][c]['familia'], 'Fabaceae'})
@@ -382,9 +386,9 @@ def _generar(exp, normales, i0, lang):
                         s2 = None
                     siguientes.append((leg, s, otro, s2))
             else:
-                if id != "viva":
-                    for s in range(inicio + periodo, i0 + 12, periodo):
-                        cama.update(_ocupa(c, s, lang=lang))
+                for s in range(inicio + periodo, i0 + 12, periodo):
+                    cama.update(_ocupa(c, s, lang=lang))
+                    pasos.append({'cultivo': c, 'siembra': s, 'repeticion': True})
                 if id == 'viva':
                     # En cada hueco libre: no arranca la comida ni pisa la próxima siembra.
                     for s in range(max(i0, fin), i0 + 12):
@@ -394,7 +398,7 @@ def _generar(exp, normales, i0, lang):
                             for k, v in _ocupa(viva, s, corte, lang).items():
                                 if k < libre:
                                     cama[k] = v
-                            pasos.append({'cultivo': viva, 'siembra': s})
+                            pasos.append({'cultivo': viva, 'siembra': s, 'corte': max(k for k in cama if s <= k < libre) + 1, 'abono_verde': True})
             camas.append(cama)
         vac = list(vacios)
         usados = list(dict.fromkeys(conocidos + [p['cultivo'] for p in pasos] + (['mani_forrajero'] if arboles and id == 'viva' else [])))
@@ -410,6 +414,9 @@ def _generar(exp, normales, i0, lang):
             if faltas and c not in perennes:
                 vac.append(f'{nombre_cultivo(c, lang)}: ' + '; '.join(faltas) + '.')
         nombre, razon, beneficios = _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang)
+        if id == 'viva' and cortos and not any(p.get('abono_verde') for p in pasos):
+            razon += t(' No cabe cobertura viva en los meses libres antes de la próxima siembra.',
+                       ' Living cover does not fit in the free months before the next planting.')
         riesgos = [t('Revisa las plagas compartidas, el drenaje y la adaptación local antes de cambiar de cultivo.',
                      'Check shared pests, drainage and local adaptation before changing crops.')]
         if id != 'actual':
@@ -446,6 +453,33 @@ def _mezclar(camas, idx, hojas, lang):
             'kc':mean(f['kc'] for f in filas), 'cobertura':min((f['cobertura'] for f in filas), key=NIVEL.get)}
 
 
+def _foto_mes(foto):
+    try:
+        fecha = dt.date.fromisoformat(foto['fecha'][:10])
+        return fecha.year * 12 + fecha.month - 1
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _foto_cobertura(foto):
+    cob = _cobertura_foto(foto['cobertura'])
+    minimo = {'mucha': 'media', 'poca': 'baja'}.get(foto.get('hojarasca'), 'desnudo')
+    return max((cob, minimo), key=NIVEL.get)
+
+
+def _primera_comida(pasos, i0):
+    cosechas = []
+    for p in pasos:
+        c = AGRO['cultivos'][p['cultivo']]
+        if c['tipo'] == 'cobertura' or p.get('abono_verde') or not c.get('ciclo_dias'):
+            continue
+        # El catálogo define ciclo_dias hasta primera cosecha; extremo conservador.
+        mes = p['siembra'] + max(1, round(max(c['ciclo_dias']) / 30.4))
+        if mes >= i0:
+            cosechas.append(mes - i0)
+    return min(cosechas) if cosechas else None
+
+
 def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.date | None = None, lang="es") -> dict:
     t = lambda es, en: _texto(es, en, lang)
     hoy = hoy or dt.date.today()
@@ -465,10 +499,11 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             mes = idx % 12 + 1
             m = _mezclar(e['_camas'], idx, e['huecos'] == 'acolchado', lang)
             m = {**m, "mes": mes}
-            if idx == i0 and "cama" in fotos:  # el dato de campo manda sobre el supuesto en el mes de la foto
-                m["cobertura"] = _cobertura_foto(fotos["cama"]["cobertura"])
+            if "cama" in fotos and idx == _foto_mes(fotos["cama"]):  # el dato de campo manda sobre el supuesto en el mes de la foto
+                m["cobertura"] = _foto_cobertura(fotos["cama"])
                 m["medido"] = True
-            tira.append(m)
+            if e['_camas']:
+                tira.append(m)
             a = {"mes": mes, "cultivo": None}
             if e["arboles"] == "mani_forrajero":
                 siembra = _ventana(i0, temporada)
@@ -480,30 +515,18 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
                 a.update(nombre=None, cobertura="desnudo")
             if e["_tiene_arboles"]:
                 arboles.append(a)
-        # la foto debajo de los árboles corrige el supuesto de la estrategia actual
-        if e["id"] == "actual" and e["_tiene_arboles"] and "perennes" in fotos:
-            pct = fotos["perennes"]["cobertura"]
-            hoj = fotos["perennes"].get("hojarasca")
-            cob = _cobertura_foto(pct)
-            if hoj == "mucha" and NIVEL[cob] < 2:
-                cob = "media"
-            elif hoj == "poca" and NIVEL[cob] < 1:
-                cob = "baja"
-            if cob != "desnudo":
-                for k, a in enumerate(arboles):  # se mide este mes; los demás se suponen iguales hasta la próxima foto
-                    a.update(nombre=t("hojarasca", "leaf litter") if hoj in ("mucha", "poca") else t("plantas", "plants"), cobertura=cob, medido=k == 0)
-                ajustes.append(t(f"Tu foto debajo de los árboles midió {pct}% de planta verde"
-                               + (f" y dijiste que hay {hoj} hojarasca" if hoj else "")
-                               + ". Ya no se cuenta como suelo desnudo.",
-                               f"Your photo under the trees measured {pct}% green plant cover"
-                               + (f" and you reported { {'mucha': 'plenty of', 'poca': 'a little', 'nada': 'no'}.get(hoj, hoj)} leaf litter" if hoj else "")
-                               + ". It is no longer counted as bare soil."))
-            else:
-                ajustes.append(t(f"Tu foto confirma el suelo desnudo debajo de los árboles ({pct}% de planta verde). El satélite no lo puede ver porque mira la copa.", f"Your photo confirms bare soil under the trees ({pct}% green plant cover). The satellite cannot see it because it sees the tree canopy."))
+        if e['id'] == 'actual' and e['_tiene_arboles'] and 'perennes' in fotos:
+            foto = fotos['perennes']
+            for idx, a in zip(horizonte, arboles):
+                if idx == _foto_mes(foto):
+                    a.update(cobertura=_foto_cobertura(foto), medido=True,
+                             nombre=t('hojarasca y plantas', 'leaf litter and plants'))
         # agua: lo que pide el cultivo de la cama contra la lluvia efectiva, en año normal y en uno como los Niños
         seca = [m for m in tira if m["mes"] in temporada["meses_secos"]]
 
         def deficit(factor):  # seca derivada de las normales locales
+            if not tira:
+                return None
             tot = 0
             for m in seca:
                 n = normal_por_mes[m["mes"]]
@@ -515,44 +538,46 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             presentes.append('mani_forrajero')
         n_fij = [AGRO['cultivos'][c]['fija_n_kg_ha'] for c in presentes if AGRO['cultivos'][c].get('fija_n_kg_ha')]
         familias = {AGRO['cultivos'][c]['familia'] for c in presentes}
-        desn_cama = sum(m["cobertura"] == "desnudo" for m in tira)
+        desn_cama = sum(m["cobertura"] == "desnudo" for m in tira) if tira else None
         desn_arb = sum(a["cobertura"] == "desnudo" for a in arboles)
         riesgos = list(e["riesgos"])
-        # la lata manda; si no hay lata, la pregunta de los charcos dice al menos si el agua se queda arriba
-        lento = (infil is not None and infil >= 100) or exp.get("charcos") == "si"
-        if lento:
-            dato = (t(f"El agua tardó {infil:g} minutos en entrar en tu lata (infiltración {clase_infiltracion(infil)})", f"The water took {infil:g} minutes to soak into the soil in your can ({clase_infiltracion(infil, lang)} infiltration)") if infil is not None
-                    else t("Dices que después de un aguacero quedan charcos", "You report puddles after heavy rain"))
-            riesgos.append(t(f"{dato}: el agua se queda arriba. Los cultivos sensibles al encharcamiento pueden sufrir; revisa el drenaje y considera camas elevadas.", f"{dato}: water stays on the surface. Crops sensitive to waterlogging may suffer; check drainage and consider raised beds."))
-            if e["id"] == "viva":
-                ajustes.append(t(f"{dato}. La cobertura viva puede ayudar a mejorar la estructura del suelo; no sustituye corregir el drenaje.", f"{dato}. Living cover may help improve soil structure; it does not replace fixing drainage."))
-        elif infil is not None and infil < 10 and e["huecos"] == "acolchado":
-            ajustes.append(t(f"El agua entró {clase_infiltracion(infil)} en tu lata ({infil:g} minutos): drena bien pero guarda poca humedad. "
-                           "Tapar el suelo ayuda en los meses secos: por cada 10 % de suelo tapado con hojas se seca ~5 % menos (FAO-56).",
-                           f"Water soaked into the soil in your can at a {clase_infiltracion(infil, lang)} rate ({infil:g} minutes). It drains well but holds little moisture. "
-                           "Covering the soil helps during dry months. For every 10% covered with leaves, soil evaporation drops by about 5% (FAO-56)."))
+        if infil is not None:
+            ajustes.append(t(f'La lata midió infiltración {clase_infiltracion(infil)} ({infil:g} minutos).',
+                             f'The can measured {clase_infiltracion(infil, lang)} infiltration ({infil:g} minutes).'))
+        if exp.get('charcos') == 'si':
+            riesgos.append(t('Observaste charcos después de la lluvia; revisa el drenaje en esos puntos.',
+                             'You observed puddles after rain; check drainage at those spots.'))
+        if infil is not None and infil >= 100:
+            riesgos.append(t('La infiltración medida es lenta; revisa el drenaje y considera camas elevadas.',
+                             'Measured infiltration is slow; check drainage and consider raised beds.'))
         evid = e["evidencia"] + (["USDA"] if infil is not None else []) + (["F56M"] if e["huecos"] == "acolchado" else [])
         res.append({
             "id": e["id"], "nombre": e["nombre"], "aplica_a": t("huerto y árboles", "garden plot and trees") if e["_tiene_arboles"] else t("huerto", "garden plot"),
-            "tira": tira, "arboles": arboles, "meses_desnudo": desn_cama + desn_arb,
+            "tira": tira, "arboles": arboles, "meses_desnudo": (desn_cama or 0) + desn_arb,
             "desnudo_cama": desn_cama, "desnudo_arboles": desn_arb,
             "n_kg_ha": [sum(x[0] for x in n_fij), sum(x[1] for x in n_fij)] if n_fij else None,  # ponytail: solo para ordenar; la pantalla usa n_por_planta
             "n_por_planta": [{"nombre": nombre_cultivo(c, lang), "kg_ha": AGRO["cultivos"][c]["fija_n_kg_ha"]}
                              for c in presentes
                              if AGRO["cultivos"][c].get("fija_n_kg_ha")],
             "familias": len(familias),
-            "agua": {"demanda_seca_mm": round(sum(m["kc"] * normal_por_mes[m["mes"]]["et0"] for m in seca)),
+            "agua": {"demanda_seca_mm": round(sum(m["kc"] * normal_por_mes[m["mes"]]["et0"] for m in seca)) if tira else None,
                      "deficit_normal_mm": deficit(None), "deficit_nino_mm": deficit(pct_nino)},
             # nombre científico al lado: en otro país la misma planta se llama distinto
             "plantas": [{"nombre": nombre_cultivo(c, lang), "cientifico": AGRO["cultivos"][c]["cientifico"]}
                         for c in e["_plantas"]] + [{"nombre": c, "cientifico": None} for c in e["_desconocidos"]],
-            "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"]
-                      + ([t("Se supone que lo que muestra tu foto de hoy debajo de los árboles se mantiene todo el año.", "We assume what today's photo under the trees shows stays the same all year.")]
-                         if e["id"] == "actual" and e["_tiene_arboles"] and "perennes" in fotos else []),
+            "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"],
+            "comida_meses": _primera_comida(e['cama'], i0),
+            # Una aplicación inicial de hojas por cama/sotobosque; no se inventan reposiciones.
+            "labores": {
+                "siembras": sum(i0 <= p['siembra'] < i0 + 12 for p in e['cama'])
+                    + int(e['_tiene_arboles'] and e['id'] == 'viva' and _ventana(i0, temporada) is not None),
+                "tapar_hojas": (len(e['_camas']) + int(e['_tiene_arboles'])) if e['id'] != 'actual' else 0,
+                "cortes": sum(i0 <= p.get('corte', -1) < i0 + 12 for p in e['cama']),
+            },
             "riesgos": riesgos, "ajustes": [a for a in ajustes if a],
             "evidencia": [{"id": k, "titulo": AGRO["fuentes"][k]["titulo"], "url": AGRO["fuentes"][k]["url"]} for k in dict.fromkeys(evid) if k in AGRO["fuentes"]],
         })
-    return {"version": VERSION_CALCULO, "estrategias": res, "faltan": faltan(exp, lang), "lectura": lectura(res, prior, lang, (infil is not None and infil >= 100) or exp.get("charcos") == "si")}
+    return {"temporada": temporada, "version": VERSION_CALCULO, "estrategias": res, "faltan": faltan(exp, lang), "lectura": lectura(res, prior, lang, (infil is not None and infil >= 100) or exp.get("charcos") == "si")}
 
 
 def lectura(res, prior, lang="es", lento=False):
@@ -560,28 +585,39 @@ def lectura(res, prior, lang="es", lento=False):
     t = lambda es, en: _texto(es, en, lang)
     agua = {(r['agua']['deficit_normal_mm'], r['agua']['deficit_nino_mm']) for r in res}
     nota_agua = []
-    if agua == {(0, 0)}:
-        if all(r['agua']['demanda_seca_mm'] == 0 for r in res):
-            nota_agua = [t('El huerto no tiene cultivo en los meses secos del calendario calculado, así que no hace falta riego para esas camas en ese periodo. Esto no incluye los árboles ni los cultivos sin datos.',
-                           'The garden has no crop during the dry months in the calculated calendar, so those beds need no irrigation in that period. This excludes trees and crops without data.')]
-        else:
-            nota_agua = [t('La lluvia efectiva cubre la demanda calculada del huerto en los meses secos; no se estima déficit de agua.',
-                           'Effective rainfall covers the calculated garden demand during dry months; no water deficit is estimated.')]
-    elif len(agua) == 1:
+    if agua == {(None, None)}:
+        nota_agua = [t('Sin cálculo de agua: no hay camas de ciclo corto conocidas; huerto no aplica.',
+                       'Water not calculated: no known short-cycle beds; garden does not apply.')]
+    elif agua == {(0, 0)} and all(r['agua']['demanda_seca_mm'] == 0 for r in res):
+        nota_agua = [t('En los meses secos las camas de ciclo corto están vacías, así que no les falta agua. No cuenta los árboles.',
+                       'In the dry months the garden plot has no short-cycle crop, so it is not short of water. Trees are not counted.')]
+    elif len(agua) == 1:  # si difieren, cada tarjeta ya trae su número
         normal, nino = next(iter(agua))
-        nota_agua = [t(f'En agua salen iguales este año: durante los meses secos se estima un déficit de {normal} mm con lluvia normal y {nino} mm con lluvia como la de los Niños anteriores.',
-                       f'All options have the same estimated water deficit this year: {normal} mm during dry months with normal rainfall and {nino} mm with rainfall like past El Niño events.')]
+        nota_agua = [t(f'Las cuatro dan el mismo déficit de agua en los meses secos: {normal} mm en un año normal y {nino} mm si llueve como en un Niño. Es solo para las camas de ciclo corto: no cuenta árboles, perennes, riego ni el ahorro por hojas.',
+                       f'All four have the same water deficit in the dry months: {normal} mm in a normal year and {nino} mm if it rains like in an El Niño year. It covers only the short-cycle beds: not trees, perennials, watering or the water leaves save.')]
     if lento:
         viva = next(r for r in res if r['id'] == 'viva')
-        nota_agua.append(t(f"Para los charcos o la infiltración lenta, {viva['nombre']} es la opción que más puede ayudar a la estructura con raíces y suelo protegido. Revisa también el drenaje; no se calculó una mejora de infiltración.",
-                           f"For puddles or slow infiltration, {viva['nombre']} may help soil structure the most through roots and protected soil. Also check drainage; no infiltration improvement was calculated."))
+        nota_agua.append(t(f"Si quedan charcos, {viva['nombre']} es la que más puede ayudar, con raíces y suelo tapado. Revisa también el drenaje.",
+                           f"If puddles remain, {viva['nombre']} may help the most, with roots and covered soil. Also check drainage."))
     if not prior:
         return [t("Escoge qué te importa más (paso 5) y te digo cuál sale mejor para ti.", "Choose what matters most to you (step 5) to see which option fits you best.")] + nota_agua
+    explicaciones = {
+        'suelo': t('Suelo: meses pelado, nitrógeno de las leguminosas y variedad de plantas.', 'Soil: bare months, nitrogen from legumes and plant variety.'),
+        'agua': t('Agua: lo que falta en la seca si llueve como en un Niño.', 'Water: shortfall in the dry season if it rains like in an El Niño year.'),
+        'comida': t('Comida: meses hasta la primera cosecha que se come.', 'Food: months until the first harvest you can eat.'),
+        'trabajo': t('Trabajo: siembras, tapadas con hojas y cortes en el año.', 'Work: plantings, leaf mulching and cuts in the year.'),
+        'venta': t('Venta no se calcula: no hay datos de mercado.', 'Sales are not calculated: no market data.'),
+    }
+    medido = [explicaciones[p] for p in dict.fromkeys(prior) if p in explicaciones]
+    nota_agua += [' '.join(medido)] if medido else []
     crit = {"suelo": lambda r: (r["meses_desnudo"], -(r["n_kg_ha"] or [0, 0])[0], -r["familias"]),
             "agua": lambda r: (r["agua"]["deficit_nino_mm"],),
-            "trabajo": lambda r: (len([1 for a, b in zip(r["tira"], r["tira"][1:]) if a.get("cultivo") != b.get("cultivo") and b.get("cultivo")]),),
-            "comida": lambda r: (-len({m["cultivo"] for m in r["tira"] if m["cultivo"]}),),
-            "venta": lambda r: (0,)}
+            "trabajo": lambda r: (sum(r['labores'].values()),),
+            "comida": lambda r: (r['comida_meses'],)}
+    # No ordenar valores desconocidos como si fueran cero o peores que un dato conocido.
+    prior = [p for p in prior if p in crit and all(None not in crit[p](r) for r in res)]
+    if not prior:
+        return nota_agua
     puntos = {r["id"]: 0 for r in res}
     for p in prior:
         if p in crit:
@@ -603,7 +639,7 @@ def faltan(exp, lang="es"):
                     "cambia": t("El satélite ve la copa verde de los árboles, no el suelo de abajo. Tu foto dice si ahí hay suelo desnudo.", "The satellite sees the green tree canopy, not the soil underneath. Your photo shows whether that soil is bare.")})
     if "cama" not in f:
         out.append({"clave": "foto_cama", "texto": t("Foto del suelo del huerto", "Photo of the soil in the garden plot"), "cambia": t("Mide cuánto suelo está tapado este mes.", "Shows how much soil is covered this month.")})
-    if exp.get("infiltracion_min") is None and not exp.get("charcos"):
+    if exp.get("charcos") == "nose" or (exp.get("infiltracion_min") is None and exp.get("charcos") not in ("si", "no")):
         out.append({"clave": "infiltracion", "texto": t("Si quedan charcos después de un aguacero", "Whether puddles remain after heavy rain"), "cambia": t("Dice si el agua entra o se queda arriba; eso decide entre raíz honda y tapar con hojas.", "Shows whether water soaks in or stays on top. This helps choose between deep roots and covering the soil with leaves.")})
     if any(AGRO["cultivos"][c]["tipo"] != "perenne" and c not in {buscar_cultivo(k) for k in exp.get("siembras", {})} for c in _seleccion(exp)[0]):
         out.append({"clave": "parcela", "texto": t("Cuándo sembraste tus cultivos", "When you planted your crops"), "cambia": t("Mueve el mes en que el huerto queda libre para lo siguiente.", "Changes the month when the garden plot becomes free for the next crop.")})

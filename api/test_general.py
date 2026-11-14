@@ -54,16 +54,16 @@ def main():
              ({'lat':17.4,'lon':78.5,'cultivos':['tomate','ñajú','mango']},india),
              ({'cultivos':['xyz']},n), ({'cultivos':[]},n),
              ({'cultivos':['coco']},n), ({'cultivos':['papa'],'elevacion_m':2000},n)]
-    campos = {'id','nombre','aplica_a','tira','arboles','meses_desnudo','desnudo_cama','desnudo_arboles','n_kg_ha','n_por_planta','familias','agua','plantas','razon','beneficios','vacios','riesgos','ajustes','evidencia'}
+    campos = {'id','nombre','aplica_a','tira','arboles','meses_desnudo','desnudo_cama','desnudo_arboles','n_kg_ha','n_por_planta','familias','agua','plantas','razon','beneficios','vacios','riesgos','ajustes','evidencia','comida_meses','labores'}
     for exp, clima in casos:
         es = motor.comparar(exp,clima,ni,HOY)
         en = motor.comparar(exp,clima,ni,HOY,lang='en')
         assert numerico(es) == numerico(en)
-        assert es['version'] == '2026-11-15a'
+        assert es['version'] == '2026-11-15b'
         assert [e['id'] for e in es['estrategias']] == ['actual','tapar','rotar','viva']
         for e in es['estrategias']:
             assert set(e) == campos
-            assert len(e['tira']) == 12
+            assert len(e['tira']) == (12 if any(motor.AGRO['cultivos'][c]['tipo'] != 'perenne' for c in motor._seleccion(exp)[0]) else 0)
             assert all(set(m) >= {'mes','cultivo','nombre','cobertura','kc'} for m in e['tira'])
             assert all(x['cientifico'] for x in e['plantas'] if x['nombre'] != 'xyz')
         if exp.get('lon') == 37.26:
@@ -76,7 +76,7 @@ def main():
         if exp.get('cultivos') == ['xyz']:
             assert all(any('xyz' in v and 'no entra' in v for v in e['vacios']) for e in es['estrategias'])
             assert all(e['plantas'] == [{'nombre':'xyz','cientifico':None}] for e in es['estrategias'])
-            assert all(e['agua']['demanda_seca_mm'] == 0 for e in es['estrategias'])
+            assert all(e['agua']['demanda_seca_mm'] is None for e in es['estrategias'])
         if exp.get('elevacion_m'):
             assert 'frijol común' in es['estrategias'][2]['nombre']
     assert motor.buscar_cultivo(' AHUYAMA ') == 'zapallo'
@@ -89,9 +89,9 @@ def main():
     b = motor.comparar({'cultivos':['frijol_comun'],'siembras':{'frijol_comun':'2026-10'}},kenya,[],HOY)['estrategias'][0]
     assert all(abs(m['kc'] - (x['kc']+y['kc'])/2) < 1e-9 for m,x,y in zip(mix['tira'],a['tira'],b['tira']))
     # Fotos y charcos conservan su efecto, incluso con infiltración rápida declarada.
-    foto = {**SANTIAGO,'charcos':'si','infiltracion_min':2,'fotos':[{'tipo':'perennes','cobertura':5,'hojarasca':'mucha'},{'tipo':'cama','cobertura':45}]}
+    foto = {**SANTIAGO,'charcos':'si','infiltracion_min':2,'fotos':[{'tipo':'perennes','fecha':'2026-11-14','cobertura':5,'hojarasca':'mucha'},{'tipo':'cama','fecha':'2026-11-14','cobertura':45}]}
     r = motor.comparar(foto,n,ni,HOY)
-    assert r['estrategias'][0]['desnudo_arboles'] == 0
+    assert r['estrategias'][0]['desnudo_arboles'] == 11
     assert r['estrategias'][0]['arboles'][0]['medido']
     assert all(e['tira'][0]['medido'] and e['tira'][0]['cobertura'] == 'media' for e in r['estrategias'])
     assert any(r['estrategias'][3]['nombre'] in x for x in r['lectura'])
@@ -107,7 +107,8 @@ def main():
         planes = motor._generar(exp,clima,HOY.year*12+HOY.month-1,'es')
         assert leg in [p['cultivo'] for p in planes[2]['cama']]
     rr = motor.comparar(SANTIAGO,n,ni,HOY)['estrategias']
-    assert any(m['cultivo'] == 'guandu' for m in rr[3]['tira'])
+    assert all(b['cultivo'] == a['cultivo'] for a,b in zip(rr[0]['tira'],rr[3]['tira']) if a['cultivo'])
+    assert 'No cabe cobertura viva' in rr[3]['razon']
     assert all(a['cultivo'] == b['cultivo'] and a['kc'] == b['kc'] for a,b in zip(rr[0]['tira'],rr[1]['tira']))
     assert rr[0]['agua'] == rr[1]['agua']  # no atribuir ahorro numérico no modelado a hojas
     assert len(ni) == 12 and {x['mes'] for x in ni} == set(range(1,13))
@@ -127,7 +128,7 @@ def main():
         planes = motor._generar(exp,clima,i0,'es')
         for plan in planes[2:]:
             for paso in plan['cama']:
-                if not paso.get('existente'):
+                if not paso.get('existente') and not paso.get('repeticion'):
                     assert paso['siembra'] % 12 + 1 in humedos, paso
                     assert paso['siembra'] < i0 + 12
             for campo in ('beneficios','riesgos','vacios'):
@@ -145,7 +146,7 @@ def main():
                 assert cambio['mes'] in humedos
     santiago = motor.comparar(SANTIAGO,n,ni,HOY)['estrategias']
     assert santiago[0]['nombre'] == 'Lo que haces hoy: yuca tras yuca'
-    assert santiago[2]['nombre'] == 'Rotar: frijol de bejuco y luego camote después de la yuca'
+    assert santiago[2]['nombre'] == 'Rotar: frijol de bejuco, luego camote'
     assert santiago[3]['nombre'] == 'Guandú en el huerto y maní forrajero bajo los árboles'
     for e in santiago:
         assert all(c not in e['nombre'].lower() + e['razon'].lower() for c in ('piña','plátano','cacao','naranja','toronja'))
@@ -167,15 +168,76 @@ def main():
         assert all('guandú' not in e['nombre'].lower() and 'pigeon pea' not in e['nombre'].lower() for e in arboles['estrategias'])
         texto = ' '.join(arboles['lectura'])
         assert '0 mm' not in texto
-        assert ('no hace falta riego' if lang == 'es' else 'need no irrigation') in texto
+        assert ('Sin cálculo' if lang == 'es' else 'not calculated') in texto
     # Déficit cero con cultivo presente significa lluvia suficiente, no cama vacía.
     copia = json.loads(json.dumps(santiago))
     for e in copia:
         e['agua'] = {'demanda_seca_mm':10,'deficit_normal_mm':0,'deficit_nino_mm':0}
-    assert 'lluvia efectiva cubre' in ' '.join(motor.lectura(copia,[])).lower()
+    assert '0 mm' in ' '.join(motor.lectura(copia,[]))
     for e in copia:
         e['agua']['demanda_seca_mm'] = 0
-    assert 'no tiene cultivo' in ' '.join(motor.lectura(copia,[]))
+    assert 'camas de ciclo corto' in ' '.join(motor.lectura(copia,[]))
+    # Regresiones de la auditoría: criterios, ausencia de camas, fotos y agua.
+    for cultivos in ([], ['xyz'], ['mango']):
+        out = motor.comparar({'cultivos': cultivos, 'prioridades': ['agua','comida']}, n, ni, HOY)
+        for e in out['estrategias']:
+            assert e['tira'] == [] and e['desnudo_cama'] is None
+            assert all(v is None for v in e['agua'].values())
+        assert 'sin cálculo' in ' '.join(out['lectura']).lower()
+    base = {'cultivos': ['yuca'], 'siembras': {'yuca':'2026-11'}}
+    out = motor.comparar({**base, 'prioridades':['venta']}, n, ni, HOY)
+    assert 'Venta no se calcula' in ' '.join(out['lectura'])
+    assert 'empatadas' not in ' '.join(out['lectura'])
+    out = motor.comparar({**base, 'prioridades':['comida','trabajo','suelo','agua']}, n, ni, HOY)
+    assert all(k + ':' in ' '.join(out['lectura']) for k in ('Comida','Trabajo','Suelo','Agua'))
+    assert out['estrategias'][0]['comida_meses'] == 10
+    assert motor._primera_comida([{'cultivo':'canavalia','siembra':i0}], i0) is None
+    assert motor._primera_comida([{'cultivo':'guandu','siembra':i0,'abono_verde':True}], i0) is None
+    assert motor._primera_comida([{'cultivo':'ajo','siembra':i0}], i0) is None
+    assert motor._primera_comida([{'cultivo':'rabano','siembra':i0}], i0) == 1
+    assert out['estrategias'][1]['labores']['tapar_hojas'] == 1
+    assert sum(out['estrategias'][1]['labores'].values()) > sum(out['estrategias'][0]['labores'].values())
+    gap = {'cultivos':['rabano'], 'siembras':{'rabano':'2026-11'}}
+    vivo = motor.comparar(gap, normales(set(range(1,13))), [], HOY)['estrategias'][3]
+    assert vivo['labores']['cortes'] > 0 and vivo['labores']['siembras'] > 1
+    for hoj, cob in [('mucha','media'),('poca','baja')]:
+        for fecha in ('2026-11-14','2026-12-01','2025-11-14','2026-08-01'):
+            out = motor.comparar({**base,'fotos':[{'tipo':'cama','fecha':fecha,'cobertura':0,'hojarasca':hoj}]},n,ni,HOY)
+            for e in out['estrategias']:
+                medidos = [m for m in e['tira'] if m.get('medido')]
+                assert len(medidos) == (1 if fecha[:7] in ('2026-11','2026-12') else 0)
+                if medidos:
+                    assert medidos[0]['mes'] == int(fecha[5:7]) and medidos[0]['cobertura'] == cob
+    out = motor.comparar({**base,'charcos':'si','infiltracion_min':2},n,ni,HOY)
+    for e in out['estrategias']:
+        assert any('muy rápida' in x for x in e['ajustes'])
+        assert any('Observaste charcos' in x for x in e['riesgos'])
+        assert 'el agua se queda arriba' not in ' '.join(e['riesgos'])
+    assert 'infiltracion' in {f['clave'] for f in motor.faltan({'charcos':'nose'})}
+    assert 'infiltracion' in {f['clave'] for f in motor.faltan({'charcos':'nose','infiltracion_min':2})}
+    # La rotación también cuenta el corte cuando usa un abono verde.
+    rot = motor.comparar({'cultivos':['tomate'],'charcos':'si'},normales(set(range(1,13))),[],HOY)['estrategias'][2]
+    assert rot['labores']['cortes'] == 1
+    # Una cama desconocida no diluye con ceros el cálculo de otra conocida.
+    conocido = motor.comparar(base,n,ni,HOY)['estrategias'][0]
+    mixto = motor.comparar({**base,'cultivos':['yuca','xyz']},n,ni,HOY)['estrategias'][0]
+    assert mixto['agua'] == conocido['agua'] and mixto['tira'] == conocido['tira']
+    # La elección usa duración y labores, no cantidad de especies ni cambios de nombre.
+    opciones = json.loads(json.dumps(out['estrategias']))
+    for i, e in enumerate(opciones):
+        e['comida_meses'] = 4 - i
+        e['labores'] = {'siembras':i,'tapar_hojas':i,'cortes':i}
+    assert opciones[-1]['nombre'] in motor.lectura(opciones,['comida'])[0]
+    assert opciones[0]['nombre'] in motor.lectura(opciones,['trabajo'])[0]
+    assert motor.lectura(opciones,['comida'])[0] == motor.lectura(opciones,['venta','comida'])[0]
+    for fecha in ('2025-11-14','2026-08-01'):
+        viejo = motor.comparar({'cultivos':['mango'],'fotos':[{'tipo':'perennes','fecha':fecha,'cobertura':90}]},n,ni,HOY)
+        assert not any(m.get('medido') for e in viejo['estrategias'] for m in e['arboles'])
+    nota = ' '.join(motor.comparar(SANTIAGO,n,ni,HOY)['lectura'])
+    assert 'mismo déficit' in nota and 'meses secos' in nota
+    assert 'no cuenta árboles, perennes, riego ni el ahorro por hojas' in nota
+    with TestClient(app.app) as client, patch.object(app, '_clima', return_value=(kenya, {'promedio':[]})):
+        assert client.post('/api/comparar', json={'expediente':{}}).json()['temporada'] == motor.temporadas(kenya)
     # Identidad de todas las claves, alias minúsculos, procedencia de cada nuevo número.
     assert len(motor.AGRO['cultivos']) >= 50
     for k,c in motor.AGRO['cultivos'].items():

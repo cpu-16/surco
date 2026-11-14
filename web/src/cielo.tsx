@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { Lugar } from './api'
-import { BarrasLluvia, NdviMeses, Reciente } from './graficos'
+import { BarrasLluvia, MESES_LARGOS, NdviMeses, Reciente } from './graficos'
 import { Cargando, fecha, Fuente, rango } from './ui'
 import { L } from './i18n'
 
@@ -81,13 +81,29 @@ function Racha({ im }: { im: NonNullable<Lugar['reciente_imerg']> }) {
   return <p className="titular"><span className="cifra">{im.lluvia_30d}<small> mm</small></span><span>{L('en 30 días. Ha llovido casi todos los días.', 'in 30 days. It has rained almost every day.')}</span></p>
 }
 
+/** Meses secos del lugar con la misma regla del motor (lluvia < la mitad de la ET₀); sin seca, los 3 más secos. */
+const mesesSecos = (n: Lugar['normales']) => {
+  const secos = n.filter((x) => x.lluvia < 0.5 * x.et0).map((x) => x.mes)
+  return secos.length ? secos : [...n].sort((a, b) => a.lluvia - b.lluvia).slice(0, 3).map((x) => x.mes).sort((a, b) => a - b)
+}
+/** «de diciembre a marzo» si van seguidos (aunque crucen el año); si no, la lista. */
+const periodo = (ms: number[]) => {
+  const hay = new Set(ms), antes = (m: number) => (m + 10) % 12 + 1
+  const inicios = ms.filter((m) => !hay.has(antes(m)))
+  if (inicios.length !== 1 || ms.length < 2) return L('en ', 'in ') + lista(ms.map((m) => MESES_LARGOS[m - 1]))
+  const ultimo = ms.find((m) => !hay.has(m % 12 + 1))!
+  return L(`de ${MESES_LARGOS[inicios[0] - 1]} a ${MESES_LARGOS[ultimo - 1]}`, `from ${MESES_LARGOS[inicios[0] - 1]} to ${MESES_LARGOS[ultimo - 1]}`)
+}
+const lista = (xs: string[]) => xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} ${L('y', 'and')} ${xs[xs.length - 1]}`
+
 function Nino({ lugar, desde }: { lugar: Lugar; desde: number }) {
-  const seco = lugar.ninos.promedio.filter((p) => [1, 2, 3].includes(p.mes)).map((p) => p.pct_normal ?? 100)
+  const meses = mesesSecos(lugar.normales)
+  const seco = lugar.ninos.promedio.filter((p) => meses.includes(p.mes)).map((p) => p.pct_normal ?? 100)
   const pct = Math.round(seco.reduce((a, b) => a + b, 0) / (seco.length || 1))
   const f = lugar.fuentes.power
   return (
     <>
-      <p className="titular"><span className="cifra">{pct}<small> %</small></span><span>{L('de la lluvia normal cayó de enero a marzo en los cuatro Niños fuertes: 1982, 1997, 2015 y 2023.', 'of the normal rain fell from January to March in the four strong El Niño years: 1982, 1997, 2015 and 2023.')}</span></p>
+      <p className="titular"><span className="cifra">{pct}<small> %</small></span><span>{L(`de la lluvia normal cayó ${periodo(meses)}, tus meses secos, en los cuatro Niños fuertes: 1982, 1997, 2015 y 2023.`, `of the normal rain fell ${periodo(meses)}, your dry months, in the four strong El Niño years: 1982, 1997, 2015 and 2023.`)}</span></p>
       <BarrasLluvia normales={lugar.normales} ninos={lugar.ninos} desde={desde} />
       <div className="leyenda">
         <span><i style={{ background: 'var(--lluvia)' }} />{L('Lluvia normal', 'Normal rain')}</span>
@@ -111,8 +127,8 @@ function Verdor({ lugar, desde }: { lugar: Lugar; desde: number }) {
       {lugar.ndvi.progreso
         ? <p className="nota" role="status">{L(<>Ya llegaron {lugar.ndvi.n_total} imágenes, las más nuevas primero ({Math.round(100 * lugar.ndvi.progreso[0] / lugar.ndvi.progreso[1])} % de 26 años). El promedio se completa solo.</>,
           <>{lugar.ndvi.n_total} images are in, newest first ({Math.round(100 * lugar.ndvi.progreso[0] / lugar.ndvi.progreso[1])} % of 26 years). The average fills in by itself.</>)}</p>
-        : <p className="nota">{L(<>Así cambia el verdor de tu zona en el año: baja en el verano y sube con las lluvias. Es el promedio de {lugar.ndvi.n_validos} fotos del satélite sin nubes, desde el año 2000. El satélite ve un cuadro de 250 m con techos, calles y árboles; el suelo debajo de tu cacao lo ve tu foto.</>,
-          <>This is how your area’s greenness changes through the year: it drops in the dry season and comes back with the rainy season. It is the average of {lugar.ndvi.n_validos} cloud-free satellite photos since 2000. The satellite sees a 250 m square with roofs, streets and trees; the soil under your cocoa (cacao) is seen by your photo.</>)}</p>}
+        : <p className="nota">{L(<>Así cambia el verdor de tu zona en el año: baja en el verano y sube con las lluvias. Es el promedio de {lugar.ndvi.n_validos} fotos del satélite sin nubes, desde el año 2000. El satélite ve un cuadro de 250 m con techos, calles y árboles; el suelo debajo de tus plantas lo ve tu foto.</>,
+          <>This is how your area’s greenness changes through the year: it drops in the dry season and comes back with the rainy season. It is the average of {lugar.ndvi.n_validos} cloud-free satellite photos since 2000. The satellite sees a 250 m square with roofs, streets and trees; the soil under your plants is seen by your photo.</>)}</p>}
       {f && <Fuente titulo={L(`${f.producto}, consultado ${f.consultado}`, `${f.producto}, checked ${f.consultado}`)}>{FUENTE.ndvi}</Fuente>}
     </>
   )

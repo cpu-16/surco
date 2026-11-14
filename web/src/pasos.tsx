@@ -162,9 +162,12 @@ function Siembra({ nombre, valor, poner }: { nombre: string; valor: string; pone
 export const FOTOS: { tipo: TipoFoto; corto: string; titulo: string; como: string }[] = [
   { tipo: 'cama', corto: L('El huerto', 'The garden plot'), titulo: L('El suelo del huerto', 'The soil of the garden plot'), como: L('De pie, con el celular a la altura del pecho, mirando hacia abajo.', 'Standing up, with the phone at chest height, pointing down.') },
   { tipo: 'perennes', corto: L('Bajo los árboles', 'Under the trees'), titulo: L('El suelo debajo de los árboles', 'The soil under the trees'), como: L('Igual, pero debajo de la copa. El satélite no puede ver esto.', "The same way, but under the tree crown. The satellite can't see this.") },
-  { tipo: 'pina', corto: L('Una piña', 'A pineapple'), titulo: L('Una piña completa', 'A whole pineapple plant'), como: L('La planta entera con su base, para ver cómo está.', 'The whole plant with its base, to see how it is doing.') },
-  { tipo: 'general', corto: L('El patio', 'The plot'), titulo: L('El patio entero', 'The whole plot'), como: L('Desde una esquina, para ver si hay pendiente.', 'From a corner, to see if there is a slope.') },
+  { tipo: 'pina', corto: L('Una planta', 'A plant'), titulo: L('Una planta que te preocupa', 'A plant you are worried about'), como: L('La planta entera con su base. No entra en el cálculo: el asistente la describe y queda en tu registro.', 'The whole plant with its base. It is not part of the calculation: the assistant describes it and it stays in your record.') },
+  { tipo: 'general', corto: L('El patio', 'The plot'), titulo: L('El patio entero', 'The whole plot'), como: L('Desde una esquina, para ver si hay pendiente. No entra en el cálculo; queda en tu registro.', 'From a corner, to see if there is a slope. It is not part of the calculation; it stays in your record.') },
 ]
+
+/** Solo las fotos que aplican: la de debajo de los árboles si hay árboles o cultivos que duran años. */
+export const fotosDe = (exp: Expediente) => FOTOS.filter((f) => f.tipo !== 'perennes' || exp.cultivos.some((c) => !esCorto(c)))
 
 /** Lo que dice cada botón; la clave es lo que se guarda. */
 const HOJARASCA = { mucha: L('Mucha', 'A lot'), poca: L('Poca', 'A little'), nada: L('Nada', 'None') }
@@ -176,7 +179,8 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
   const [midiendo, setMidiendo] = useState(false)
   const [nueva, setNueva] = useState<string | null>(null) // la foto recién medida hace el barrido una vez
   const [dir, setDir] = useState(1)
-  const f = FOTOS[sub]
+  const lista = fotosDe(exp)
+  const f = lista[Math.min(sub, lista.length - 1)]
   const foto = exp.fotos.find((x) => x.tipo === f.tipo)
   const irSub = (n: number) => { setDir(n > sub ? 1 : -1); setSub(n) }
 
@@ -202,7 +206,7 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
   return (
     <>
       <div className="subpasos" role="tablist" aria-label={L('Fotos', 'Photos')}>
-        {FOTOS.map((x, i) => {
+        {lista.map((x, i) => {
           const hecha = exp.fotos.some((y) => y.tipo === x.tipo)
           return (
             <button key={x.tipo} role="tab" aria-selected={i === sub} data-hecha={hecha} onClick={() => irSub(i)}>
@@ -255,7 +259,7 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
               <Icono n="galeria" />{TACTIL ? L('De la galería', 'From the gallery') : midiendo ? L('Midiendo…', 'Measuring…') : L('Elegir una foto', 'Choose a photo')}
               <input type="file" accept="image/*" hidden disabled={midiendo} onChange={(e) => { tomar(e.target.files?.[0]); e.target.value = '' }} />
             </label>
-            {sub < FOTOS.length - 1 && <button className="boton fantasma" onClick={() => irSub(sub + 1)}>{foto ? L('Siguiente foto', 'Next photo') : L('Saltar', 'Skip')}</button>}
+            {sub < lista.length - 1 && <button className="boton fantasma" onClick={() => irSub(sub + 1)}>{foto ? L('Siguiente foto', 'Next photo') : L('Saltar', 'Skip')}</button>}
           </div>
           {foto && <button className="enlace" onClick={() => cambiar({ fotos: exp.fotos.filter((x) => x.tipo !== f.tipo) })}>{L('Quitar esta foto', 'Remove this photo')}</button>}
         </motion.div>
@@ -432,11 +436,10 @@ function Escala({ min }: { min: number }) {
 /* ---------------- Paso 5: lo que te importa ---------------- */
 
 const PRIORIDADES: [string, string, string][] = [
-  ['agua', L('Gastar menos agua', 'Use less water'), L('Que el suelo aguante el verano', 'So the soil holds up through the dry season')],
-  ['suelo', L('Mejorar el suelo', 'Improve the soil'), L('Que esté más vivo y suelto', 'More alive and loose')],
-  ['comida', L('Comida para la casa', 'Food for the home'), L('Algo que se coma pronto', 'Something to eat soon')],
-  ['venta', L('Algo para vender', 'Something to sell'), L('Que deje unos reales', 'That brings in some money')],
-  ['trabajo', L('Menos trabajo', 'Less work'), L('Que no pida tanta mano', "That doesn't take so many hands")],
+  ['agua', L('Gastar menos agua', 'Use less water'), L('Que le falte menos agua en la seca', 'Less water shortfall in the dry season')],
+  ['suelo', L('Mejorar el suelo', 'Improve the soil'), L('Menos meses con el suelo pelado', 'Fewer months with bare soil')],
+  ['comida', L('Comida para la casa', 'Food for the home'), L('Que dé algo de comer más pronto', 'Something to eat sooner')],
+  ['trabajo', L('Menos trabajo', 'Less work'), L('Menos siembras, tapadas y cortes', 'Fewer plantings, mulching and cutting')],
 ]
 
 /** Lo que dice cada botón; la clave es lo que se guarda. */
@@ -446,7 +449,7 @@ export function Importa({ exp, cambiar }: Props) {
   const alternar = (v: string) => cambiar({ prioridades: exp.prioridades.includes(v) ? exp.prioridades.filter((x) => x !== v) : [...exp.prioridades, v] })
   return (
     <>
-      <p className="nota">{L('Escoge una o varias. Ordena las maneras de sembrar según lo tuyo.', 'Pick one or more. This sorts the ways of planting by what matters to you.')}</p>
+      <p className="nota">{L('Escoge una o varias. En «Tu año» te digo cuál manera de sembrar sale mejor en eso.', 'Pick one or more. In “Your year” I tell you which way of planting does best on that.')}</p>
       <div className="tejas">
         {PRIORIDADES.map(([k, n, d]) => (
           <button key={k} className="teja" aria-pressed={exp.prioridades.includes(k)} onClick={() => alternar(k)}>
@@ -460,6 +463,7 @@ export function Importa({ exp, cambiar }: Props) {
           <button key={r} className="chip" aria-pressed={exp.riego === r} onClick={() => cambiar({ riego: exp.riego === r ? '' : r })}>{RIEGO[r]}</button>
         ))}
       </div>
+      <p className="nota">{L('No cambia el cálculo: queda en tu registro para el técnico y el asistente lo toma en cuenta.', 'It does not change the calculation: it stays in your record for the advisor, and the assistant takes it into account.')}</p>
     </>
   )
 }

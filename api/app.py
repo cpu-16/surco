@@ -263,8 +263,9 @@ async def ia_pregunta(c: Charla):
     resumen = [{k: e.get(k) for k in ("nombre", "meses_desnudo", "n_kg_ha", "familias", "agua", "razon", "beneficios", "vacios", "riesgos", "ajustes")}
                | {"meses": [f"{m['mes']}:{m.get('nombre') or 'desnudo'}/{m['cobertura']}" for m in e.get("tira", [])]}
                for e in comp.get("estrategias", [])]
-    ctx = {"expediente": c.expediente, "estrategias": resumen, "lectura": comp.get("lectura"), "clima_nasa": c.lugar,
-           "pina_no_crece": motor.AGRO.get("piña_no_crece")}
+    expediente = {**c.expediente, "pais": "PA" if ia.es_panama(c.expediente) else None}
+    ctx = {"expediente": expediente, "estrategias": resumen, "lectura": comp.get("lectura"), "clima_nasa": c.lugar,
+           "pina_no_crece": motor.AGRO.get("piña_no_crece") if ia.es_panama(expediente) and "pina" in motor._seleccion(expediente)[0] else None}
     try:
         r = await run_in_threadpool(ia.pregunta, c.historia, ctx, c.lang)
         prop = r.get("propuesta") if isinstance(r, dict) else None

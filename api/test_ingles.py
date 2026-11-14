@@ -58,7 +58,7 @@ def main():
             assert ia.foto(jpeg, 'cama', lang)['hojarasca'] == 'mucha'
             assert mock.call_args.args[0] == ia.FOTO + (ia.INGLES if lang == 'en' else '')
             assert ia.pregunta([], {}, lang)['propuesta'] == {'charcos': 'si'}
-            assert mock.call_args.args[0] == ia.PREG + (ia.INGLES if lang == 'en' else '')
+            assert mock.call_args.args[0] == ia.PREG + ia.region({}) + (ia.INGLES if lang == 'en' else '')
     with TestClient(app.app) as client, patch.object(app, '_clima', return_value=(n, ni)):
         for lang in (None, 'es', 'en', 'fr'):
             fields = {} if lang is None else {'lang': lang}
@@ -72,6 +72,19 @@ def main():
             with patch.object(ia, 'pregunta', return_value={}) as mock:
                 assert client.post('/api/ia/pregunta', json={'historia': [], 'expediente': {}, **fields}).status_code == 200
                 assert mock.call_args.args[-1] == expected
+    assert 'Panamá' not in ia.BASE and 'MIDA' not in ia.FOTO
+    for exp, panama in [({'lat':8.1,'lon':-80.98,'pais':'IN'},True),
+                        ({'lat':17.4,'lon':78.5,'pais':'PA'},False),
+                        ({'lat':7.0,'lon':-83.1},True), ({'lat':9.7,'lon':-77.1},True),
+                        ({'lat':9.71,'lon':-80},False), ({},False)]:
+        for lang in ('es','en'):
+            with TestClient(app.app) as client, patch.object(ia, '_claude', return_value={}) as mock:
+                assert client.post('/api/ia/pregunta',json={'historia':[],'expediente':exp,'lang':lang}).status_code == 200
+                prompt, content = mock.call_args.args
+                assert ('Usa palabras panameñas' in prompt) == panama
+                assert ('MIDA/IDIAP' in prompt) == panama
+                assert ('el servicio de extensión agrícola de tu zona' in prompt)
+                assert ('"pais": "PA"' in content[0]['text']) == panama
     print('OK: inglés, español idéntico en 4 casos, prompts y los 3 endpoints.')
 
 

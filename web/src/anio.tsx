@@ -6,26 +6,27 @@ import { L } from './i18n'
 
 export type Muestra = { mes: number; cultivo: string | null; nombre: string | null; cobertura: 'alta' | 'media' | 'baja' | 'desnudo'; medido?: boolean }
 export type Estrategia = {
-  id: string; nombre: string; aplica_a: string; tira: Muestra[]; arboles: Muestra[]; meses_desnudo: number; desnudo_cama: number; desnudo_arboles: number
+  id: string; nombre: string; aplica_a: string; tira: Muestra[]; arboles: Muestra[]; meses_desnudo: number; desnudo_cama: number | null; desnudo_arboles: number
   n_kg_ha: [number, number] | null
   n_por_planta?: { nombre: string; kg_ha: [number, number] }[]
-  agua: { demanda_seca_mm: number; deficit_normal_mm: number; deficit_nino_mm: number }
+  agua: { demanda_seca_mm: number | null; deficit_normal_mm: number | null; deficit_nino_mm: number | null }
   razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string }[]
   beneficios: string[]; vacios: string[]; riesgos: string[]; ajustes: string[]
 }
-export type Comparacion = { estrategias: Estrategia[]; faltan: { clave: string; texto: string; cambia: string }[]; lectura: string[] }
+export type Comparacion = { estrategias: Estrategia[]; faltan: { clave: string; texto: string; cambia: string }[]; lectura: string[]; temporada?: { meses_secos: number[] } }
 
 const PASO_DE: Record<string, number> = { parcela: 1, foto_cama: 3, foto_perennes: 3, infiltracion: 4, prioridades: 5 }
 
 export const COLOR = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)', desnudo: 'var(--laterita)' }
 
-export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | null; desde: number; viejo: boolean; irA: (clave: string) => void }) {
+export default function Anio({ comp, desde, viejo, irA, enLinea }: { comp: Comparacion | null; desde: number; viejo: boolean; irA: (clave: string) => void; enLinea: boolean }) {
   const [sel, setSel] = useState<Estrategia | null>(null)
   const [abierta, setAbierta] = useState(false)
   const cerrar = useCallback(() => setAbierta(false), [])
+  if (!comp && !enLinea) return <p className="aviso">{L('Sin señal y todavía no hay un cálculo para este patio. Se hace solo cuando vuelva la señal.', 'Offline, and there is no calculation for this plot yet. It runs by itself when the signal comes back.')}</p>
   if (!comp) return <Cargando texto={L('Calculando el año de tu suelo…', 'Working out your soil’s year…')} />
   const orden = ordenMeses(desde)
-  const total = (e: Estrategia) => e.desnudo_cama + e.desnudo_arboles
+  const total = (e: Estrategia) => (e.desnudo_cama ?? 0) + e.desnudo_arboles
   const mejor = Math.min(...comp.estrategias.map(total))
   const hayMejor = comp.estrategias.some((e) => total(e) !== mejor)
   return (
@@ -41,11 +42,11 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
                 <span className="e-nombre">{e.nombre}</span>
                 {hayMejor && total(e) === mejor && <span className="sello">{L('Menos suelo desnudo', 'Least bare soil')}</span>}
               </span>
-              <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />
+              {e.tira.length > 0 && <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />}
               {e.arboles.length > 0 && <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />}
               <span className="e-pie">
-                <span>{L(<>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto{e.arboles.length > 0 && <>, <b>{e.desnudo_arboles}</b> bajo los árboles</>}</>,
-                  <>Bare: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot{e.arboles.length > 0 && <>, <b>{e.desnudo_arboles}</b> under the trees</>}</>)}</span>
+                <span>{L(<>Desnudo: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> bajo los árboles</>}</>,
+                  <>Bare: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> under the trees</>}</>)}</span>
                 <span className="ver">{L('Ver por qué', 'See why')}</span>
               </span>
             </button>
@@ -108,19 +109,20 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
   const nombre = (fila: Muestra[], m: number) => fila.find((x) => x.mes === m)?.nombre?.toLowerCase() ?? L('suelo desnudo', 'bare soil')
   return (
     <div className="detalle">
-      <div className="tira grande" role="group" aria-label={L('Toca un mes', 'Tap a month')}>
+      {e.tira.length > 0 && <div className="tira grande" role="group" aria-label={L('Toca un mes', 'Tap a month')}>
         {orden.map((m) => {
-          const t = e.tira.find((x) => x.mes === m)!
+          const t = e.tira.find((x) => x.mes === m)
+          if (!t) return <span key={m} className="muestra" />
           return (
             <button key={m} className="muestra" aria-pressed={mes === m} style={{ background: COLOR[t.cobertura] }} onClick={() => setMes(mes === m ? null : m)}
               aria-label={`${MESES_LARGOS[m - 1]}: ${nombre(e.tira, m)}`}>{MESES[m - 1]}</button>
           )
         })}
-      </div>
+      </div>}
       <p className="nota" aria-live="polite">
-        {mes ? L(`En ${MESES_LARGOS[mes - 1]}: el huerto con ${nombre(e.tira, mes)}; debajo de los árboles, ${nombre(e.arboles, mes)}.`,
-          `In ${MESES_LARGOS[mes - 1]}: the garden plot has ${nombre(e.tira, mes)}; under the trees, ${nombre(e.arboles, mes)}.`)
-          : L('Toca un mes para ver qué hay sembrado.', 'Tap a month to see what is planted.')}
+        {mes ? L(`En ${MESES_LARGOS[mes - 1]}: el huerto con ${nombre(e.tira, mes)}${e.arboles.length ? `; debajo de los árboles, ${nombre(e.arboles, mes)}` : ''}.`,
+          `In ${MESES_LARGOS[mes - 1]}: the garden plot has ${nombre(e.tira, mes)}${e.arboles.length ? `; under the trees, ${nombre(e.arboles, mes)}` : ''}.`)
+          : e.tira.length ? L('Toca un mes para ver qué hay sembrado.', 'Tap a month to see what is planted.') : ''}
       </p>
 
       <p className="razon">{e.razon}</p>
@@ -129,11 +131,14 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
       )}
 
       <div className="numeros">
-        <div><span className="cifra">{e.desnudo_cama}</span><span>{L(`${e.desnudo_cama === 1 ? 'mes' : 'meses'} con el huerto pelado`, `${e.desnudo_cama === 1 ? 'month' : 'months'} with the garden plot bare`)}</span></div>
-        <div><span className="cifra">{e.desnudo_arboles}</span><span>{L(`${e.desnudo_arboles === 1 ? 'mes' : 'meses'} con el suelo pelado bajo los árboles`, `${e.desnudo_arboles === 1 ? 'month' : 'months'} with bare soil under the trees`)}</span></div>
-        <div><span className="cifra">{e.agua.deficit_normal_mm}<small> mm</small></span><span>{L('de agua que falta en la seca de un año normal', 'of water short in the dry season of a normal year')}</span></div>
-        <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>{L('si llueve como en los Niños', 'if it rains like in the El Niño years')}</span></div>
+        {e.desnudo_cama !== null && <div><span className="cifra">{e.desnudo_cama}</span><span>{L(`${e.desnudo_cama === 1 ? 'mes' : 'meses'} con el huerto pelado`, `${e.desnudo_cama === 1 ? 'month' : 'months'} with the garden plot bare`)}</span></div>}
+        {e.arboles.length > 0 && <div><span className="cifra">{e.desnudo_arboles}</span><span>{L(`${e.desnudo_arboles === 1 ? 'mes' : 'meses'} con el suelo pelado bajo los árboles`, `${e.desnudo_arboles === 1 ? 'month' : 'months'} with bare soil under the trees`)}</span></div>}
+        {e.agua.deficit_normal_mm !== null && <>
+          <div><span className="cifra">{e.agua.deficit_normal_mm}<small> mm</small></span><span>{L('de agua que le falta al huerto en la seca de un año normal', 'of water the garden plot is short in the dry season of a normal year')}</span></div>
+          <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>{L('si llueve como en los Niños', 'if it rains like in the El Niño years')}</span></div>
+        </>}
       </div>
+      {e.agua.deficit_normal_mm !== null && <p className="nota">{L('1 mm es 1 litro por cada metro cuadrado de huerto. Cuenta solo las camas de ciclo corto: no los árboles, ni tu riego, ni el agua que ahorran las hojas.', '1 mm is 1 litre for each square metre of garden plot. It counts only the short-cycle beds: not the trees, your watering, or the water the leaves save.')}</p>}
       {!!e.n_por_planta?.length && (
         <p className="nota">{L('Nitrógeno que puede dejar cada planta según estudios de otros lugares (kg por hectárea, no medido en tu patio): ', 'Nitrogen each plant can leave, from studies elsewhere (kg per hectare, not measured in your yard): ')}
           {e.n_por_planta.map((n) => `${n.nombre} ${n.kg_ha[0]}–${n.kg_ha[1]}`).join('; ')}.</p>
