@@ -393,6 +393,7 @@ fieldset.campo legend { padding: 0; margin-bottom: 0.35rem; }
 .tira .muestra { aspect-ratio: 1 / 1.25; }
 .pendiente { grid-template-columns: auto 1fr; align-items: center; gap: 0.7rem; }
 .paso-chip { font: 700 0.8rem/1 var(--display); padding: 0.35em 0.6em; border-radius: 999px; background: color-mix(in srgb, var(--laterita) 85%, var(--humus)); color: #fff; white-space: nowrap; }
+.pendiente .paso-chip { color: #fff; font-size: 0.8rem; } /* gana a .pendiente span */
 /* terrón: la laterita oscurecida, que se lea igual de tierra en claro y en oscuro */
 :root { --terron: color-mix(in srgb, var(--laterita) 72%, #2b1a10); }
 .terron, .subpasos .punto, .paso-chip, .bienvenida-tira .muestra { background: var(--terron); }
@@ -488,3 +489,4 @@ fieldset.campo legend { padding: 0; margin-bottom: 0.35rem; }
   .escena { padding: 0; max-width: none; }
 }
 .compartida { padding-top: 1.4rem; } .marca-texto { display: flex; justify-content: space-between; align-items: baseline; font: 700 1.5rem/1 var(--display); margin-bottom: 1.4rem; } .marca-texto .enlace { font: 600 0.95rem var(--texto); }
+.otros-lugares { margin: 0.9rem 0 0.4rem; }

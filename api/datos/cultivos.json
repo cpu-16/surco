@@ -190,6 +190,20 @@
       "anio": 2015,
       "url": "https://acsess.onlinelibrary.wiley.com/doi/10.2134/agronj15.0150",
       "doi": "10.2134/agronj15.0150"
+    },
+    "F56T11": {
+      "titulo": "FAO-56, capítulo 6, tabla 11: duración de etapas por región",
+      "autor": "Allen, Pereira, Raes y Smith / FAO",
+      "anio": 1998,
+      "url": "https://www.fao.org/4/x0490e/x0490e0b.htm",
+      "doi": null
+    },
+    "F56T12": {
+      "titulo": "FAO-56, capítulo 6, tabla 12: coeficientes Kc; valores iniciales de grupo cuando la fila está vacía",
+      "autor": "Allen, Pereira, Raes y Smith / FAO",
+      "anio": 1998,
+      "url": "https://www.fao.org/4/x0490e/x0490e0b.htm",
+      "doi": null
     }
   },
   "cultivos": {
@@ -273,7 +287,13 @@
         ],
         "plagas_compartidas": null,
         "fija_n_kg_ha": null
-      }
+      },
+      "nombre_en": "Cassava",
+      "alias": [
+        "mandioca",
+        "cassava",
+        "manioc"
+      ]
     },
     "pina": {
       "nombre": "Piña",
@@ -368,7 +388,13 @@
           "NE"
         ],
         "fija_n_kg_ha": null
-      }
+      },
+      "nombre_en": "Pineapple",
+      "alias": [
+        "piña",
+        "ananá",
+        "pineapple"
+      ]
     },
     "platano": {
       "nombre": "Plátano",
@@ -454,7 +480,12 @@
           "PC"
         ],
         "fija_n_kg_ha": null
-      }
+      },
+      "nombre_en": "Plantain",
+      "alias": [
+        "plátano",
+        "plantain"
+      ]
     },
     "cacao": {
       "nombre": "Cacao",
@@ -522,7 +553,12 @@
           "PC"
         ],
         "fija_n_kg_ha": null
-      }
+      },
+      "nombre_en": "Cocoa",
+      "alias": [
+        "cocoa",
+        "cacao"
+      ]
     },
     "naranja": {
       "nombre": "Naranja",
@@ -607,7 +643,11 @@
           "PC"
         ],
         "fija_n_kg_ha": null
-      }
+      },
+      "nombre_en": "Orange",
+      "alias": [
+        "orange"
+      ]
     },
     "toronja": {
       "nombre": "Toronja",
@@ -688,7 +728,12 @@
           "PC"
         ],
         "fija_n_kg_ha": null
-      }
+      },
+      "nombre_en": "Grapefruit",
+      "alias": [
+        "pomelo",
+        "grapefruit"
+      ]
     },
     "guandu": {
       "nombre": "Guandú",
@@ -766,7 +811,14 @@
           "TG",
           "TV"
         ]
-      }
+      },
+      "nombre_en": "Pigeon pea",
+      "alias": [
+        "guandú",
+        "gandul",
+        "guandul",
+        "pigeon pea"
+      ]
     },
     "caupi": {
       "nombre": "Frijol caupí (frijol Vigna)",
@@ -870,7 +922,15 @@
           "NE",
           "PN"
         ]
-      }
+      },
+      "nombre_en": "Cowpea",
+      "alias": [
+        "caupí",
+        "frijol de bejuco",
+        "chícharo de vaca",
+        "cowpea",
+        "black-eyed pea"
+      ]
     },
     "frijol_comun": {
       "nombre": "Frijol común / poroto",
@@ -966,7 +1026,16 @@
           "NE",
           "PN"
         ]
-      }
+      },
+      "nombre_en": "Common bean",
+      "alias": [
+        "frijol común",
+        "poroto",
+        "judía",
+        "alubia",
+        "common bean",
+        "frijol"
+      ]
     },
     "canavalia": {
       "nombre": "Canavalia",
@@ -1028,7 +1097,11 @@
           "CI"
         ],
         "plagas_compartidas": null
-      }
+      },
+      "nombre_en": "Jack bean",
+      "alias": [
+        "jack bean"
+      ]
     },
     "mucuna": {
       "nombre": "Mucuna",
@@ -1083,7 +1156,11 @@
           "TM"
         ],
         "plagas_compartidas": null
-      }
+      },
+      "nombre_en": "Velvet bean",
+      "alias": [
+        "velvet bean"
+      ]
     },
     "mani_forrajero": {
       "nombre": "Maní forrajero",
@@ -1151,7 +1228,12 @@
           "TV",
           "IP"
         ]
-      }
+      },
+      "nombre_en": "Forage peanut",
+      "alias": [
+        "maní forrajero",
+        "forage peanut"
+      ]
     },
     "maiz": {
       "nombre": "Maíz",
@@ -1243,7 +1325,15 @@
           "PN",
           "TV"
         ]
-      }
+      },
+      "nombre_en": "Corn",
+      "alias": [
+        "maíz",
+        "corn",
+        "maize",
+        "elote",
+        "choclo"
+      ]
     },
     "camote": {
       "nombre": "Camote",
@@ -1332,7 +1422,13 @@
           "PN",
           "TV"
         ]
-      }
+      },
+      "nombre_en": "Sweet potato",
+      "alias": [
+        "batata",
+        "boniato",
+        "sweet potato"
+      ]
     },
     "zapallo": {
       "nombre": "Zapallo",
@@ -1422,7 +1518,1948 @@
           "PN",
           "TV"
         ]
-      }
+      },
+      "nombre_en": "Squash",
+      "alias": [
+        "ahuyama",
+        "auyama",
+        "calabaza",
+        "pumpkin",
+        "squash"
+      ]
+    },
+    "arroz": {
+      "nombre": "Arroz",
+      "cientifico": "Oryza sativa",
+      "familia": "Poaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        150,
+        150
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 1.05,
+        "mid": 1.2,
+        "end": 0.6
+      },
+      "etapas_dias": [
+        30,
+        30,
+        60,
+        30
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Rice; trópico / Mediterráneo; dic/may Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc end: extremo 0.60; arroz inundado, no modela lámina ni percolación.",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Rice",
+      "alias": [
+        "rice"
+      ]
+    },
+    "sorgo": {
+      "nombre": "Sorgo",
+      "cientifico": "Sorghum bicolor",
+      "familia": "Poaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        130,
+        130
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.3,
+        "mid": 1,
+        "end": 0.55
+      },
+      "etapas_dias": [
+        20,
+        35,
+        45,
+        30
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sorghum; región árida; mar/abr; suma 130 (total impreso 140) Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc mid: extremo 1.00 del intervalo 1.00–1.10.",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Sorghum",
+      "alias": [
+        "sorghum"
+      ]
+    },
+    "mani": {
+      "nombre": "Maní",
+      "cientifico": "Arachis hypogaea",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        130,
+        130
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1.15,
+        "end": 0.6
+      },
+      "etapas_dias": [
+        25,
+        35,
+        45,
+        25
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Groundnut; África occidental; seca Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Peanut",
+      "alias": [
+        "cacahuate",
+        "cacahuete",
+        "peanut",
+        "groundnut"
+      ]
+    },
+    "soya": {
+      "nombre": "Soya",
+      "cientifico": "Glycine max",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        85,
+        85
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1.15,
+        "end": 0.5
+      },
+      "etapas_dias": [
+        15,
+        15,
+        40,
+        15
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Soybeans; trópico; dic Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Soybean",
+      "alias": [
+        "soja",
+        "soybean",
+        "soy"
+      ]
+    },
+    "haba": {
+      "nombre": "Haba",
+      "cientifico": "Vicia faba",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        90,
+        90
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.15,
+        "end": 1.1
+      },
+      "etapas_dias": [
+        15,
+        25,
+        35,
+        15
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Faba bean; Europa; may; cosecha fresca Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Broad bean",
+      "alias": [
+        "broad bean",
+        "faba bean"
+      ]
+    },
+    "lenteja": {
+      "nombre": "Lenteja",
+      "cientifico": "Lens culinaris",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        150,
+        150
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1.1,
+        "end": 0.3
+      },
+      "etapas_dias": [
+        20,
+        30,
+        60,
+        40
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Lentil; Europa; abr Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Lentil",
+      "alias": [
+        "lentil"
+      ]
+    },
+    "garbanzo": {
+      "nombre": "Garbanzo",
+      "cientifico": "Cicer arietinum",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1,
+        "end": 0.35
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc: fila Chick pea, no la fila Grabanzo.",
+      "fuentes": [
+        "F56T12"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Chickpea",
+      "alias": [
+        "chickpea",
+        "chick pea"
+      ]
+    },
+    "papa": {
+      "nombre": "Papa",
+      "cientifico": "Solanum tuberosum",
+      "familia": "Solanaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        130,
+        130
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.15,
+        "end": 0.75
+      },
+      "etapas_dias": [
+        25,
+        30,
+        45,
+        30
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Potato; clima continental; may Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Potato",
+      "alias": [
+        "patata",
+        "potato"
+      ]
+    },
+    "name": {
+      "nombre": "Ñame",
+      "cientifico": "Dioscorea alata",
+      "familia": "Dioscoreaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Yam",
+      "alias": [
+        "ñame",
+        "yam"
+      ]
+    },
+    "otoe": {
+      "nombre": "Otoe",
+      "cientifico": "Colocasia esculenta",
+      "familia": "Araceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Taro",
+      "alias": [
+        "taro",
+        "malanga colocasia"
+      ]
+    },
+    "malanga": {
+      "nombre": "Malanga",
+      "cientifico": "Xanthosoma sagittifolium",
+      "familia": "Araceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Cocoyam",
+      "alias": [
+        "yautía",
+        "tiquisque",
+        "cocoyam",
+        "tannia",
+        "malanga xanthosoma"
+      ]
+    },
+    "banano": {
+      "nombre": "Guineo / banano",
+      "cientifico": "Musa acuminata (grupo de cultivares)",
+      "familia": "Musaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.1,
+        "end": 1
+      },
+      "etapas_dias": [
+        120,
+        90,
+        120,
+        60
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Banana primer año; Mediterráneo; mar Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Banana",
+      "alias": [
+        "guineo",
+        "banano",
+        "banana"
+      ]
+    },
+    "papaya": {
+      "nombre": "Papaya",
+      "cientifico": "Carica papaya",
+      "familia": "Caricaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Papaya fruit",
+      "alias": [
+        "lechosa",
+        "papaya",
+        "papaw"
+      ]
+    },
+    "tomate": {
+      "nombre": "Tomate",
+      "cientifico": "Solanum lycopersicum",
+      "familia": "Solanaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        135,
+        135
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.6,
+        "mid": 1.15,
+        "end": 0.9
+      },
+      "etapas_dias": [
+        30,
+        40,
+        40,
+        25
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Tomato; región árida; ene Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc end: extremo 0.90 del intervalo 0.70–0.90.",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Tomato",
+      "alias": [
+        "jitomate",
+        "tomato"
+      ]
+    },
+    "aji": {
+      "nombre": "Ají / pimentón",
+      "cientifico": "Capsicum annuum",
+      "familia": "Solanaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        210,
+        210
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.6,
+        "mid": 1.05,
+        "end": 0.9
+      },
+      "etapas_dias": [
+        30,
+        40,
+        110,
+        30
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sweet peppers; región árida; oct Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Sweet pepper",
+      "alias": [
+        "ají",
+        "pimentón",
+        "pimiento",
+        "morrón",
+        "bell pepper",
+        "sweet pepper"
+      ]
+    },
+    "berenjena": {
+      "nombre": "Berenjena",
+      "cientifico": "Solanum melongena",
+      "familia": "Solanaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        130,
+        130
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.6,
+        "mid": 1.05,
+        "end": 0.9
+      },
+      "etapas_dias": [
+        30,
+        40,
+        40,
+        20
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Egg plant; región árida; oct Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Eggplant",
+      "alias": [
+        "eggplant",
+        "aubergine"
+      ]
+    },
+    "pepino": {
+      "nombre": "Pepino",
+      "cientifico": "Cucumis sativus",
+      "familia": "Cucurbitaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        105,
+        105
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.6,
+        "mid": 1,
+        "end": 0.75
+      },
+      "etapas_dias": [
+        20,
+        30,
+        40,
+        15
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Cucumber; región árida; jun/ago; mercado fresco Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Cucumber",
+      "alias": [
+        "cucumber"
+      ]
+    },
+    "sandia": {
+      "nombre": "Sandía",
+      "cientifico": "Citrullus lanatus",
+      "familia": "Cucurbitaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        110,
+        110
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1,
+        "end": 0.75
+      },
+      "etapas_dias": [
+        20,
+        30,
+        30,
+        30
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Water melons; Italia; abr Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Watermelon",
+      "alias": [
+        "patilla",
+        "watermelon"
+      ]
+    },
+    "melon": {
+      "nombre": "Melón",
+      "cientifico": "Cucumis melo",
+      "familia": "Cucurbitaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        120,
+        120
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.05,
+        "end": 0.75
+      },
+      "etapas_dias": [
+        25,
+        35,
+        40,
+        20
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sweet melons; Mediterráneo; may Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Sweet melon",
+      "alias": [
+        "melon",
+        "sweet melon"
+      ]
+    },
+    "lechuga": {
+      "nombre": "Lechuga",
+      "cientifico": "Lactuca sativa",
+      "familia": "Asteraceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        75,
+        75
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        20,
+        30,
+        15,
+        10
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Lettuce; Mediterráneo; abr Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Lettuce",
+      "alias": [
+        "lettuce"
+      ]
+    },
+    "repollo": {
+      "nombre": "Repollo",
+      "cientifico": "Brassica oleracea var. capitata",
+      "familia": "Brassicaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        165,
+        165
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1.05,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        40,
+        60,
+        50,
+        15
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Cabbage; desierto California; sep Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Cabbage",
+      "alias": [
+        "col",
+        "cabbage"
+      ]
+    },
+    "cebolla": {
+      "nombre": "Cebolla",
+      "cientifico": "Allium cepa",
+      "familia": "Amaryllidaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        150,
+        150
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1.05,
+        "end": 0.75
+      },
+      "etapas_dias": [
+        15,
+        25,
+        70,
+        40
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Onion dry; Mediterráneo; abr Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Onion",
+      "alias": [
+        "onion",
+        "dry onion"
+      ]
+    },
+    "cebollina": {
+      "nombre": "Cebollina",
+      "cientifico": "Allium fistulosum",
+      "familia": "Amaryllidaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. No se equipara Allium fistulosum automáticamente con Onion green.",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Welsh onion",
+      "alias": [
+        "cebollín",
+        "cebolla larga",
+        "welsh onion",
+        "scallion"
+      ]
+    },
+    "culantro": {
+      "nombre": "Culantro",
+      "cientifico": "Eryngium foetidum",
+      "familia": "Apiaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Culantro (long coriander)",
+      "alias": [
+        "culantro coyote",
+        "recao",
+        "long coriander"
+      ]
+    },
+    "cilantro": {
+      "nombre": "Cilantro",
+      "cientifico": "Coriandrum sativum",
+      "familia": "Apiaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Coriander",
+      "alias": [
+        "coriander",
+        "cilantro"
+      ]
+    },
+    "habichuela": {
+      "nombre": "Habichuela / vainita",
+      "cientifico": "Phaseolus vulgaris",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        90,
+        90
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.05,
+        "end": 0.9
+      },
+      "etapas_dias": [
+        20,
+        30,
+        30,
+        10
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Beans green; California/Mediterráneo; feb/mar Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Green bean",
+      "alias": [
+        "habichuela",
+        "vainita",
+        "ejote",
+        "judía verde",
+        "green bean",
+        "snap bean"
+      ]
+    },
+    "naju": {
+      "nombre": "Ñajú",
+      "cientifico": "Abelmoschus esculentus",
+      "familia": "Malvaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Okra",
+      "alias": [
+        "ñajú",
+        "okra",
+        "quimbombó",
+        "bamia",
+        "lady finger"
+      ]
+    },
+    "espinaca": {
+      "nombre": "Espinaca",
+      "cientifico": "Spinacia oleracea",
+      "familia": "Amaranthaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        100,
+        100
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        20,
+        30,
+        40,
+        10
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Spinach; región árida; nov Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Spinach",
+      "alias": [
+        "spinach"
+      ]
+    },
+    "zanahoria": {
+      "nombre": "Zanahoria",
+      "cientifico": "Daucus carota subsp. sativus",
+      "familia": "Apiaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        150,
+        150
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1.05,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        30,
+        40,
+        60,
+        20
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Carrots; Mediterráneo; feb/mar Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Carrot",
+      "alias": [
+        "carrot"
+      ]
+    },
+    "remolacha": {
+      "nombre": "Remolacha",
+      "cientifico": "Beta vulgaris",
+      "familia": "Amaranthaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        70,
+        70
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.05,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        15,
+        25,
+        20,
+        10
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Beets table; Mediterráneo; abr/may Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Beetroot",
+      "alias": [
+        "betabel",
+        "betarraga",
+        "beetroot",
+        "table beet"
+      ]
+    },
+    "rabano": {
+      "nombre": "Rábano",
+      "cientifico": "Raphanus sativus",
+      "familia": "Brassicaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        35,
+        35
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 0.9,
+        "end": 0.85
+      },
+      "etapas_dias": [
+        5,
+        10,
+        15,
+        5
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Radish; Mediterráneo/Europa; mar/abr Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Radish",
+      "alias": [
+        "radish"
+      ]
+    },
+    "cafe": {
+      "nombre": "Café",
+      "cientifico": "Coffea arabica",
+      "familia": "Rubiaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.9,
+        "mid": 0.95,
+        "end": 0.95
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc: suelo desnudo.",
+      "fuentes": [
+        "F56T12"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Coffee",
+      "alias": [
+        "coffee"
+      ]
+    },
+    "mango": {
+      "nombre": "Mango",
+      "cientifico": "Mangifera indica",
+      "familia": "Anacardiaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Mango fruit",
+      "alias": [
+        "mango"
+      ]
+    },
+    "aguacate": {
+      "nombre": "Aguacate",
+      "cientifico": "Persea americana",
+      "familia": "Lauraceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.6,
+        "mid": 0.85,
+        "end": 0.75
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc: suelo desnudo.",
+      "fuentes": [
+        "F56T12"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Avocado",
+      "alias": [
+        "palta",
+        "avocado"
+      ]
+    },
+    "coco": {
+      "nombre": "Coco",
+      "cientifico": "Cocos nucifera",
+      "familia": "Arecaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": null,
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. No se equipara automáticamente con Palm Trees.",
+      "fuentes": [],
+      "fuentes_por_campo": {
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Coconut",
+      "alias": [
+        "coconut"
+      ]
+    },
+    "limon": {
+      "nombre": "Limón",
+      "cientifico": "Citrus limon",
+      "familia": "Rutaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.65,
+        "mid": 0.6,
+        "end": 0.65
+      },
+      "etapas_dias": [
+        60,
+        90,
+        120,
+        95
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Citrus; Mediterráneo; ene Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. Kc: grupo Citrus, 50% de copa y suelo desnudo.",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Lemon",
+      "alias": [
+        "limón",
+        "lemon"
+      ]
+    },
+    "cana": {
+      "nombre": "Caña de azúcar",
+      "cientifico": "Saccharum officinarum",
+      "familia": "Poaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1.25,
+        "end": 0.75
+      },
+      "etapas_dias": [
+        35,
+        60,
+        190,
+        120
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sugarcane virgin; latitudes bajas Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Sugar cane",
+      "alias": [
+        "caña de azúcar",
+        "sugar cane",
+        "sugarcane"
+      ]
+    },
+    "brocoli": {
+      "nombre": "Brócoli",
+      "cientifico": "Brassica oleracea var. italica",
+      "familia": "Brassicaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        135,
+        135
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1.05,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        35,
+        45,
+        40,
+        15
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Broccoli; desierto California; sep Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Broccoli",
+      "alias": [
+        "broccoli"
+      ]
+    },
+    "coliflor": {
+      "nombre": "Coliflor",
+      "cientifico": "Brassica oleracea var. botrytis",
+      "familia": "Brassicaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        140,
+        140
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1.05,
+        "end": 0.95
+      },
+      "etapas_dias": [
+        35,
+        50,
+        40,
+        15
+      ],
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Cauliflower; desierto California; sep Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12",
+        "F56T11"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "etapas_dias": [
+          "F56T11"
+        ],
+        "ciclo_dias": [
+          "F56T11"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Cauliflower",
+      "alias": [
+        "cauliflower"
+      ]
+    },
+    "ajo": {
+      "nombre": "Ajo",
+      "cientifico": "Allium sativum",
+      "familia": "Amaryllidaceae",
+      "tipo": "anual",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.7,
+        "mid": 1,
+        "end": 0.7
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": null,
+      "residuo": null,
+      "plagas_compartidas": [],
+      "mercado_pa": null,
+      "notas": "FAO-56: Sin etapas específicas verificadas en tabla 11. Valores orientativos, no calendario local. Taxonomía y nombres comunes de referencia; confirmar especie y cultivar local. ",
+      "fuentes": [
+        "F56T12"
+      ],
+      "fuentes_por_campo": {
+        "kc": [
+          "F56T12"
+        ],
+        "fija_n_kg_ha": null,
+        "raiz_m": null,
+        "tolerancia_sequia": null,
+        "cobertura": null,
+        "residuo": null,
+        "siembra_meses": null
+      },
+      "nombre_en": "Garlic",
+      "alias": [
+        "garlic"
+      ]
     }
   },
   "piña_no_crece": [

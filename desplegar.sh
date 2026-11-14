@@ -22,5 +22,5 @@ rm -f /tmp/web.tgz /tmp/api.tgz /tmp/surco-api.service /tmp/nginx-surco.conf
 cd /opt/surco/api && runuser -u surco -- /usr/local/bin/uv sync --frozen -q
 systemctl daemon-reload && systemctl enable -q surco-api && systemctl restart surco-api && nginx -t -q && systemctl reload nginx
 "'
-for i in $(seq 1 20); do ssh prox 'pct exec 138 -- curl -sf -o /dev/null http://127.0.0.1/api/expediente/no-existe -w "%{http_code}"' 2>/dev/null | grep -q 404 && { echo "desplegado: API arriba"; exit 0; }; sleep 2; done
+for i in $(seq 1 20); do ssh prox 'pct exec 138 -- curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1/api/expediente/no-existe' 2>/dev/null | grep -q 404 && { echo "desplegado: API arriba"; exit 0; }; sleep 2; done
 echo "la API no respondió; revisar: ssh prox 'pct exec 138 -- journalctl -u surco-api -n 40'"; exit 1

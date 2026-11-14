@@ -64,7 +64,7 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
           ))}
         </div>
       )}
-      <p className="nota pie">{L('Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico del MIDA o del IDIAP.', 'This shows patterns and possibilities. The decision is yours, and it is worth going over it with a farm technician from MIDA or IDIAP.')}</p>
+      <p className="nota pie">{L('Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico agrícola de tu zona (en Panamá, el MIDA o el IDIAP).', 'This shows patterns and possibilities. The decision is yours, and it is worth going over it with a local farm advisor or extension officer.')}</p>
 
       <Hoja abierta={abierta} cerrar={cerrar} titulo={sel?.nombre ?? ''}>
         {sel && <Detalle e={sel} orden={orden} />}

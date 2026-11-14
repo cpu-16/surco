@@ -225,6 +225,13 @@ def _clima(exp):
     return n, motor.ninos(p["dias"], n)
 
 
+@app.get("/api/cultivos")
+def cultivos(lang: str = "es"):
+    return [{"id": clave, "nombre": motor.nombre_cultivo(clave, lang),
+             "cientifico": c["cientifico"], "tipo": c["tipo"], "alias": c["alias"]}
+            for clave, c in motor.AGRO["cultivos"].items()]
+
+
 @app.post("/api/comparar")
 def comparar(pd: Pedido):
     n, ni = _clima(pd.expediente)

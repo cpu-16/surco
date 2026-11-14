@@ -1,39 +1,32 @@
 """Desde api/: uv run python test_ingles.py. Usa el clima POWER en caché."""
 import datetime as dt
-import hashlib
 import json
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 import app
 import ia
 import motor
-import nasa
+from test_general import power_cache, SANTIAGO
 
 
 def main():
-    p = nasa.power(8.10, -80.98)
+    p = power_cache()
     n = motor.clima_mensual(p['dias'])
     ni = motor.ninos(p['dias'], n)
     casos = [{}, {'prioridades': ['suelo'], 'charcos': 'si'},
              {'prioridades': ['agua'], 'infiltracion_min': 2, 'fotos': [{'tipo': 'perennes', 'cobertura': 5, 'hojarasca': 'mucha'}]},
              {'prioridades': ['comida'], 'infiltracion_min': 150, 'siembras': {'yuca': '2026-06'},
               'fotos': [{'tipo': 'cama', 'cobertura': 45}, {'tipo': 'perennes', 'cobertura': 0}]}]
-    # Respuestas completas del motor original, capturadas antes de los cambios.
-    huellas = ['cb88e53370a9620fc72f5abdac7ce360dedb95a4092115f6c2e9eb1f82c0e539',
-               'c4e5283d9a43ebdc4d4356da979738485c374b2d441d3e6e69abc6af5b3679c5',
-               'a0279d87ba8a00e18328e24d513b0d90aa7ab0a7bffe0665923b5a1c8e0aa950',
-               '3059947a4b29f67b2ef256ba97f432e7c952fc84efc6af1d67f940f6985c4b6c']
-    nombres = ['Current practice: cassava after cassava',
-               'Cover the soil with dry leaves (mulch), cowpea and sweet potato',
-               'Cover the soil with dry leaves (mulch), jack bean to feed the soil, and corn',
-               'Pigeon pea in the garden plot and forage peanut (Arachis pintoi) under the trees']
-    for exp, huella in zip(casos, huellas):
+    # Nombres dinámicos: ahora dependen de los cultivos del expediente.
+    for exp in casos:
+        exp = {**SANTIAGO, **exp}
         args = (exp, n, ni['promedio'], dt.date(2026, 11, 14))
         es = motor.comparar(*args, lang='es')
         # la huella del español fijó la salida durante la traducción (14-nov); los cambios de reglas posteriores la mueven a propósito
         assert es == motor.comparar(*args) == motor.comparar(*args, lang='fr')
         en = motor.comparar(*args, lang='en')
-        assert [e['nombre'] for e in en['estrategias']] == nombres
+        assert en['estrategias'][0]['nombre'] == 'What you do now: cassava after cassava'
+        assert [e['id'] for e in en['estrategias']] == ['actual', 'tapar', 'rotar', 'viva']
         assert es['lectura'] != en['lectura']
         assert 'Con lo que escogiste' not in json.dumps(en['lectura'])
         assert 'Foto del suelo' not in json.dumps(en['faltan'])
@@ -72,7 +65,7 @@ def main():
             expected = 'en' if lang == 'en' else 'es'
             r = client.post('/api/comparar', json={'expediente': {}, **fields})
             assert r.status_code == 200
-            assert r.json()['estrategias'][0]['nombre'] == (nombres[0] if expected == 'en' else motor.ESTR[0]['nombre'])
+            assert r.json()['estrategias'][0]['nombre'] == ('What you do now: keep your existing plants' if expected == 'en' else 'Lo que haces hoy: conservar las plantas que ya tienes')
             with patch.object(ia, 'foto', return_value={}) as mock:
                 assert client.post('/api/ia/foto', files={'foto': ('test.jpg', jpeg, 'image/jpeg')}, data=fields).status_code == 200
                 assert mock.call_args.args[-1] == expected

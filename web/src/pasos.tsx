@@ -10,25 +10,53 @@ type Props = { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }
 
 export const CULTIVOS: [string, string][] = [
   ['yuca', L('Yuca', 'Cassava')], ['pina', L('Piña', 'Pineapple')], ['platano', L('Plátano', 'Plantain')], ['cacao', L('Cacao', 'Cocoa (cacao)')], ['naranja', L('Naranja', 'Orange')], ['toronja', L('Toronja', 'Grapefruit')],
-  ['maiz', L('Maíz', 'Corn')], ['frijol', L('Frijol', 'Beans')], ['guandu', L('Guandú', 'Pigeon pea')], ['otoe', L('Otoe', 'Taro (otoe)')], ['name', L('Ñame', 'Yam')], ['zapallo', L('Zapallo', 'Squash')],
+  ['maiz', L('Maíz', 'Corn')], ['frijol_comun', L('Frijol', 'Beans')], ['guandu', L('Guandú', 'Pigeon pea')], ['otoe', L('Otoe', 'Taro (otoe)')], ['name', L('Ñame', 'Yam')], ['zapallo', L('Zapallo', 'Squash')],
 ]
 
-/** Los que duran años: no se les pregunta la fecha de siembra. */
-const ARBOLES = new Set(['cacao', 'naranja', 'toronja', 'platano', 'mango', 'aguacate', 'limón', 'limon', 'coco', 'guanábana', 'café', 'cafe', 'marañón', 'nance'])
-export const nombreDe = (c: string) => CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
+/* Catálogo de la API (55 cultivos con nombres de varios países). Se guarda para que funcione sin señal. */
+type Cultivo = { id: string; nombre: string; cientifico: string | null; tipo: string; alias: string[] }
+const LLAVE_CAT = `surco-cultivos-${idioma}`
+let CATALOGO: Cultivo[] = local.leer<Cultivo[]>(LLAVE_CAT) ?? []
+const llano = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
+const buscar = (t: string) => { const n = llano(t); return CATALOGO.find((c) => c.id === n || llano(c.nombre) === n || c.alias.some((a) => llano(a) === n)) }
+
+function useCatalogo() {
+  const [cat, setCat] = useState(CATALOGO)
+  useEffect(() => {
+    fetch(`/api/cultivos?lang=${idioma}`).then((r) => r.ok ? r.json() : null).then((d: Cultivo[] | null) => {
+      if (d?.length) { CATALOGO = d; local.poner(LLAVE_CAT, d); setCat(d) }
+    }).catch(() => { /* sin señal: queda el guardado */ })
+  }, [])
+  return cat
+}
+
+/** Los que duran años no necesitan fecha de siembra; sin catálogo, se adivina por la lista corta. */
+const ARBOLES = new Set(['cacao', 'naranja', 'toronja', 'platano', 'mango', 'aguacate', 'limon', 'coco', 'cafe', 'banano', 'pina'])
+const esCorto = (c: string) => { const x = CATALOGO.find((k) => k.id === c); return x ? x.tipo === 'anual' : !ARBOLES.has(c) }
+export const nombreDe = (c: string) => CATALOGO.find((k) => k.id === c)?.nombre ?? CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
 
 /* ---------------- Paso 1: el patio ---------------- */
+
+/** Otros climas de un toque: la misma app con los datos de la NASA de cada lugar. Puntos redondeados, sin direcciones. */
+const LUGARES: { id: string; nombre: string; lat: number; lon: number; cultivos: string[] }[] = [
+  { id: 'pa', nombre: L('Santiago de Veraguas, Panamá', 'Santiago de Veraguas, Panama'), lat: 8.1, lon: -80.98, cultivos: ['yuca', 'pina', 'platano', 'cacao', 'naranja', 'toronja'] },
+  { id: 'gt', nombre: L('Chiquimula, Guatemala (Corredor Seco)', 'Chiquimula, Guatemala (Dry Corridor)'), lat: 14.8, lon: -89.54, cultivos: ['maiz', 'frijol_comun', 'zapallo'] },
+  { id: 'ke', nombre: L('Machakos, Kenia', 'Machakos, Kenya'), lat: -1.52, lon: 37.26, cultivos: ['maiz', 'frijol_comun', 'mango'] },
+  { id: 'in', nombre: L('Telangana, India', 'Telangana, India'), lat: 17.4, lon: 78.5, cultivos: ['tomate', 'naju', 'mango'] },
+]
 
 export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) {
   const [buscando, setBuscando] = useState(false)
   const [aviso, setAviso] = useState('')
   const alternar = (v: string) => cambiar({ cultivos: exp.cultivos.includes(v) ? exp.cultivos.filter((x) => x !== v) : [...exp.cultivos, v] })
   const [otro, setOtro] = useState('')
+  const catalogo = useCatalogo()
   const propios = exp.cultivos.filter((c) => !CULTIVOS.some(([k]) => k === c))
-  const cortos = exp.cultivos.filter((c) => !ARBOLES.has(c))
+  const cortos = exp.cultivos.filter(esCorto)
   const agregar = (e: FormEvent) => {
     e.preventDefault()
-    const v = otro.trim().toLowerCase()
+    // «ahuyama», «auyama» o «pumpkin» llegan al mismo zapallo; lo que no está en el catálogo se guarda tal cual
+    const v = buscar(otro)?.id ?? otro.trim().toLowerCase()
     if (v && !exp.cultivos.includes(v)) cambiar({ cultivos: [...exp.cultivos, v] })
     setOtro('')
   }
@@ -55,6 +83,15 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
         <button className="boton claro lugar-boton" onClick={ubicar} disabled={buscando}><Icono n="ubicar" />{buscando ? L('Buscando…', 'Searching…') : L('Usar mi ubicación', 'Use my location')}</button>
         {aviso && <p className="nota alerta lugar-boton" role="alert">{aviso}</p>}
       </div>
+      <p className="nota otros-lugares">{L('O mira cómo sale en otro clima:', 'Or see how it works in another climate:')}</p>
+      <div className="chips">
+        {LUGARES.map((x) => (
+          <button key={x.id} className="chip" aria-pressed={exp.lat === x.lat && exp.lon === x.lon} onClick={() => {
+            if (exp.fotos.length && !confirm(L('Esto cambia tu patio por el ejemplo y quita tus fotos. ¿Sigues?', 'This replaces your yard with the example and removes your photos. Continue?'))) return
+            cambiar({ lat: x.lat, lon: x.lon, nombre: x.nombre, cultivos: x.cultivos, siembras: {}, fotos: [] })
+          }}>{x.nombre}</button>
+        ))}
+      </div>
 
       <h2 className="sub">{L('¿Qué tienes sembrado?', 'What do you have planted?')}</h2>
       <div className="chips">
@@ -63,14 +100,15 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
           {propios.map((c) => (
             <motion.button key={c} className="chip" aria-pressed="true" onClick={() => alternar(c)} aria-label={L(`Quitar ${c}`, `Remove ${c}`)}
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}>
-              {c[0].toUpperCase() + c.slice(1)}<Icono n="cerrar" t={14} />
+              {nombreDe(c)}<Icono n="cerrar" t={14} />
             </motion.button>
           ))}
         </AnimatePresence>
       </div>
       <form className="otro" onSubmit={agregar}>
-        <input value={otro} onChange={(e) => setOtro(e.target.value)} maxLength={40} enterKeyHint="done"
-          placeholder={L('¿Otro? Ej.: ají, mango, culantro', 'Another one? E.g.: hot pepper, mango, culantro')} aria-label={L('Escribe otro cultivo', 'Type another crop')} />
+        <input value={otro} onChange={(e) => setOtro(e.target.value)} maxLength={40} enterKeyHint="done" list="lista-cultivos"
+          placeholder={L('¿Otro? Ej.: ají, tomate, culantro', 'Another one? E.g.: hot pepper, tomato, culantro')} aria-label={L('Escribe otro cultivo', 'Type another crop')} />
+        <datalist id="lista-cultivos">{catalogo.map((c) => <option key={c.id} value={c.nombre} label={c.alias.join(', ')} />)}</datalist>
         <button className="boton claro" disabled={!otro.trim()}>{L('Agregar', 'Add')}</button>
       </form>
 
@@ -80,7 +118,7 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
           {cortos.map((c) => (
             <Siembra key={c} nombre={nombreDe(c)} valor={exp.siembras[c] ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, [c]: v } })} />
           ))}
-          <small className="nota">{L('Los árboles no hacen falta.', 'Trees are not needed.')}{exp.cultivos.includes('yuca') && !exp.siembras.yuca ? L(' Si no pones la yuca, calculo como si fuera en mayo.', " If you leave out the cassava, I'll count it as planted in May.") : ''}</small>
+          <small className="nota">{L('Los árboles no hacen falta. Si dejas uno en blanco, calculo como si lo hubieras sembrado al empezar las lluvias.', "Trees are not needed. If you leave one blank, I'll count it as planted when the rains started.")}</small>
         </fieldset>
       )}
       <label className="campo">
@@ -118,8 +156,8 @@ function Siembra({ nombre, valor, poner }: { nombre: string; valor: string; pone
 /* ---------------- Paso 3: las fotos, una por una ---------------- */
 
 export const FOTOS: { tipo: TipoFoto; corto: string; titulo: string; como: string }[] = [
-  { tipo: 'cama', corto: L('El huerto', 'The garden plot'), titulo: L('El suelo del huerto (yuca, piña…)', 'The soil of the garden plot (cassava, pineapple…)'), como: L('De pie, con el celular a la altura del pecho, mirando hacia abajo.', 'Standing up, with the phone at chest height, pointing down.') },
-  { tipo: 'perennes', corto: L('Bajo los árboles', 'Under the trees'), titulo: L('El suelo debajo del cacao o los cítricos', 'The soil under the cocoa (cacao) or citrus trees'), como: L('Igual, pero debajo de la copa. El satélite no puede ver esto.', "The same way, but under the tree crown. The satellite can't see this.") },
+  { tipo: 'cama', corto: L('El huerto', 'The garden plot'), titulo: L('El suelo del huerto', 'The soil of the garden plot'), como: L('De pie, con el celular a la altura del pecho, mirando hacia abajo.', 'Standing up, with the phone at chest height, pointing down.') },
+  { tipo: 'perennes', corto: L('Bajo los árboles', 'Under the trees'), titulo: L('El suelo debajo de los árboles', 'The soil under the trees'), como: L('Igual, pero debajo de la copa. El satélite no puede ver esto.', "The same way, but under the tree crown. The satellite can't see this.") },
   { tipo: 'pina', corto: L('Una piña', 'A pineapple'), titulo: L('Una piña completa', 'A whole pineapple plant'), como: L('La planta entera con su base, para ver cómo está.', 'The whole plant with its base, to see how it is doing.') },
   { tipo: 'general', corto: L('El patio', 'The plot'), titulo: L('El patio entero', 'The whole plot'), como: L('Desde una esquina, para ver si hay pendiente.', 'From a corner, to see if there is a slope.') },
 ]

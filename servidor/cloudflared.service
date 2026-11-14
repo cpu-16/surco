@@ -1,0 +1,19 @@
+[Unit]
+Description=Cloudflare Tunnel (surco)
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+EnvironmentFile=/etc/cloudflared/surco.env
+ExecStart=/usr/local/bin/cloudflared --no-autoupdate --loglevel info tunnel run
+Restart=on-failure
+RestartSec=5
+User=root
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
