@@ -22,7 +22,7 @@ export type Lugar = {
 
 export type Foto = { id: string; tipo: TipoFoto; fecha: string; cobertura: number; descripcion?: string; hojarasca?: 'mucha' | 'poca' | 'nada' | null; miniatura: string; mascara?: string }
 export type TipoFoto = 'cama' | 'perennes' | 'pina' | 'general'
-export type Ficha = { decision?: string; motivo?: string; pendiente?: string; revisar?: string }
+export type Ficha = { decision?: string; semilla?: 'tengo' | 'conseguir' | 'no hay'; motivo?: string; pendiente?: string; revisar?: string }
 export type Resultado = {
   fecha: string; version?: string; lectura: string[]
   estrategias: { id: string; nombre: string; desnudo_cama: number | null; desnudo_arboles: number; deficit_normal_mm: number | null; deficit_nino_mm: number | null }[]

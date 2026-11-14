@@ -18,7 +18,7 @@ type Paso = { id: string; corto: string; titulo: string; listo: (e: Expediente) 
 const PASOS: Paso[] = [
   { id: 'patio', corto: L('Tu patio', "Your plot"), titulo: L('¿Dónde está y qué siembras?', "Where is it and what do you grow?"), listo: (e) => e.cultivos.length > 0 },
   { id: 'cielo', corto: L('El cielo', "The sky"), titulo: L('Lo que ve la NASA sobre tu patio', "What NASA sees above your plot"), listo: () => true },
-  { id: 'fotos', corto: L('Tus fotos', "Your photos"), titulo: L('El suelo que ves tú', "The soil you see"), listo: (e) => e.fotos.length >= 2 },
+  { id: 'fotos', corto: L('Tus fotos', "Your photos"), titulo: L('El suelo que ves tú', "The soil you see"), listo: (e) => fotosDe(e).filter((f) => f.tipo === 'cama' || f.tipo === 'perennes').every((f) => e.fotos.some((x) => x.tipo === f.tipo)) },
   { id: 'agua', corto: L('El agua', "Water"), titulo: L('¿El agua entra o se queda arriba?', "Does water soak in or stay on top?"), listo: (e) => e.infiltracion_min != null || !!e.charcos },
   { id: 'importa', corto: L('Lo tuyo', "Your needs"), titulo: L('¿Qué te importa más?', "What matters most to you?"), listo: (e) => e.prioridades.length > 0 },
   { id: 'anio', corto: L('Tu año', "Your year"), titulo: L('Así le iría a tu suelo', "How your soil could do"), listo: () => true },

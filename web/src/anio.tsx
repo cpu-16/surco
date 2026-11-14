@@ -8,6 +8,7 @@ export type Muestra = { mes: number; cultivo: string | null; nombre: string | nu
 export type Estrategia = {
   id: string; nombre: string; aplica_a: string; tira: Muestra[]; arboles: Muestra[]; meses_desnudo: number; desnudo_cama: number | null; desnudo_arboles: number
   n_kg_ha: [number, number] | null
+  comida_meses?: number | null; labores?: { siembras: number; tapar_hojas: number; cortes: number }
   n_por_planta?: { nombre: string; kg_ha: [number, number] }[]
   agua: { demanda_seca_mm: number | null; deficit_normal_mm: number | null; deficit_nino_mm: number | null }
   razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string }[]
@@ -138,6 +139,9 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
           <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>{L('si llueve como en los Niños', 'if it rains like in the El Niño years')}</span></div>
         </>}
       </div>
+      {e.labores && <p className="nota">{L(<>Trabajo en el año: <b>{e.labores.siembras}</b> {e.labores.siembras === 1 ? 'siembra' : 'siembras'}, <b>{e.labores.tapar_hojas}</b> {e.labores.tapar_hojas === 1 ? 'tapada' : 'tapadas'} con hojas y <b>{e.labores.cortes}</b> {e.labores.cortes === 1 ? 'corte' : 'cortes'}.</>,
+        <>Work in the year: <b>{e.labores.siembras}</b> {e.labores.siembras === 1 ? 'planting' : 'plantings'}, <b>{e.labores.tapar_hojas}</b> leaf {e.labores.tapar_hojas === 1 ? 'mulching' : 'mulchings'} and <b>{e.labores.cortes}</b> {e.labores.cortes === 1 ? 'cut' : 'cuts'}.</>)}
+        {e.comida_meses != null && L(<> Primera cosecha que se come: en <b>{e.comida_meses}</b> {e.comida_meses === 1 ? 'mes' : 'meses'}.</>, <> First harvest you can eat: in <b>{e.comida_meses}</b> {e.comida_meses === 1 ? 'month' : 'months'}.</>)}</p>}
       {e.agua.deficit_normal_mm !== null && <p className="nota">{L('1 mm es 1 litro por cada metro cuadrado de huerto. Cuenta solo las camas de ciclo corto: no los árboles, ni tu riego, ni el agua que ahorran las hojas.', '1 mm is 1 litre for each square metre of garden plot. It counts only the short-cycle beds: not the trees, your watering, or the water the leaves save.')}</p>}
       {!!e.n_por_planta?.length && (
         <p className="nota">{L('Nitrógeno que puede dejar cada planta según estudios de otros lugares (kg por hectárea, no medido en tu patio): ', 'Nitrogen each plant can leave, from studies elsewhere (kg per hectare, not measured in your yard): ')}

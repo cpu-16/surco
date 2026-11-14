@@ -41,6 +41,9 @@ function linea(e: ExpRegistro, nombreCultivo: (c: string) => string, ajeno = fal
   return items.sort((a, b) => b.fecha.localeCompare(a.fecha))
 }
 
+/** La primera revisión, a un mes: lo que se puede comprobar rápido es si el suelo sigue tapado. */
+const en30dias = () => new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 7)
+
 /* ---------------- Paso 8: el registro del dueño ---------------- */
 
 export function Registro({ exp, cambiar, comp, lugar, enLinea, nombreCultivo }: {
@@ -94,20 +97,29 @@ export function Registro({ exp, cambiar, comp, lugar, enLinea, nombreCultivo }: 
       <h2 className="sub">{L('¿Cuál vas a probar?', 'Which one will you try?')}</h2>
       <div className="decision" role="radiogroup" aria-label={L('Lo que decidiste', 'Your decision')}>
         {(comp?.estrategias ?? []).map((e) => (
-          <button key={e.id} role="radio" aria-checked={ficha.decision === e.id} className="decision-op" onClick={() => poner({ decision: ficha.decision === e.id ? undefined : e.id })}>
+          <button key={e.id} role="radio" aria-checked={ficha.decision === e.id} className="decision-op" onClick={() => poner({ decision: ficha.decision === e.id ? undefined : e.id, revisar: ficha.revisar || en30dias() })}>
             <span className="marca-op" aria-hidden="true">{ficha.decision === e.id && <motion.span layoutId="op" className="marca-llena" transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }} />}</span>
             {e.nombre}
           </button>
         ))}
         {!comp && <Cargando texto={L('Calculando las opciones…', 'Working out the options…')} />}
       </div>
+      {ficha.decision && ficha.decision !== 'actual' && <>
+        <h2 className="sub">{L('¿Tienes la semilla o las hojas?', 'Do you have the seed or the leaves?')}</h2>
+        <div className="chips">
+          {([['tengo', L('Sí, las tengo', 'Yes, I have them')], ['conseguir', L('Hay que conseguirlas', 'I need to get them')], ['no hay', L('No hay por aquí', 'None around here')]] as const).map(([k, t]) => (
+            <button key={k} className="chip" aria-pressed={ficha.semilla === k} onClick={() => poner({ semilla: ficha.semilla === k ? undefined : k })}>{t}</button>
+          ))}
+        </div>
+        {ficha.semilla === 'no hay' && <p className="nota">{L('Pregúntale al técnico qué hay en tu zona, o prueba con «Tapar con hojas secas», que usa lo que ya cae en tu patio.', 'Ask your advisor what is available where you live, or try “Cover with dry leaves”, which uses what already falls in your yard.')}</p>}
+      </>}
       <label className="campo">
         <span>{L('¿Por qué esa?', 'Why that one?')}</span>
         <input value={ficha.motivo ?? ''} onChange={(e) => poner({ motivo: e.target.value })} maxLength={300} placeholder={L('Ej.: tengo semilla de guandú', 'E.g.: I have pigeon pea seed')} />
       </label>
       <label className="campo">
         <span>{L('¿Qué vas a revisar?', 'What will you check?')}</span>
-        <input value={ficha.pendiente ?? ''} onChange={(e) => poner({ pendiente: e.target.value })} maxLength={300} placeholder={L('Ej.: si el suelo bajo el cacao se mantiene tapado', 'E.g.: whether the soil under the cacao stays covered')} />
+        <input value={ficha.pendiente ?? ''} onChange={(e) => poner({ pendiente: e.target.value })} maxLength={300} placeholder={L('Ej.: si el suelo sigue tapado en un mes', 'E.g.: whether the soil is still covered in a month')} />
       </label>
       <label className="campo en-linea">
         <span>{L('Próxima revisión:', 'Next check:')}</span>
@@ -187,6 +199,7 @@ export function VistaRegistro({ id, nombreCultivo }: { id: string; nombreCultivo
 
       <h2 className="sub">{L('Lo que decidió', 'Their decision')}</h2>
       <p><b>{elegida?.nombre ?? L('Todavía no ha escogido.', 'Not chosen yet.')}</b>{exp.ficha?.motivo && <> {L('Porque:', 'Because:')} {exp.ficha.motivo}</>}</p>
+      {exp.ficha?.semilla && <p>{L('Semilla u hojas:', 'Seed or leaves:')} {{ tengo: L('ya las tiene', 'has them'), conseguir: L('hay que conseguirlas', 'needs to get them'), 'no hay': L('no hay por su zona', 'none in the area') }[exp.ficha.semilla]}</p>}
       {exp.ficha?.pendiente && <p>{L('Va a revisar:', 'Will check:')} {exp.ficha.pendiente}{exp.ficha.revisar && ` (${MES(exp.ficha.revisar)})`}</p>}
 
       {r && (
