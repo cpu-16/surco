@@ -113,37 +113,10 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
         <button className="icono-btn lleno" disabled={ocupado || !texto.trim() || !enLinea} aria-label={L('Enviar', 'Send')}><Icono n="enviar" /></button>
       </form>
 
-      <Compartir exp={exp} cambiar={cambiar} enLinea={enLinea} />
     </>
   )
 }
 
-function Compartir({ exp, cambiar, enLinea }: { exp: Expediente; cambiar: (p: Partial<Expediente>) => void; enLinea: boolean }) {
-  const [enlace, setEnlace] = useState('')
-  const [error, setError] = useState('')
-  const compartir = async () => {
-    setError('')
-    try {
-      const datos = { datos: sinImagenes(exp) }
-      const r = exp.id
-        ? (await pedir(`/api/expediente/${exp.id}`, { method: 'PUT', body: JSON.stringify(datos) }), { id: exp.id })
-        : await pedir<{ id: string }>('/api/expediente', { method: 'POST', body: JSON.stringify(datos) })
-      cambiar({ id: r.id })
-      const url = `${location.origin}/?e=${r.id}`
-      setEnlace(url)
-      navigator.share?.({ title: exp.nombre, url }).catch(() => { /* cancelado */ })
-    } catch (e) { setError((e as Error).message) }
-  }
-  return (
-    <div className="compartir">
-      <h2 className="sub">{L('Revisarlo con un técnico', 'Go over it with a farm technician')}</h2>
-      <p className="nota">{L('El técnico abre lo mismo que ves tú. Las fotos se quedan en tu celular; solo va su medición.', 'The technician opens the same thing you see. The photos stay on your phone; only what was measured from them is sent.')}</p>
-      <button className="boton" onClick={compartir} disabled={!enLinea}><Icono n="compartir" />{L('Compartir mi patio', 'Share my yard')}</button>
-      {enlace && <p className="enlace-listo"><a href={enlace}>{enlace}</a></p>}
-      {error && <p className="nota alerta" role="alert">{L('No se pudo compartir:', 'Could not share:')} {error}</p>}
-    </div>
-  )
-}
 
 function resumenLugar(l: Lugar | null) {
   if (!l) return null

@@ -8,6 +8,7 @@ export type Muestra = { mes: number; cultivo: string | null; nombre: string | nu
 export type Estrategia = {
   id: string; nombre: string; aplica_a: string; tira: Muestra[]; arboles: Muestra[]; meses_desnudo: number; desnudo_cama: number; desnudo_arboles: number
   n_kg_ha: [number, number] | null
+  n_por_planta?: { nombre: string; kg_ha: [number, number] }[]
   agua: { demanda_seca_mm: number; deficit_normal_mm: number; deficit_nino_mm: number }
   razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string }[]
   beneficios: string[]; vacios: string[]; riesgos: string[]; ajustes: string[]
@@ -127,12 +128,15 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
       )}
 
       <div className="numeros">
-        <div><span className="cifra">{e.desnudo_cama + e.desnudo_arboles}</span><span>{L(`${e.desnudo_cama + e.desnudo_arboles === 1 ? 'mes' : 'meses'} de suelo desnudo, sumando huerto y árboles`,
-          `${e.desnudo_cama + e.desnudo_arboles === 1 ? 'month' : 'months'} of bare soil, garden plot and trees added together`)}</span></div>
+        <div><span className="cifra">{e.desnudo_cama}</span><span>{L(`${e.desnudo_cama === 1 ? 'mes' : 'meses'} con el huerto pelado`, `${e.desnudo_cama === 1 ? 'month' : 'months'} with the garden plot bare`)}</span></div>
+        <div><span className="cifra">{e.desnudo_arboles}</span><span>{L(`${e.desnudo_arboles === 1 ? 'mes' : 'meses'} con el suelo pelado bajo los árboles`, `${e.desnudo_arboles === 1 ? 'month' : 'months'} with bare soil under the trees`)}</span></div>
         <div><span className="cifra">{e.agua.deficit_normal_mm}<small> mm</small></span><span>{L('de agua que falta en la seca de un año normal', 'of water short in the dry season of a normal year')}</span></div>
         <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>{L('si llueve como en los Niños', 'if it rains like in the El Niño years')}</span></div>
-        {e.n_kg_ha && <div><span className="cifra">{e.n_kg_ha[0]}–{e.n_kg_ha[1]}</span><span>{L('kg de nitrógeno por hectárea que dejan las leguminosas', 'kg of nitrogen per hectare left by the legumes')}</span></div>}
       </div>
+      {!!e.n_por_planta?.length && (
+        <p className="nota">{L('Nitrógeno que puede dejar cada planta según estudios de otros lugares (kg por hectárea, no medido en tu patio): ', 'Nitrogen each plant can leave, from studies elsewhere (kg per hectare, not measured in your yard): ')}
+          {e.n_por_planta.map((n) => `${n.nombre} ${n.kg_ha[0]}–${n.kg_ha[1]}`).join('; ')}.</p>
+      )}
 
       {!!e.ajustes.length && <Bloque titulo={L('Lo que cambió con tus datos', 'What changed with your data')} items={e.ajustes} />}
       <Bloque titulo={L('Qué le da al suelo', 'What it gives the soil')} items={e.beneficios} />

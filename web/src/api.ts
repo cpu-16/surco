@@ -22,6 +22,12 @@ export type Lugar = {
 
 export type Foto = { id: string; tipo: TipoFoto; fecha: string; cobertura: number; descripcion?: string; hojarasca?: 'mucha' | 'poca' | 'nada' | null; miniatura: string; mascara?: string }
 export type TipoFoto = 'cama' | 'perennes' | 'pina' | 'general'
+export type Ficha = { decision?: string; motivo?: string; pendiente?: string; revisar?: string }
+export type Resultado = {
+  fecha: string; version?: string; lectura: string[]
+  estrategias: { id: string; nombre: string; desnudo_cama: number; desnudo_arboles: number; deficit_normal_mm: number; deficit_nino_mm: number }[]
+  fuentes: string[]
+}
 export type Expediente = {
   id?: string
   nombre: string
@@ -34,7 +40,9 @@ export type Expediente = {
   fotos: Foto[]
   infiltracion_min: number | null // minutos que tarda en entrar la segunda lata (450 mL, 2,5 cm de agua)
   charcos?: 'si' | 'no' | 'nose' | null // ¿quedan charcos al día siguiente de un aguacero?
-  notas: { quien: 'productor' | 'tecnico'; texto: string; fecha: string }[]
+  notas: { quien: 'productor' | 'tecnico'; nombre?: string; texto: string; fecha: string }[]
+  ficha?: Ficha // la decisión que se lleva al registro
+  resultado?: Resultado // copia de lo que calculó la app al guardar
 }
 
 export const EJEMPLO: Expediente = {

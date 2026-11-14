@@ -1,10 +1,11 @@
 import { Escena, useMes } from './escena'
 import { cambiarIdioma, idioma, L } from './i18n'
+import { Registro } from './registro'
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
 import { EJEMPLO, local, pedir, sinImagenes, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
-import { Agua, FOTOS, Fotos, Importa, Patio } from './pasos'
+import { Agua, FOTOS, Fotos, Importa, nombreDe, Patio } from './pasos'
 import Cielo from './cielo'
 import Anio, { type Comparacion } from './anio'
 import { Cargando, Hoja, Icono } from './ui'
@@ -22,6 +23,7 @@ const PASOS: Paso[] = [
   { id: 'importa', corto: L('Lo tuyo', "Your needs"), titulo: L('¿Qué te importa más?', "What matters most to you?"), listo: (e) => e.prioridades.length > 0 },
   { id: 'anio', corto: L('Tu año', "Your year"), titulo: L('Así le iría a tu suelo', "How your soil could do"), listo: () => true },
   { id: 'conversa', corto: L('Conversa', "Chat"), titulo: L('Pregunta o compártelo', "Ask or share"), listo: () => true },
+  { id: 'registro', corto: L('Registro', 'Record'), titulo: L('Tu registro del patio', 'Your yard record'), listo: (e) => !!e.id },
 ]
 const IDS = PASOS.map((p) => p.id)
 // lo que el motor pide → el paso donde se resuelve
@@ -186,6 +188,7 @@ export default function App() {
             {p.id === 'importa' && <Importa exp={exp} cambiar={cambiar} />}
             {p.id === 'anio' && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} />}
             {p.id === 'conversa' && <Suspense fallback={<Cargando texto={L("Abriendo…", "Opening…")} />}><Conversa exp={exp} lugar={lugar} comp={comp} cambiar={cambiar} enLinea={enLinea} /></Suspense>}
+            {p.id === 'registro' && <Registro exp={exp} cambiar={cambiar} comp={comp} lugar={lugar} enLinea={enLinea} nombreCultivo={nombreDe} />}
           </motion.section>
         </AnimatePresence>
       </main>

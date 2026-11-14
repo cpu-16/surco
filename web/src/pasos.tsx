@@ -15,7 +15,7 @@ export const CULTIVOS: [string, string][] = [
 
 /** Los que duran años: no se les pregunta la fecha de siembra. */
 const ARBOLES = new Set(['cacao', 'naranja', 'toronja', 'platano', 'mango', 'aguacate', 'limón', 'limon', 'coco', 'guanábana', 'café', 'cafe', 'marañón', 'nance'])
-const nombreDe = (c: string) => CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
+export const nombreDe = (c: string) => CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
 
 /* ---------------- Paso 1: el patio ---------------- */
 
