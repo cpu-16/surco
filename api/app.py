@@ -266,6 +266,13 @@ async def ia_pregunta(c: Charla):
     ctx = {"expediente": c.expediente, "estrategias": resumen, "lectura": comp.get("lectura"), "clima_nasa": c.lugar,
            "pina_no_crece": motor.AGRO.get("piña_no_crece")}
     try:
-        return await run_in_threadpool(ia.pregunta, c.historia, ctx, c.lang)
+        r = await run_in_threadpool(ia.pregunta, c.historia, ctx, c.lang)
+        prop = r.get("propuesta") if isinstance(r, dict) else None
+        if isinstance(prop, dict):  # «maíz» o «ahuyama» de la charla → la clave del catálogo, igual que en el paso 1
+            if isinstance(prop.get("cultivos"), list):
+                prop["cultivos"] = [motor.buscar_cultivo(str(x)) or str(x).lower() for x in prop["cultivos"]]
+            if isinstance(prop.get("siembras"), dict):
+                prop["siembras"] = {motor.buscar_cultivo(str(k)) or str(k).lower(): v for k, v in prop["siembras"].items()}
+        return r
     except Exception as e:
         raise HTTPException(503, str(e) if "cupo" in str(e) else "El asistente no está disponible ahora")

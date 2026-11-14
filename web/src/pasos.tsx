@@ -33,6 +33,7 @@ function useCatalogo() {
 /** Los que duran años no necesitan fecha de siembra; sin catálogo, se adivina por la lista corta. */
 const ARBOLES = new Set(['cacao', 'naranja', 'toronja', 'platano', 'mango', 'aguacate', 'limon', 'coco', 'cafe', 'banano', 'pina'])
 const esCorto = (c: string) => { const x = CATALOGO.find((k) => k.id === c); return x ? x.tipo === 'anual' : !ARBOLES.has(c) }
+const lista = (xs: string[]) => xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} ${L('y', 'and')} ${xs[xs.length - 1]}`
 export const nombreDe = (c: string) => CATALOGO.find((k) => k.id === c)?.nombre ?? CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
 
 /* ---------------- Paso 1: el patio ---------------- */
@@ -53,6 +54,7 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
   const catalogo = useCatalogo()
   const propios = exp.cultivos.filter((c) => !CULTIVOS.some(([k]) => k === c))
   const cortos = exp.cultivos.filter(esCorto)
+  const largos = exp.cultivos.filter((c) => !esCorto(c))
   const agregar = (e: FormEvent) => {
     e.preventDefault()
     // «ahuyama», «auyama» o «pumpkin» llegan al mismo zapallo; lo que no está en el catálogo se guarda tal cual
@@ -118,7 +120,9 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
           {cortos.map((c) => (
             <Siembra key={c} nombre={nombreDe(c)} valor={exp.siembras[c] ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, [c]: v } })} />
           ))}
-          <small className="nota">{L('Los árboles no hacen falta. Si dejas uno en blanco, calculo como si lo hubieras sembrado al empezar las lluvias.', "Trees are not needed. If you leave one blank, I'll count it as planted when the rains started.")}</small>
+          <small className="nota">{largos.length > 0 && L(`Solo pregunto por los que se siembran y se cosechan en meses. ${lista(largos.map(nombreDe))} ${largos.length === 1 ? 'dura' : 'duran'} años, así que no hace falta la fecha. `,
+            `I only ask about crops you plant and harvest within months. ${lista(largos.map(nombreDe))} ${largos.length === 1 ? 'lasts' : 'last'} for years, so no date is needed. `)}
+          {L('Si dejas uno en blanco, calculo como si lo hubieras sembrado al empezar las lluvias.', "If you leave one blank, I'll count it as planted when the rains started.")}</small>
         </fieldset>
       )}
       <label className="campo">
@@ -256,7 +260,7 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
           {foto && <button className="enlace" onClick={() => cambiar({ fotos: exp.fotos.filter((x) => x.tipo !== f.tipo) })}>{L('Quitar esta foto', 'Remove this photo')}</button>}
         </motion.div>
       </AnimatePresence>
-      <p className="nota pie">{L('La parte verde se mide aquí en tu celular. La foto no se sube a ningún lado.', "The green part is measured here on your phone. The photo isn't uploaded anywhere.")}</p>
+      <p className="nota pie">{L('La parte verde se mide aquí en tu celular. Con señal, el asistente mira la foto para describirla; no se guarda.', 'The green part is measured here on your phone. When online, the assistant looks at the photo to describe it; it is not stored.')}</p>
     </>
   )
 }

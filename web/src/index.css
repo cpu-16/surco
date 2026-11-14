@@ -349,16 +349,18 @@ svg text { font-family: var(--display); fill: var(--tinta-2); }
 .terrones-carga span { width: 1.15rem; height: 1.5rem; border-radius: 4px; background: var(--laterita); transform-origin: bottom; animation: brotar 1.3s var(--ease-out) infinite; }
 @keyframes brotar { 0%, 100% { transform: scaleY(0.55); background: var(--laterita); } 45% { transform: scaleY(1); background: var(--brote); } }
 
-/* bienvenida */
-.bienvenida { min-height: 100dvh; max-width: 30rem; margin: 0 auto; display: grid; align-content: center; padding: max(2rem, env(safe-area-inset-top)) 1.25rem max(2rem, env(safe-area-inset-bottom)); }
-.bienvenida-marca { display: flex; align-items: center; gap: 0.6rem; font: 700 1.7rem/1 var(--display); }
-.bienvenida-tira { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; margin: 2.2rem 0 1.8rem; }
-.bienvenida-tira .muestra { aspect-ratio: 1 / 1.7; border-radius: 5px; background: color-mix(in srgb, var(--laterita) 85%, var(--humus)); }
-.bienvenida-tira .tapa { position: absolute; inset: 0; transform-origin: bottom; }
-.bienvenida h1 { font-size: clamp(2.7rem, 12vw, 3.8rem); line-height: 0.93; letter-spacing: -0.02em; text-wrap: balance; }
-.bienvenida p { font-size: 1.08rem; margin-top: 0.9rem; }
-.bienvenida .boton.grande { width: 100%; margin: 1.5rem 0 0.4rem; }
-.bienvenida .nota { font-size: 0.9rem; }
+/* bienvenida: una sola pantalla de celular, como app. El dibujo cede alto para que el botón siempre se vea */
+.bienvenida { height: 100dvh; max-width: 30rem; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;
+  padding: max(16px, env(safe-area-inset-top)) 20px max(16px, env(safe-area-inset-bottom)); overflow: hidden; }
+.bienvenida-marca { display: flex; align-items: center; gap: 8px; font: 700 1.35rem/1 var(--display); }
+.bienvenida-idioma { margin-left: auto; font: 500 0.9rem/1 var(--texto); padding: 8px 0; }
+.bienvenida .escena-fig { flex: 1 1 auto; min-height: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; }
+.bienvenida .escena-fig svg { flex: 0 1 auto; min-height: 0; max-height: 100%; width: 100%; }
+.bienvenida-texto { flex: none; }
+.bienvenida h1 { font-size: clamp(1.9rem, min(9.5vw, 5.4dvh), 3rem); line-height: 0.98; letter-spacing: -0.01em; text-wrap: balance; }
+.bienvenida-texto > p:not(.nota) { font-size: 1rem; line-height: 1.4; margin-top: 8px; text-wrap: pretty; }
+.bienvenida .boton.grande { width: 100%; margin: 16px 0 8px; }
+.bienvenida .nota { font-size: 0.85rem; margin: 0; text-align: center; }
 
 /* el cambio de tema se abre en círculo; sin la animación por defecto de cruce */
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
@@ -396,8 +398,7 @@ fieldset.campo legend { padding: 0; margin-bottom: 0.35rem; }
 .pendiente .paso-chip { color: #fff; font-size: 0.8rem; } /* gana a .pendiente span */
 /* terrón: la laterita oscurecida, que se lea igual de tierra en claro y en oscuro */
 :root { --terron: color-mix(in srgb, var(--laterita) 72%, #2b1a10); }
-.terron, .subpasos .punto, .paso-chip, .bienvenida-tira .muestra { background: var(--terron); }
-.e-pie .ver { white-space: nowrap; }
+.terron, .subpasos .punto, .paso-chip, .e-pie .ver { white-space: nowrap; }
 
 /* ---- Cultivo escrito a mano ---- */
 .otro { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
@@ -456,8 +457,6 @@ fieldset.campo legend { padding: 0; margin-bottom: 0.35rem; }
 @keyframes corre { to { stroke-dashoffset: 26; } }
 .entra path { animation: baja 0.9s linear infinite; }
 @keyframes baja { to { stroke-dashoffset: -20; } }
-.bienvenida-tira .muestra { position: relative; transition: transform 250ms var(--ease-out), box-shadow 250ms ease; }
-.bienvenida-tira .muestra[data-actual='true'] { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--fondo), 0 0 0 3.5px var(--tinta); }
 @media (prefers-reduced-motion: reduce) { .satelite, .rayos, .lluvia-cae path, .salpica circle, .arrastre, .entra path { animation: none; } .satelite { transform: translate(250px, 14px); } }
 .icono-btn.idioma { font: 700 0.95rem/1 var(--display); letter-spacing: 0.04em; }
 

@@ -42,10 +42,10 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
                 {hayMejor && total(e) === mejor && <span className="sello">{L('Menos suelo desnudo', 'Least bare soil')}</span>}
               </span>
               <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />
-              <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />
+              {e.arboles.length > 0 && <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />}
               <span className="e-pie">
-                <span>{L(<>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto, <b>{e.desnudo_arboles}</b> bajo los árboles</>,
-                  <>Bare: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot, <b>{e.desnudo_arboles}</b> under the trees</>)}</span>
+                <span>{L(<>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto{e.arboles.length > 0 && <>, <b>{e.desnudo_arboles}</b> bajo los árboles</>}</>,
+                  <>Bare: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot{e.arboles.length > 0 && <>, <b>{e.desnudo_arboles}</b> under the trees</>}</>)}</span>
                 <span className="ver">{L('Ver por qué', 'See why')}</span>
               </span>
             </button>
@@ -79,7 +79,8 @@ function Tira({ etq, fila, orden, retraso }: { etq: string; fila: Muestra[]; ord
       <span className="etq">{etq}</span>
       <span className="tira" role="img" aria-label={`${etq}: ${orden.map((mes) => `${MESES_LARGOS[mes - 1]} ${fila.find((x) => x.mes === mes)?.nombre ?? L('desnudo', 'bare')}`).join(', ')}`}>
         {orden.map((mes, i) => {
-          const m = fila.find((x) => x.mes === mes)!
+          const m = fila.find((x) => x.mes === mes)
+          if (!m) return <span key={mes} className="muestra" />
           return (
             <motion.span key={mes} className="muestra" data-medido={m.medido ? 1 : 0} style={{ background: COLOR[m.cobertura] }}
               initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}

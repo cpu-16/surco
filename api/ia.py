@@ -35,8 +35,8 @@ PREG = BASE + (" Te llegan los DATOS del expediente (cultivos, fotos medidas, pr
                "calculada de las estrategias y el clima de la NASA para su zona, más la HISTORIA de la conversación. Responde "
                "a lo último que dijo el productor en 2 a 6 frases. Si el productor te cuenta datos de su patio (qué siembra, "
                "cuándo sembró algo en formato AAAA-MM, si riega, qué le importa, cuántos minutos tardó el agua), propónlos "
-               "para guardar. Claves válidas de propuesta: cultivos (lista de: yuca, pina, platano, cacao, naranja, toronja, "
-               "maiz, frijol, guandu, otoe, name, zapallo, o el nombre en minúscula de cualquier otro cultivo que diga), siembras (objeto cultivo → AAAA-MM), riego (no | a veces | si), "
+               "para guardar. Claves válidas de propuesta: cultivos (lista con el nombre en minúscula de cada cultivo que diga, "
+               "como lo dijo: «yuca», «maíz», «frijol», «ahuyama»; la app lo busca en su catálogo de 55 cultivos), siembras (objeto cultivo → AAAA-MM), riego (no | a veces | si), "
                "prioridades (lista de: agua, suelo, comida, venta, trabajo), infiltracion_min (número), charcos (si | no | nose). Devuelve SOLO JSON: "
                '{"respuesta": "...", "fuentes": ["nombre corto de cada dato o fuente que usaste"], "propuesta": {…} o null}')
 

@@ -212,27 +212,22 @@ function Marca({ t = 22 }: { t?: number }) {
 }
 
 /** Primera vez: un año de suelo que se va cubriendo, mes por mes. Es toda la idea en un segundo. */
-const AÑO = ['alta', 'alta', 'media', 'baja', 'alta', 'alta', 'alta', 'media', 'media', 'alta', 'alta', 'media'] as const
 function Bienvenida({ empezar }: { empezar: () => void }) {
   const mes = useMes()
-  const color = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)' }
   return (
     <main className="bienvenida">
-      <div className="bienvenida-marca"><Marca t={30} /><span>{NOMBRE}</span></div>
-      <Escena mes={mes} />
-      <div className="bienvenida-tira" aria-hidden="true">
-        {AÑO.map((c, i) => (
-          <span key={i} className="muestra" data-actual={i === mes}>
-            <motion.span className="tapa" style={{ background: color[c] }} initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
-              transition={{ type: 'spring', bounce: 0.2, duration: 0.6, delay: 0.5 + i * 0.07 }} />
-          </span>
-        ))}
+      <div className="bienvenida-marca">
+        <Marca t={26} /><span>{NOMBRE}</span>
+        <button className="enlace bienvenida-idioma" onClick={() => cambiarIdioma(idioma === 'en' ? 'es' : 'en')} lang={idioma === 'en' ? 'es' : 'en'}>
+          {idioma === 'en' ? 'Español' : 'English'}
+        </button>
       </div>
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', bounce: 0, duration: 0.6, delay: 0.15 }}>
-        <h1>{L("El año de tu suelo, mes por mes", "Your soil through the year, month by month")}</h1>
-        <p>{L("Compara maneras de sembrar tu patio según cuánto tiempo dejan el suelo desnudo. Con datos de la NASA y lo que ves tú.", "Compare ways to plant your plot by how long they leave the soil bare. Using NASA data and what you see.")}</p>
-        <button className="boton grande" onClick={empezar}>{L("Empezar", "Start")}</button>
-        <p className="nota">{L("Ocho pasos cortos. Funciona sin señal. La foto se mide en tu celular; con señal, el asistente la mira para describirla y no se guarda.", "Eight short steps. Works offline. Photos are measured on your phone; when online, the assistant looks at them to describe them, and they are not stored.")}</p>
+      <Escena mes={mes} />
+      <motion.div className="bienvenida-texto" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', bounce: 0, duration: 0.5, delay: 0.1 }}>
+        <h1>{L('El año de tu suelo, mes por mes', 'Your soil through the year, month by month')}</h1>
+        <p>{L('Compara maneras de sembrar tu huerto según cuántos meses dejan el suelo pelado. Con datos de la NASA y lo que ves tú.', 'Compare ways to plant your garden by how many months they leave the soil bare. With NASA data and what you see.')}</p>
+        <button className="boton grande" onClick={empezar}>{L('Empezar', 'Start')}</button>
+        <p className="nota">{L('8 pasos cortos · funciona sin señal', '8 short steps · works offline')}</p>
       </motion.div>
     </main>
   )
