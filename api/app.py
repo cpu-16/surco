@@ -10,7 +10,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 import earthdata
 import motor
@@ -142,7 +142,16 @@ from fastapi import File, Form, UploadFile  # noqa: E402
 import ia  # noqa: E402
 
 
-class Pedido(BaseModel):
+class Idioma(BaseModel):
+    lang: str = "es"
+
+    @field_validator("lang", mode="before")
+    @classmethod
+    def validar_lang(cls, value):
+        return "en" if value == "en" else "es"
+
+
+class Pedido(Idioma):
     expediente: dict
 
 
@@ -156,21 +165,21 @@ def _clima(exp):
 @app.post("/api/comparar")
 def comparar(pd: Pedido):
     n, ni = _clima(pd.expediente)
-    return motor.comparar(pd.expediente, n, ni["promedio"])
+    return motor.comparar(pd.expediente, n, ni["promedio"], lang=pd.lang)
 
 
 @app.post("/api/ia/foto")
-async def ia_foto(foto: UploadFile = File(...), tipo: str = Form("general")):
+async def ia_foto(foto: UploadFile = File(...), tipo: str = Form("general"), lang: str = Form("es")):
     datos = await foto.read()
     try:
-        return await run_in_threadpool(ia.foto, datos, tipo[:20])
+        return await run_in_threadpool(ia.foto, datos, tipo[:20], "en" if lang == "en" else "es")
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception:
         raise HTTPException(503, "El asistente no pudo ver la foto ahora")
 
 
-class Charla(BaseModel):
+class Charla(Idioma):
     historia: list
     expediente: dict
     comparacion: dict | None = None
@@ -187,6 +196,6 @@ async def ia_pregunta(c: Charla):
     ctx = {"expediente": c.expediente, "estrategias": resumen, "lectura": comp.get("lectura"), "clima_nasa": c.lugar,
            "pina_no_crece": motor.AGRO.get("piña_no_crece")}
     try:
-        return await run_in_threadpool(ia.pregunta, c.historia, ctx)
+        return await run_in_threadpool(ia.pregunta, c.historia, ctx, c.lang)
     except Exception as e:
         raise HTTPException(503, str(e) if "cupo" in str(e) else "El asistente no está disponible ahora")

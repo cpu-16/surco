@@ -41,6 +41,16 @@ PREG = BASE + (" Te llegan los DATOS del expediente (cultivos, fotos medidas, pr
                '{"respuesta": "...", "fuentes": ["nombre corto de cada dato o fuente que usaste"], "propuesta": {…} o null}')
 
 
+INGLES = (" Language override: respond in plain, simple English for a small farmer, using short sentences. "
+          "This replaces the Spanish-language instruction above. Say 'garden plot', 'dry season', and "
+          "'cover the soil with dry leaves (mulch)'. Use cowpea, jack bean, pigeon pea, forage peanut "
+          "(Arachis pintoi), sweet potato, cassava and pineapple. Explain root-knot nematode as a tiny "
+          "soil worm that makes knots on roots. On first mention, explain MIDA as Panama's agriculture "
+          "ministry and IDIAP as Panama's research institute. Translate only human-readable text. "
+          "Keep all JSON keys and all enumerated values unchanged, including proposal crop identifiers, "
+          "priorities, si/no/nose, a veces, and mucha/poca/nada. Return the same JSON structure.")
+
+
 def _claude(sistema: str, contenido: list, timeout=90) -> dict:
     hoy = dt.date.today().isoformat()
     if _uso["dia"] != hoy:
@@ -65,10 +75,10 @@ def _claude(sistema: str, contenido: list, timeout=90) -> dict:
     return json.loads(m.group(0) if m else t)
 
 
-def foto(jpeg: bytes, tipo: str) -> dict:
+def foto(jpeg: bytes, tipo: str, lang="es") -> dict:
     if not (jpeg[:3] == b"\xff\xd8\xff" and 1000 < len(jpeg) <= 3_000_000):
         raise ValueError("No es una foto JPEG")
-    d = _claude(FOTO, [{"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(jpeg).decode()}},
+    d = _claude(FOTO + (INGLES if lang == "en" else ""), [{"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(jpeg).decode()}},
                        {"type": "text", "text": f"Tipo de foto según el productor: {tipo}"}])
     hoj = d.get("hojarasca") if d.get("hojarasca") in ("mucha", "poca", "nada") else None
     return {"descripcion": str(d.get("descripcion", ""))[:400], "hojarasca": hoj, "senales": [str(s)[:120] for s in d.get("senales", [])][:5]}
@@ -77,9 +87,9 @@ def foto(jpeg: bytes, tipo: str) -> dict:
 CLAVES = {"cultivos", "siembras", "riego", "prioridades", "infiltracion_min", "charcos"}
 
 
-def pregunta(historia: list, contexto: dict) -> dict:
+def pregunta(historia: list, contexto: dict, lang="es") -> dict:
     hist = "\n".join(f"{'PRODUCTOR' if m.get('de') == 'tu' else 'ASISTENTE'}: {str(m.get('texto', ''))[:1500]}" for m in historia[-12:])
-    d = _claude(PREG, [{"type": "text", "text": "DATOS:\n" + json.dumps(contexto, ensure_ascii=False)[:60000] + "\n\nHISTORIA:\n" + hist}])
+    d = _claude(PREG + (INGLES if lang == "en" else ""), [{"type": "text", "text": "DATOS:\n" + json.dumps(contexto, ensure_ascii=False)[:60000] + "\n\nHISTORIA:\n" + hist}])
     prop = d.get("propuesta") if isinstance(d.get("propuesta"), dict) else None
     prop = {k: v for k, v in (prop or {}).items() if k in CLAVES} or None
     return {"respuesta": str(d.get("respuesta", ""))[:2500], "fuentes": [str(f)[:120] for f in d.get("fuentes", [])][:8], "propuesta": prop}

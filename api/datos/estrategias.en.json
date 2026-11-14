@@ -1,0 +1,163 @@
+{
+  "nota": "Versión en lenguaje sencillo de las estrategias de cultivos.json (investigación del 14-nov-2026). Las claves de evidencia apuntan a cultivos.json → fuentes. Palabras revisadas el 14-nov para Panamá: «tapar con hojas» en vez de acolchado, «frijol de bejuco» para el caupí (así lo llama la investigación de Chiriquí, 1989).",
+  "estrategias": [
+    {
+      "id": "actual",
+      "nombre": "Current practice: cassava after cassava",
+      "cama": [
+        {
+          "cultivo": "yuca",
+          "siembra": "existente"
+        },
+        {
+          "cultivo": "yuca",
+          "siembra": "2027-05"
+        }
+      ],
+      "huecos": "desnudo",
+      "arboles": "desnudo",
+      "razon": "This is what you do today. It gives you a starting point for comparison. Cassava handles the dry season well. But the soil stays exposed after harvest and during the first months of growth. We assume the soil under the trees is bare until your photo shows otherwise.",
+      "beneficios": [
+        "Your work and food stay the same.",
+        "Cassava handles the dry season better than most crops on this list."
+      ],
+      "vacios": [
+        "We do not know when you planted the cassava or when you will harvest it.",
+        "Without a soil test, we do not know how much nitrogen or organic matter remains.",
+        "We do not know how much soil is covered under the trees."
+      ],
+      "riesgos": [
+        "Growing cassava in the same spot year after year wears out the soil and keeps the same pests around. Ask a farm adviser."
+      ],
+      "evidencia": [
+        "MR",
+        "IY",
+        "SC",
+        "F56"
+      ]
+    },
+    {
+      "id": "caupi_camote",
+      "nombre": "Cover the soil with dry leaves (mulch), cowpea and sweet potato",
+      "cama": [
+        {
+          "cultivo": "yuca",
+          "siembra": "existente"
+        },
+        {
+          "cultivo": "caupi",
+          "siembra": "2027-05"
+        },
+        {
+          "cultivo": "camote",
+          "siembra": "2027-08"
+        }
+      ],
+      "huecos": "acolchado",
+      "arboles": "acolchado",
+      "razon": "Before the dry season, cover the soil with dry leaves (mulch), straw or rice husks under the trees and in gaps. Plant cowpea with the May rains. It covers the soil quickly and feeds it. Follow with sweet potato, which also covers the soil and provides food.",
+      "beneficios": [
+        "Leaves on the soil reduce soil wash and keep moisture in during the dry season.",
+        "Cowpea feeds the soil if you chop the plants and leave them on top after harvest.",
+        "Three kinds of plants instead of just one."
+      ],
+      "vacios": [
+        "Planting cowpea in May and sweet potato in August in Santiago is a trial, not a tested schedule.",
+        "We do not know whether your cassava will be harvested by May."
+      ],
+      "riesgos": [
+        "Cowpea, sweet potato and pineapple can share root-knot nematode (a tiny soil worm that makes knots on roots). If your pineapple has it, check with a farm adviser first.",
+        "Use only healthy leaves to cover the soil. Do not move soil or leaves from sick pineapple plants."
+      ],
+      "evidencia": [
+        "TV",
+        "ML",
+        "MR",
+        "SC",
+        "NF",
+        "NE",
+        "NC"
+      ]
+    },
+    {
+      "id": "canavalia_maiz",
+      "nombre": "Cover the soil with dry leaves (mulch), jack bean to feed the soil, and corn",
+      "cama": [
+        {
+          "cultivo": "yuca",
+          "siembra": "existente"
+        },
+        {
+          "cultivo": "canavalia",
+          "siembra": "2027-05",
+          "corte_dias": 80
+        },
+        {
+          "cultivo": "maiz",
+          "siembra": "2027-08"
+        }
+      ],
+      "huecos": "acolchado",
+      "arboles": "acolchado",
+      "razon": "Cover the soil with dry leaves (mulch) during the dry season, as in the previous option. Plant jack bean in May. This large bean plant handles drought and makes plenty of leaves. Cut it after two or three months and leave it on the soil to feed it. Plant corn in that spot in August.",
+      "beneficios": [
+        "Jack bean leaves plenty of leaves that break down and enrich the soil.",
+        "It handles the dry season better than cowpea.",
+        "Corn uses the nutrients it leaves behind."
+      ],
+      "vacios": [
+        "How long to grow jack bean before cutting it in a small garden has not been tested here.",
+        "In a small garden, corn needs full sun and several plants together for the ears to fill well."
+      ],
+      "riesgos": [
+        "Jack bean seeds are poisonous. Do not cook them like ordinary beans.",
+        "Corn needs plenty of water when it flowers. Avoid it if your garden is shaded."
+      ],
+      "evidencia": [
+        "CI",
+        "NF",
+        "MM",
+        "SC",
+        "F56"
+      ]
+    },
+    {
+      "id": "guandu_mani",
+      "nombre": "Pigeon pea in the garden plot and forage peanut (Arachis pintoi) under the trees",
+      "cama": [
+        {
+          "cultivo": "yuca",
+          "siembra": "existente"
+        },
+        {
+          "cultivo": "guandu",
+          "siembra": "2027-05"
+        }
+      ],
+      "huecos": "acolchado",
+      "arboles": "mani_forrajero",
+      "razon": "Pigeon pea is the familiar crop with deep roots. It handles the dry season, feeds the soil and gives grain by December. Try a small patch of forage peanut (Arachis pintoi) under the trees. It is a low-growing plant with yellow flowers, used by cattle farmers. It covers the soil all year, even in shade.",
+      "beneficios": [
+        "Once forage peanut takes hold, it covers the soil under the trees all year.",
+        "Deep pigeon pea roots help loosen hard soil.",
+        "Pigeon peas to eat or sell in December and January."
+      ],
+      "vacios": [
+        "How much pigeon pea or forage peanut feeds the soil was measured elsewhere, not in your garden.",
+        "We do not know how forage peanut will handle five months of dry season and El Niño."
+      ],
+      "riesgos": [
+        "Forage peanut competes with young trees for water. Try a small patch first.",
+        "Pigeon pea casts shade. Do not plant it next to pineapple."
+      ],
+      "evidencia": [
+        "TG",
+        "ML",
+        "TA",
+        "NA",
+        "CI",
+        "NF"
+      ]
+    }
+  ]
+}
