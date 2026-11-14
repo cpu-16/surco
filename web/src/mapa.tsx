@@ -1,25 +1,26 @@
+import { L } from './i18n'
 import { useEffect, useRef, useState } from 'react'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 
 /** Lo que ve cada satélite: el tamaño real de su píxel alrededor de tu parcela. */
 const ESCALAS = [
-  { id: 'patio', nombre: 'Tu foto', lado_m: 12, color: '#3d7638', nota: 'Lo que ves tú: unos metros' },
-  { id: 'hls', nombre: 'Landsat y Sentinel-2 (HLS)', lado_m: 30, color: '#8fae55', nota: '30 m: una cuadra pequeña' },
-  { id: 'modis', nombre: 'MODIS', lado_m: 250, color: '#c4a46a', nota: '250 m: el verdor de tu barrio' },
-  { id: 'smap', nombre: 'SMAP', lado_m: 9000, color: '#2e6a93', nota: '9 km: humedad del suelo de la zona' },
-  { id: 'imerg', nombre: 'GPM IMERG', lado_m: 11100, color: '#6aa6d1', nota: '0.1°: lluvia de satélite' },
-  { id: 'power', nombre: 'NASA POWER', lado_m: 55000, color: '#a04b2c', nota: '0.5°: clima regional' },
+  { id: 'patio', nombre: L('Tu foto', "Your photo"), lado_m: 12, color: '#3d7638', nota: L('Lo que ves tú: unos metros', "What you see: a few meters") },
+  { id: 'hls', nombre: L('Landsat y Sentinel-2 (HLS)', "Landsat and Sentinel-2 (HLS)"), lado_m: 30, color: '#8fae55', nota: L('30 m: una cuadra pequeña', "30 m: a small block") },
+  { id: 'modis', nombre: 'MODIS', lado_m: 250, color: '#c4a46a', nota: L('250 m: el verdor de tu barrio', "250 m: greenery in your neighborhood") },
+  { id: 'smap', nombre: 'SMAP', lado_m: 9000, color: '#2e6a93', nota: L('9 km: humedad del suelo de la zona', "9 km: soil moisture in the area") },
+  { id: 'imerg', nombre: 'GPM IMERG', lado_m: 11100, color: '#6aa6d1', nota: L('0.1°: lluvia de satélite', "0.1°: satellite rainfall") },
+  { id: 'power', nombre: 'NASA POWER', lado_m: 55000, color: '#a04b2c', nota: L('0.5°: clima regional', "0.5°: regional climate") },
 ] as const
 
 // Capas de GIBS (NASA) en su fecha más reciente; «default» le pide a GIBS el último día disponible
 const GIBS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best'
 const CAPAS = [
-  { id: 'ninguna', nombre: 'Calles', capa: '', nivel: 0, ext: '' },
-  { id: 'color', nombre: 'Foto de satélite de ayer', capa: 'VIIRS_NOAA20_CorrectedReflectance_TrueColor', nivel: 9, ext: 'jpeg' },
-  { id: 'lluvia', nombre: 'Lluvia IMERG', capa: 'IMERG_Precipitation_Rate', nivel: 6, ext: 'png' },
-  { id: 'humedad', nombre: 'Humedad del suelo SMAP', capa: 'SMAP_L4_Analyzed_Root_Zone_Soil_Moisture', nivel: 6, ext: 'png' },
-  { id: 'verdor', nombre: 'Verdor VIIRS', capa: 'VIIRS_NOAA20_NDVI_8Day', nivel: 8, ext: 'png' },
+  { id: 'ninguna', nombre: L('Calles', "Streets"), capa: '', nivel: 0, ext: '' },
+  { id: 'color', nombre: L('Foto de satélite de ayer', "Yesterday’s satellite photo"), capa: 'VIIRS_NOAA20_CorrectedReflectance_TrueColor', nivel: 9, ext: 'jpeg' },
+  { id: 'lluvia', nombre: L('Lluvia IMERG', "IMERG rainfall"), capa: 'IMERG_Precipitation_Rate', nivel: 6, ext: 'png' },
+  { id: 'humedad', nombre: L('Humedad del suelo SMAP', "SMAP soil moisture"), capa: 'SMAP_L4_Analyzed_Root_Zone_Soil_Moisture', nivel: 6, ext: 'png' },
+  { id: 'verdor', nombre: L('Verdor VIIRS', "VIIRS greenery"), capa: 'VIIRS_NOAA20_NDVI_8Day', nivel: 8, ext: 'png' },
 ] as const
 
 function cuadro(lat: number, lon: number, lado_m: number) {
@@ -87,7 +88,7 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
   const e = ESCALAS.find((x) => x.id === sel)!
   return (
     <div>
-      <div ref={div} className="mapa" role="img" aria-label={`Mapa con el tamaño del píxel de ${e.nombre}`} />
+      <div ref={div} className="mapa" role="img" aria-label={L(`Mapa con el tamaño del píxel de ${e.nombre}`, `Map showing the pixel size for ${e.nombre}`)} />
       <div className="chips" style={{ marginTop: '0.7rem' }}>
         {ESCALAS.map((x) => (
           <button key={x.id} className="chip" aria-pressed={sel === x.id} onClick={() => setSel(x.id)}>
@@ -96,11 +97,11 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
           </button>
         ))}
       </div>
-      <p className="nota" style={{ marginBottom: 0 }}>Capa de la NASA encima, la más reciente:</p>
+      <p className="nota" style={{ marginBottom: 0 }}>{L("Capa de la NASA encima, la más reciente:", "Latest NASA layer on top:")}</p>
       <div className="chips">
         {CAPAS.map((c) => <button key={c.id} className="chip" aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{c.nombre}</button>)}
       </div>
-      <p className="nota">{e.nota}. Un píxel más grande que tu parcela promedia todo lo que hay alrededor: casas, calles y árboles.</p>
+      <p className="nota">{e.nota}{L(". Un píxel más grande que tu parcela promedia todo lo que hay alrededor: casas, calles y árboles.", ". A pixel larger than your plot averages everything around it: houses, streets and trees.")}</p>
     </div>
   )
 }

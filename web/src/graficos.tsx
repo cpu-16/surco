@@ -1,7 +1,8 @@
+import { L } from './i18n'
 import type { Normal, Ninos } from './api'
 
-export const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-export const MESES_LARGOS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+export const MESES = L(['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'], ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
+export const MESES_LARGOS = L(['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'], ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"])
 
 /** 12 meses empezando en el mes actual (1-12). */
 export const ordenMeses = (desde: number) => Array.from({ length: 12 }, (_, i) => ((desde - 1 + i) % 12) + 1)
@@ -15,7 +16,7 @@ export function BarrasLluvia({ normales, ninos, desde }: { normales: Normal[]; n
   const pct = (m: number) => ninos?.promedio.find((p) => p.mes === m)?.pct_normal ?? null
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img"
-      aria-label="Lluvia normal por mes, demanda de agua y lluvia en años de El Niño fuerte">
+      aria-label={L("Lluvia normal por mes, demanda de agua y lluvia en años de El Niño fuerte", "Normal monthly rainfall, water needs and rainfall in strong El Niño years")}>
       <defs>
         <pattern id="raya" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="2.2" height="5" fill="var(--lluvia)" />
@@ -41,7 +42,7 @@ export function BarrasLluvia({ normales, ninos, desde }: { normales: Normal[]; n
 export function Reciente({ dias }: { dias: { fecha: string; lluvia: number | null }[] }) {
   const W = 360, H = 96, base = H - 22, max = Math.max(...dias.map((d) => d.lluvia ?? 0), 10), a = W / dias.length
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Lluvia diaria: ${dias.filter((d) => (d.lluvia ?? 0) < 1).length} de ${dias.length} días sin lluvia`}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={L(`Lluvia diaria: ${dias.filter((d) => (d.lluvia ?? 0) < 1).length} de ${dias.length} días sin lluvia`, `Daily rainfall: ${dias.filter((d) => (d.lluvia ?? 0) < 1).length} of ${dias.length} days without rain`)}>
       {dias.map((d, i) => {
         const v = d.lluvia ?? 0, h = (Math.sqrt(v) / Math.sqrt(max)) * (base - 6)
         return v < 1
@@ -49,8 +50,8 @@ export function Reciente({ dias }: { dias: { fecha: string; lluvia: number | nul
           : <rect key={d.fecha} x={i * a + a * 0.12} y={base - h} width={a * 0.76} height={h} rx="1.5" fill="var(--lluvia)" />
       })}
       <line x1="0" x2={W} y1={base + 0.5} y2={base + 0.5} stroke="var(--linea)" />
-      <text x="0" y={H - 4} fontSize="12">{dias[0]?.fecha.slice(5).split('-').reverse().join('/')}</text>
-      <text x={W} y={H - 4} fontSize="12" textAnchor="end">{dias.at(-1)?.fecha.slice(5).split('-').reverse().join('/')}</text>
+      <text x="0" y={H - 4} fontSize="12">{L(dias[0]?.fecha.slice(5).split('-').reverse().join('/'), dias[0]?.fecha.slice(5).replace('-', '/'))}</text>
+      <text x={W} y={H - 4} fontSize="12" textAnchor="end">{L(dias.at(-1)?.fecha.slice(5).split('-').reverse().join('/'), dias.at(-1)?.fecha.slice(5).replace('-', '/'))}</text>
     </svg>
   )
 }
@@ -63,7 +64,7 @@ export function NdviMeses({ meses, desde }: { meses: { mes: number; ndvi: number
   const y = (v: number) => 8 + (1 - (v - lo) / (hi - lo)) * (H - 34)
   const pts = orden.map((m, i) => ({ x: i * a + a / 2, v: meses[m - 1]?.ndvi, m }))
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Verdor medio (NDVI) por mes del año">
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={L("Verdor medio (NDVI) por mes del año", "Average greenery (NDVI) by month")}>
       <polyline fill="none" stroke="var(--hoja)" strokeWidth="2.5"
         points={pts.filter((p) => p.v != null).map((p) => `${p.x},${y(p.v!)}`).join(' ')} />
       {pts.map((p) => p.v != null && (

@@ -1,4 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
+import { L } from './i18n'
 import { Icono } from './ui'
 
 /* La prueba de la lata en dibujos: una tarjeta por paso, se desliza con el dedo.
@@ -22,7 +23,8 @@ const LATA = (
 
 const PASOS: { dibujo: ReactNode; texto: ReactNode }[] = [
   {
-    texto: <><b>Una lata sin fondo ni tapa</b>, de unos 15 cm de ancho (la de leche en polvo grande). Lima la orilla.</>,
+    texto: L(<><b>Una lata sin fondo ni tapa</b>, de unos 15 cm de ancho (la de leche en polvo grande). Lima la orilla.</>,
+      <><b>A can with no bottom and no lid</b>, about 15 cm wide (like a big powdered milk can). File down the edge.</>),
     dibujo: (
       <>
         <ellipse cx="80" cy="30" rx="24" ry="6" strokeDasharray="4 3" />
@@ -38,7 +40,8 @@ const PASOS: { dibujo: ReactNode; texto: ReactNode }[] = [
     ),
   },
   {
-    texto: <><b>Entiérrala 7 a 8 cm</b>: pon una tablita encima y dale parejo con un martillo o una piedra.</>,
+    texto: L(<><b>Entiérrala 7 a 8 cm</b>: pon una tablita encima y dale parejo con un martillo o una piedra.</>,
+      <><b>Drive it 7 to 8 cm into the ground</b>: put a small board on top and tap it evenly with a hammer or a stone.</>),
     dibujo: (
       <>
         {SUELO}{LATA}
@@ -54,19 +57,21 @@ const PASOS: { dibujo: ReactNode; texto: ReactNode }[] = [
     ),
   },
   {
-    texto: <><b>Pon una bolsa plástica adentro</b> y échale encima casi 2 tazas de agua (450 mL).</>,
+    texto: L(<><b>Pon una bolsa plástica adentro</b> y échale encima casi 2 tazas de agua (450 mL).</>,
+      <><b>Put a plastic bag inside</b> and pour almost 2 cups of water (450 mL) onto it.</>),
     dibujo: (
       <>
         {SUELO}{LATA}
         <path d="M58 50q2 18 22 20q20-2 22-20" fill="var(--lluvia)" fillOpacity="0.25" stroke="var(--tinta-2)" />
         <path d="M26 8l22 6-6 20-18-5z" fill="var(--superficie)" />
         <path d="M46 20q22 4 30 30" stroke="var(--lluvia)" strokeWidth="3.5" />
-        <text x="12" y="46">2 tazas</text>
+        <text x="12" y="46">{L('2 tazas', '2 cups')}</text>
       </>
     ),
   },
   {
-    texto: <><b>Saca la bolsa despacio.</b> Así el agua queda en la lata sin revolver la tierra.</>,
+    texto: L(<><b>Saca la bolsa despacio.</b> Así el agua queda en la lata sin revolver la tierra.</>,
+      <><b>Pull the bag out slowly.</b> That way the water stays in the can without stirring up the soil.</>),
     dibujo: (
       <>
         {SUELO}{LATA}
@@ -77,19 +82,21 @@ const PASOS: { dibujo: ReactNode; texto: ReactNode }[] = [
     ),
   },
   {
-    texto: <><b>La primera vez solo moja.</b> Espera que se vaya y repite: <b>con la segunda, toca Empezar</b>.</>,
+    texto: L(<><b>La primera vez solo moja.</b> Espera que se vaya y repite: <b>con la segunda, toca Empezar</b>.</>,
+      <><b>The first time only wets the soil.</b> Wait for it to soak in and repeat: <b>on the second time, tap Start</b>.</>),
     dibujo: (
       <>
         {SUELO}{LATA}
         <ellipse className="agua-baja" cx="80" cy="54" rx="22" ry="4.5" fill="var(--lluvia)" stroke="none" />
         <circle cx="132" cy="32" r="15" fill="var(--superficie)" />
         <path d="M132 13v4M128 13h8M132 32l7-6" />
-        <text x="24" y="34" className="dos">2.ª</text>
+        <text x="24" y="34" className="dos">{L('2.ª', '2nd')}</text>
       </>
     ),
   },
   {
-    texto: <><b>Cuando la tierra ya no brille</b>, toca Listo. Puede tardar de 5 minutos a más de una hora.</>,
+    texto: L(<><b>Cuando la tierra ya no brille</b>, toca Listo. Puede tardar de 5 minutos a más de una hora.</>,
+      <><b>When the soil stops shining</b>, tap Done. It can take from 5 minutes to more than an hour.</>),
     dibujo: (
       <>
         {SUELO}{LATA}
@@ -118,7 +125,7 @@ export function GuiaLata() {
   }
   return (
     <div className="guia-marco">
-      <ol className="guia" ref={lista} onScroll={alDeslizar} aria-label="La prueba de la lata, paso a paso">
+      <ol className="guia" ref={lista} onScroll={alDeslizar} aria-label={L('La prueba de la lata, paso a paso', 'The can test, step by step')}>
         {PASOS.map((p, k) => (
           <li key={k} aria-current={k === i ? 'step' : undefined}>
             <svg viewBox="0 0 160 110" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{p.dibujo}</svg>
@@ -127,9 +134,9 @@ export function GuiaLata() {
         ))}
       </ol>
       <div className="guia-control">
-        <button className="icono-btn" onClick={() => ir(i - 1)} disabled={i === 0} aria-label="Paso anterior"><Icono n="atras" /></button>
-        <span className="guia-puntos" aria-live="polite">{PASOS.map((_, k) => <i key={k} data-activo={k === i} />)}<span className="sr">Paso {i + 1} de {PASOS.length}</span></span>
-        <button className="icono-btn derecha" onClick={() => ir(i + 1)} disabled={i === PASOS.length - 1} aria-label="Paso siguiente"><Icono n="atras" /></button>
+        <button className="icono-btn" onClick={() => ir(i - 1)} disabled={i === 0} aria-label={L('Paso anterior', 'Previous step')}><Icono n="atras" /></button>
+        <span className="guia-puntos" aria-live="polite">{PASOS.map((_, k) => <i key={k} data-activo={k === i} />)}<span className="sr">{L(<>Paso {i + 1} de {PASOS.length}</>, <>Step {i + 1} of {PASOS.length}</>)}</span></span>
+        <button className="icono-btn derecha" onClick={() => ir(i + 1)} disabled={i === PASOS.length - 1} aria-label={L('Paso siguiente', 'Next step')}><Icono n="atras" /></button>
       </div>
     </div>
   )

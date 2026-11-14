@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { motion } from 'motion/react'
 import { MESES, MESES_LARGOS, ordenMeses } from './graficos'
 import { Cargando, Fuente, Hoja } from './ui'
+import { L } from './i18n'
 
 export type Muestra = { mes: number; cultivo: string | null; nombre: string | null; cobertura: 'alta' | 'media' | 'baja' | 'desnudo'; medido?: boolean }
 export type Estrategia = {
@@ -21,14 +22,14 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
   const [sel, setSel] = useState<Estrategia | null>(null)
   const [abierta, setAbierta] = useState(false)
   const cerrar = useCallback(() => setAbierta(false), [])
-  if (!comp) return <Cargando texto="Calculando el año de tu suelo…" />
+  if (!comp) return <Cargando texto={L('Calculando el año de tu suelo…', 'Working out your soil’s year…')} />
   const orden = ordenMeses(desde)
   const total = (e: Estrategia) => e.desnudo_cama + e.desnudo_arboles
   const mejor = Math.min(...comp.estrategias.map(total))
   const hayMejor = comp.estrategias.some((e) => total(e) !== mejor)
   return (
     <>
-      {viejo && <p className="aviso">Sin señal: es el cálculo de la última vez. Se pone al día solo cuando vuelva.</p>}
+      {viejo && <p className="aviso">{L('Sin señal: es el cálculo de la última vez. Se pone al día solo cuando vuelva.', 'Offline: this is the last calculation. It updates by itself when the signal comes back.')}</p>}
       {comp.lectura.map((l, i) => <p key={i} className={i ? 'lectura-2' : 'lectura'}>{l}</p>)}
       <Leyenda />
       <ul className="estrategias">
@@ -37,13 +38,14 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
             <button className="estrategia" onClick={() => { setSel(e); setAbierta(true) }} aria-haspopup="dialog">
               <span className="e-cab">
                 <span className="e-nombre">{e.nombre}</span>
-                {hayMejor && total(e) === mejor && <span className="sello">Menos suelo desnudo</span>}
+                {hayMejor && total(e) === mejor && <span className="sello">{L('Menos suelo desnudo', 'Least bare soil')}</span>}
               </span>
-              <Tira etq="Huerto" fila={e.tira} orden={orden} retraso={fila * 0.12} />
-              <Tira etq="Árboles" fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />
+              <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />
+              <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />
               <span className="e-pie">
-                <span>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto, <b>{e.desnudo_arboles}</b> bajo los árboles</span>
-                <span className="ver">Ver por qué</span>
+                <span>{L(<>Desnudo: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto, <b>{e.desnudo_arboles}</b> bajo los árboles</>,
+                  <>Bare: <b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot, <b>{e.desnudo_arboles}</b> under the trees</>)}</span>
+                <span className="ver">{L('Ver por qué', 'See why')}</span>
               </span>
             </button>
           </li>
@@ -53,15 +55,15 @@ export default function Anio({ comp, desde, viejo, irA }: { comp: Comparacion | 
 
       {comp.faltan.length > 0 && (
         <div className="afinar">
-          <h2 className="sub">Para afinar el cálculo</h2>
+          <h2 className="sub">{L('Para afinar el cálculo', 'To make the numbers more exact')}</h2>
           {comp.faltan.map((f) => (
             <button key={f.clave} className="pendiente" onClick={() => irA(f.clave)} title={f.cambia}>
-              <span className="paso-chip">Paso {PASO_DE[f.clave] ?? ''}</span><b>{f.texto}</b>
+              <span className="paso-chip">{L('Paso', 'Step')} {PASO_DE[f.clave] ?? ''}</span><b>{f.texto}</b>
             </button>
           ))}
         </div>
       )}
-      <p className="nota pie">Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico del MIDA o del IDIAP.</p>
+      <p className="nota pie">{L('Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico del MIDA o del IDIAP.', 'This shows patterns and possibilities. The decision is yours, and it is worth going over it with a farm technician from MIDA or IDIAP.')}</p>
 
       <Hoja abierta={abierta} cerrar={cerrar} titulo={sel?.nombre ?? ''}>
         {sel && <Detalle e={sel} orden={orden} />}
@@ -74,7 +76,7 @@ function Tira({ etq, fila, orden, retraso }: { etq: string; fila: Muestra[]; ord
   return (
     <span className="fila-tira">
       <span className="etq">{etq}</span>
-      <span className="tira" role="img" aria-label={`${etq}: ${orden.map((mes) => `${MESES_LARGOS[mes - 1]} ${fila.find((x) => x.mes === mes)?.nombre ?? 'desnudo'}`).join(', ')}`}>
+      <span className="tira" role="img" aria-label={`${etq}: ${orden.map((mes) => `${MESES_LARGOS[mes - 1]} ${fila.find((x) => x.mes === mes)?.nombre ?? L('desnudo', 'bare')}`).join(', ')}`}>
         {orden.map((mes, i) => {
           const m = fila.find((x) => x.mes === mes)!
           return (
@@ -90,21 +92,21 @@ function Tira({ etq, fila, orden, retraso }: { etq: string; fila: Muestra[]; ord
 }
 
 function Leyenda() {
-  const items: [keyof typeof COLOR, string][] = [['desnudo', 'Desnudo'], ['baja', 'Poco tapado'], ['media', 'Medio'], ['alta', 'Bien tapado']]
+  const items: [keyof typeof COLOR, string][] = [['desnudo', L('Desnudo', 'Bare')], ['baja', L('Poco tapado', 'Barely covered')], ['media', L('Medio', 'Half covered')], ['alta', L('Bien tapado', 'Well covered')]]
   return (
     <div className="leyenda">
       {items.map(([k, t]) => <span key={k}><i style={{ background: COLOR[k] }} />{t}</span>)}
-      <span><i className="medido" />Medido con tu foto</span>
+      <span><i className="medido" />{L('Medido con tu foto', 'Measured from your photo')}</span>
     </div>
   )
 }
 
 function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
   const [mes, setMes] = useState<number | null>(null)
-  const nombre = (fila: Muestra[], m: number) => fila.find((x) => x.mes === m)?.nombre?.toLowerCase() ?? 'suelo desnudo'
+  const nombre = (fila: Muestra[], m: number) => fila.find((x) => x.mes === m)?.nombre?.toLowerCase() ?? L('suelo desnudo', 'bare soil')
   return (
     <div className="detalle">
-      <div className="tira grande" role="group" aria-label="Toca un mes">
+      <div className="tira grande" role="group" aria-label={L('Toca un mes', 'Tap a month')}>
         {orden.map((m) => {
           const t = e.tira.find((x) => x.mes === m)!
           return (
@@ -114,30 +116,33 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
         })}
       </div>
       <p className="nota" aria-live="polite">
-        {mes ? `En ${MESES_LARGOS[mes - 1]}: el huerto con ${nombre(e.tira, mes)}; debajo de los árboles, ${nombre(e.arboles, mes)}.` : 'Toca un mes para ver qué hay sembrado.'}
+        {mes ? L(`En ${MESES_LARGOS[mes - 1]}: el huerto con ${nombre(e.tira, mes)}; debajo de los árboles, ${nombre(e.arboles, mes)}.`,
+          `In ${MESES_LARGOS[mes - 1]}: the garden plot has ${nombre(e.tira, mes)}; under the trees, ${nombre(e.arboles, mes)}.`)
+          : L('Toca un mes para ver qué hay sembrado.', 'Tap a month to see what is planted.')}
       </p>
 
       <p className="razon">{e.razon}</p>
       {!!e.plantas?.length && (
-        <p className="nota plantas">{e.plantas.map((p, i) => <span key={p.cientifico}>{i ? ' · ' : ''}{p.nombre} <i>({p.cientifico})</i></span>)}. Con el nombre científico la encuentras aunque en tu país le digan distinto.</p>
+        <p className="nota plantas">{e.plantas.map((p, i) => <span key={p.cientifico}>{i ? ' · ' : ''}{p.nombre} <i>({p.cientifico})</i></span>)}{L('. Con el nombre científico la encuentras aunque en tu país le digan distinto.', '. With the scientific name you can find it even if people where you live call it something else.')}</p>
       )}
 
       <div className="numeros">
-        <div><span className="cifra">{e.desnudo_cama + e.desnudo_arboles}</span><span>{e.desnudo_cama + e.desnudo_arboles === 1 ? 'mes' : 'meses'} de suelo desnudo, sumando huerto y árboles</span></div>
-        <div><span className="cifra">{e.agua.deficit_normal_mm}<small> mm</small></span><span>de agua que falta en la seca de un año normal</span></div>
-        <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>si llueve como en los Niños</span></div>
-        {e.n_kg_ha && <div><span className="cifra">{e.n_kg_ha[0]}–{e.n_kg_ha[1]}</span><span>kg de nitrógeno por hectárea que dejan las leguminosas</span></div>}
+        <div><span className="cifra">{e.desnudo_cama + e.desnudo_arboles}</span><span>{L(`${e.desnudo_cama + e.desnudo_arboles === 1 ? 'mes' : 'meses'} de suelo desnudo, sumando huerto y árboles`,
+          `${e.desnudo_cama + e.desnudo_arboles === 1 ? 'month' : 'months'} of bare soil, garden plot and trees added together`)}</span></div>
+        <div><span className="cifra">{e.agua.deficit_normal_mm}<small> mm</small></span><span>{L('de agua que falta en la seca de un año normal', 'of water short in the dry season of a normal year')}</span></div>
+        <div><span className="cifra">{e.agua.deficit_nino_mm}<small> mm</small></span><span>{L('si llueve como en los Niños', 'if it rains like in the El Niño years')}</span></div>
+        {e.n_kg_ha && <div><span className="cifra">{e.n_kg_ha[0]}–{e.n_kg_ha[1]}</span><span>{L('kg de nitrógeno por hectárea que dejan las leguminosas', 'kg of nitrogen per hectare left by the legumes')}</span></div>}
       </div>
 
-      {!!e.ajustes.length && <Bloque titulo="Lo que cambió con tus datos" items={e.ajustes} />}
-      <Bloque titulo="Qué le da al suelo" items={e.beneficios} />
-      <Bloque titulo="Lo que todavía no se sabe" items={e.vacios} />
-      <Bloque titulo="Para revisar con un técnico" items={e.riesgos} />
-      <h3>De dónde sale</h3>
+      {!!e.ajustes.length && <Bloque titulo={L('Lo que cambió con tus datos', 'What changed with your data')} items={e.ajustes} />}
+      <Bloque titulo={L('Qué le da al suelo', 'What it gives the soil')} items={e.beneficios} />
+      <Bloque titulo={L('Lo que todavía no se sabe', 'What we don’t know yet')} items={e.vacios} />
+      <Bloque titulo={L('Para revisar con un técnico', 'To check with a farm technician')} items={e.riesgos} />
+      <h3>{L('De dónde sale', 'Where this comes from')}</h3>
       <ul className="fuentes">
         {e.evidencia.map((f) => <li key={f.id}><a href={f.url} target="_blank" rel="noreferrer">{f.titulo}</a></li>)}
       </ul>
-      <Fuente>Agua: lluvia efectiva USDA y ET₀ FAO-56 con NASA POWER</Fuente>
+      <Fuente>{L('Agua: lluvia efectiva USDA y ET₀ FAO-56 con NASA POWER', 'Water: USDA effective rainfall and FAO-56 ET₀ with NASA POWER')}</Fuente>
     </div>
   )
 }

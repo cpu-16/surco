@@ -1,3 +1,4 @@
+import { L } from './i18n'
 export type Normal = { mes: number; nombre: string; lluvia: number; et0: number; tmax: number; humedad_raiz: number }
 export type Ninos = {
   eventos: { evento: string; meses: { mes: number; lluvia: number; pct_normal: number | null }[] }[]
@@ -37,7 +38,7 @@ export type Expediente = {
 }
 
 export const EJEMPLO: Expediente = {
-  nombre: 'Patio en Santiago de Veraguas',
+  nombre: L('Patio en Santiago de Veraguas', 'Plot in Santiago de Veraguas'),
   lat: 8.1,
   lon: -80.98,
   cultivos: ['yuca', 'pina', 'platano', 'cacao', 'naranja', 'toronja'],
@@ -51,7 +52,7 @@ export const EJEMPLO: Expediente = {
 
 export async function pedir<T>(ruta: string, init?: RequestInit): Promise<T> {
   const r = await fetch(ruta, { ...init, headers: { 'Content-Type': 'application/json', ...init?.headers } })
-  if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? `El servidor respondió ${r.status}`)
+  if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? L(`El servidor respondió ${r.status}`, `The server returned ${r.status}`))
   return r.json()
 }
 

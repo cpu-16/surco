@@ -15,19 +15,19 @@ export const NOMBRE = 'Surco'
 
 type Paso = { id: string; corto: string; titulo: string; listo: (e: Expediente) => boolean }
 const PASOS: Paso[] = [
-  { id: 'patio', corto: 'Tu patio', titulo: '¿Dónde está y qué siembras?', listo: (e) => e.cultivos.length > 0 },
-  { id: 'cielo', corto: 'El cielo', titulo: 'Lo que ve la NASA sobre tu patio', listo: () => true },
-  { id: 'fotos', corto: 'Tus fotos', titulo: 'El suelo que ves tú', listo: (e) => e.fotos.length >= 2 },
-  { id: 'agua', corto: 'El agua', titulo: '¿El agua entra o se queda arriba?', listo: (e) => e.infiltracion_min != null || !!e.charcos },
-  { id: 'importa', corto: 'Lo tuyo', titulo: '¿Qué te importa más?', listo: (e) => e.prioridades.length > 0 },
-  { id: 'anio', corto: 'Tu año', titulo: 'Así le iría a tu suelo', listo: () => true },
-  { id: 'conversa', corto: 'Conversa', titulo: 'Pregunta o compártelo', listo: () => true },
+  { id: 'patio', corto: L('Tu patio', "Your plot"), titulo: L('¿Dónde está y qué siembras?', "Where is it and what do you grow?"), listo: (e) => e.cultivos.length > 0 },
+  { id: 'cielo', corto: L('El cielo', "The sky"), titulo: L('Lo que ve la NASA sobre tu patio', "What NASA sees above your plot"), listo: () => true },
+  { id: 'fotos', corto: L('Tus fotos', "Your photos"), titulo: L('El suelo que ves tú', "The soil you see"), listo: (e) => e.fotos.length >= 2 },
+  { id: 'agua', corto: L('El agua', "Water"), titulo: L('¿El agua entra o se queda arriba?', "Does water soak in or stay on top?"), listo: (e) => e.infiltracion_min != null || !!e.charcos },
+  { id: 'importa', corto: L('Lo tuyo', "Your needs"), titulo: L('¿Qué te importa más?', "What matters most to you?"), listo: (e) => e.prioridades.length > 0 },
+  { id: 'anio', corto: L('Tu año', "Your year"), titulo: L('Así le iría a tu suelo', "How your soil could do"), listo: () => true },
+  { id: 'conversa', corto: L('Conversa', "Chat"), titulo: L('Pregunta o compártelo', "Ask or share"), listo: () => true },
 ]
 const IDS = PASOS.map((p) => p.id)
 // lo que el motor pide → el paso donde se resuelve
 const DONDE: Record<string, [number, TipoFoto?]> = { foto_cama: [2, 'cama'], foto_perennes: [2, 'perennes'], infiltracion: [3], parcela: [0], prioridades: [4] }
 
-const L = { exp: 'surco-expediente', lugar: 'surco-lugar', comp: 'surco-comp', vistos: 'surco-vistos', visto: 'surco-bienvenida' }
+const LLAVES = { exp: 'surco-expediente', lugar: 'surco-lugar', comp: 'surco-comp', vistos: 'surco-vistos', visto: 'surco-bienvenida' }
 type CacheLugar = { lat: number; lon: number; datos: Lugar }
 const cerca = (c: CacheLugar | null, e: Expediente) => !!c && Math.abs(c.lat - e.lat) < 0.005 && Math.abs(c.lon - e.lon) < 0.005
 
@@ -44,16 +44,16 @@ function useEnLinea() {
 const pasoDeHash = () => IDS.indexOf(location.hash.slice(1))
 
 export default function App() {
-  const [exp, setExp] = useState<Expediente>(() => ({ ...EJEMPLO, ...local.leer<Expediente>(L.exp) }))
+  const [exp, setExp] = useState<Expediente>(() => ({ ...EJEMPLO, ...local.leer<Expediente>(LLAVES.exp) }))
   const enLinea = useEnLinea()
   const [error, setError] = useState('')
 
   /* ---------- navegación: cada paso es una entrada del historial, así el botón Atrás del celular funciona ---------- */
-  const [paso, setPaso] = useState(() => { const n = pasoDeHash(); return n >= 0 ? n : local.leer(L.visto) ? 0 : -1 })
+  const [paso, setPaso] = useState(() => { const n = pasoDeHash(); return n >= 0 ? n : local.leer(LLAVES.visto) ? 0 : -1 })
   const [dir, setDir] = useState(1)
   const actual = useRef(paso)
   const [subFoto, setSubFoto] = useState(0)
-  const [vistos, setVistos] = useState<string[]>(() => local.leer<string[]>(L.vistos) ?? [])
+  const [vistos, setVistos] = useState<string[]>(() => local.leer<string[]>(LLAVES.vistos) ?? [])
   const titulo = useRef<HTMLHeadingElement>(null)
 
   const mover = useCallback((n: number) => {
@@ -80,11 +80,11 @@ export default function App() {
     setVistos((v) => v.includes(IDS[paso]) ? v : [...v, IDS[paso]])
     titulo.current?.focus({ preventScroll: true })
   }, [paso])
-  useEffect(() => local.poner(L.vistos, vistos), [vistos])
+  useEffect(() => local.poner(LLAVES.vistos, vistos), [vistos])
   const irA = (clave: string) => { const d = DONDE[clave]; if (d) ir(d[0], d[1] ? FOTOS.findIndex((f) => f.tipo === d[1]) : undefined) }
 
   /* ---------- el expediente vive en el celular ---------- */
-  useEffect(() => local.poner(L.exp, exp), [exp])
+  useEffect(() => local.poner(LLAVES.exp, exp), [exp])
   const cambiar = useCallback((p: Partial<Expediente>) => setExp((e) => ({ ...e, ...p })), [])
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function App() {
   }, [])
 
   /* ---------- satélite: lo último que llegó se guarda y se muestra sin señal ---------- */
-  const [lugar, setLugar] = useState<Lugar | null>(() => { const c = local.leer<CacheLugar>(L.lugar); return cerca(c, exp) ? c!.datos : null })
+  const [lugar, setLugar] = useState<Lugar | null>(() => { const c = local.leer<CacheLugar>(LLAVES.lugar); return cerca(c, exp) ? c!.datos : null })
   const [lugarViejo, setLugarViejo] = useState(false)
   useEffect(() => {
     let vivo = true, t = 0
@@ -112,13 +112,13 @@ export default function App() {
       .then((l) => {
         if (!vivo) return
         setLugar(l); setLugarViejo(false); setError('')
-        local.poner(L.lugar, { lat: exp.lat, lon: exp.lon, datos: l })
+        local.poner(LLAVES.lugar, { lat: exp.lat, lon: exp.lon, datos: l })
         // AppEEARS tarda horas: no se pregunta cada 15 s por él
         if (l.pendiente.length) t = window.setTimeout(traer, l.pendiente.every((p) => p === 'appeears') ? 120000 : 15000)
       })
       .catch((e) => {
         if (!vivo) return
-        const c = local.leer<CacheLugar>(L.lugar)
+        const c = local.leer<CacheLugar>(LLAVES.lugar)
         if (cerca(c, exp)) { setLugar(c!.datos); setLugarViejo(true) } else setError(e.message)
       })
     traer()
@@ -127,40 +127,40 @@ export default function App() {
 
   /* ---------- la comparación se recalcula con cada dato de campo; sin señal queda la última ---------- */
   const claveComp = JSON.stringify({ ...sinImagenes(exp), nombre: '', id: '' })
-  const [comp, setComp] = useState<Comparacion | null>(() => local.leer<{ clave: string; datos: Comparacion }>(L.comp)?.datos ?? null)
+  const [comp, setComp] = useState<Comparacion | null>(() => local.leer<{ clave: string; datos: Comparacion }>(LLAVES.comp)?.datos ?? null)
   const [compViejo, setCompViejo] = useState(false)
   useEffect(() => {
     if (!lugar) return
     let vivo = true
     pedir<Comparacion>('/api/comparar', { method: 'POST', body: JSON.stringify({ expediente: sinImagenes(exp), lang: idioma }) })
-      .then((c) => { if (!vivo) return; setComp(c); setCompViejo(false); local.poner(L.comp, { clave: claveComp, datos: c }) })
-      .catch(() => vivo && setCompViejo(local.leer<{ clave: string }>(L.comp)?.clave !== claveComp))
+      .then((c) => { if (!vivo) return; setComp(c); setCompViejo(false); local.poner(LLAVES.comp, { clave: claveComp, datos: c }) })
+      .catch(() => vivo && setCompViejo(local.leer<{ clave: string }>(LLAVES.comp)?.clave !== claveComp))
     return () => { vivo = false }
   }, [claveComp, lugar?.punto.lat, lugar?.punto.lon, enLinea]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const mesActual = new Date().getMonth() + 1
   const listo = (i: number) => vistos.includes(IDS[i]) && PASOS[i].listo(exp)
 
-  if (paso < 0) return <MotionConfig reducedMotion="user"><Bienvenida empezar={() => { local.poner(L.visto, true); ir(0) }} /></MotionConfig>
+  if (paso < 0) return <MotionConfig reducedMotion="user"><Bienvenida empezar={() => { local.poner(LLAVES.visto, true); ir(0) }} /></MotionConfig>
 
   const p = PASOS[paso]
   return (
     <MotionConfig reducedMotion="user">
       <header className="cabecera">
         <div className="cabecera-fila">
-          <button className="marca" onClick={() => ir(-1)} aria-label={`${NOMBRE}, volver al inicio`}><Marca />{NOMBRE}</button>
+          <button className="marca" onClick={() => ir(-1)} aria-label={L(`${NOMBRE}, volver al inicio`, `${NOMBRE}, back to start`)}><Marca />{NOMBRE}</button>
           <AnimatePresence>
-            {!enLinea && <motion.span className="sin-senal" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>Sin señal</motion.span>}
+            {!enLinea && <motion.span className="sin-senal" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>{L("Sin señal", "Offline")}</motion.span>}
           </AnimatePresence>
           <span className="espacio" />
           <Instalar />
           <button className="icono-btn idioma" onClick={() => cambiarIdioma(idioma === 'en' ? 'es' : 'en')} aria-label={L('Switch to English', 'Cambiar a español')}>{idioma === 'en' ? 'ES' : 'EN'}</button>
           <BotonTema />
         </div>
-        <nav className="surco" aria-label="Pasos">
+        <nav className="surco" aria-label={L("Pasos", "Steps")}>
           {PASOS.map((x, i) => (
             <button key={x.id} className="terron" data-listo={listo(i)} aria-current={i === paso ? 'step' : undefined} onClick={() => ir(i)}
-              aria-label={`Paso ${i + 1}: ${x.corto}${listo(i) ? ', listo' : ''}`}>
+              aria-label={L(`Paso ${i + 1}: ${x.corto}${listo(i) ? ', listo' : ''}`, `Step ${i + 1}: ${x.corto}${listo(i) ? ', done' : ''}`)}>
               <motion.span className="tapa" initial={false} animate={{ scaleY: listo(i) ? 1 : 0 }} transition={{ type: 'spring', bounce: 0.3, duration: 0.5 }} />
               <span className="num">{listo(i) ? <Icono n="brote" t={14} /> : i + 1}</span>
             </button>
@@ -174,25 +174,25 @@ export default function App() {
             variants={{ entra: (d: number) => ({ x: d * 56, opacity: 0 }), centro: { x: 0, opacity: 1 }, sale: (d: number) => ({ x: d * -56, opacity: 0 }) }}
             initial="entra" animate="centro" exit="sale" transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
             <header className="paso-cab">
-              <p className="paso-n">Paso {paso + 1} de {PASOS.length}</p>
+              <p className="paso-n">{L(<>Paso {paso + 1} de {PASOS.length}</>, <>Step {paso + 1} of {PASOS.length}</>)}</p>
               <h1 id={`t-${p.id}`} ref={titulo} tabIndex={-1}>{p.titulo}</h1>
             </header>
-            {error && !lugar && <p className="aviso" role="alert">No se pudo leer el satélite: {error}</p>}
-            {lugarViejo && p.id === 'cielo' && <p className="aviso">Sin señal: son los datos de la última vez.</p>}
+            {error && !lugar && <p className="aviso" role="alert">{L(<>No se pudo leer el satélite: {error}</>, <>Could not load satellite data: {error}</>)}</p>}
+            {lugarViejo && p.id === 'cielo' && <p className="aviso">{L("Sin señal: son los datos de la última vez.", "Offline: these are the last saved data.")}</p>}
             {p.id === 'patio' && <Patio exp={exp} cambiar={cambiar} lugar={lugar} />}
             {p.id === 'cielo' && <Cielo lugar={lugar} desde={mesActual} />}
             {p.id === 'fotos' && <Fotos exp={exp} cambiar={cambiar} sub={subFoto} setSub={setSubFoto} />}
             {p.id === 'agua' && <Agua exp={exp} cambiar={cambiar} />}
             {p.id === 'importa' && <Importa exp={exp} cambiar={cambiar} />}
             {p.id === 'anio' && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} />}
-            {p.id === 'conversa' && <Suspense fallback={<Cargando texto="Abriendo…" />}><Conversa exp={exp} lugar={lugar} comp={comp} cambiar={cambiar} enLinea={enLinea} /></Suspense>}
+            {p.id === 'conversa' && <Suspense fallback={<Cargando texto={L("Abriendo…", "Opening…")} />}><Conversa exp={exp} lugar={lugar} comp={comp} cambiar={cambiar} enLinea={enLinea} /></Suspense>}
           </motion.section>
         </AnimatePresence>
       </main>
 
-      <nav className="barra" aria-label="Avanzar">
-        <button className="boton fantasma" onClick={() => ir(paso - 1)} disabled={paso === 0}><Icono n="atras" />Atrás</button>
-        {paso < PASOS.length - 1 && <button className="boton" onClick={() => ir(paso + 1)}>Seguir: {PASOS[paso + 1].corto}</button>}
+      <nav className="barra" aria-label={L("Avanzar", "Move forward")}>
+        <button className="boton fantasma" onClick={() => ir(paso - 1)} disabled={paso === 0}><Icono n="atras" />{L("Atrás", "Back")}</button>
+        {paso < PASOS.length - 1 && <button className="boton" onClick={() => ir(paso + 1)}>{L(<>Seguir: {PASOS[paso + 1].corto}</>, <>Next: {PASOS[paso + 1].corto}</>)}</button>}
       </nav>
     </MotionConfig>
   )
@@ -226,10 +226,10 @@ function Bienvenida({ empezar }: { empezar: () => void }) {
         ))}
       </div>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', bounce: 0, duration: 0.6, delay: 0.15 }}>
-        <h1>El año de tu suelo, mes por mes</h1>
-        <p>Compara maneras de sembrar tu patio según cuánto tiempo dejan el suelo desnudo. Con datos de la NASA y lo que ves tú.</p>
-        <button className="boton grande" onClick={empezar}>Empezar</button>
-        <p className="nota">Siete pasos cortos. Funciona sin señal y tus fotos no salen del celular.</p>
+        <h1>{L("El año de tu suelo, mes por mes", "Your soil through the year, month by month")}</h1>
+        <p>{L("Compara maneras de sembrar tu patio según cuánto tiempo dejan el suelo desnudo. Con datos de la NASA y lo que ves tú.", "Compare ways to plant your plot by how long they leave the soil bare. Using NASA data and what you see.")}</p>
+        <button className="boton grande" onClick={empezar}>{L("Empezar", "Start")}</button>
+        <p className="nota">{L("Siete pasos cortos. Funciona sin señal y tus fotos no salen del celular.", "Seven short steps. Works offline. Your photos stay on your phone.")}</p>
       </motion.div>
     </main>
   )
@@ -256,7 +256,7 @@ function BotonTema() {
     )).catch(() => { /* la transición se saltó */ })
   }
   return (
-    <button className="icono-btn" onClick={cambiar} aria-label={efectivo === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
+    <button className="icono-btn" onClick={cambiar} aria-label={efectivo === 'dark' ? L('Cambiar a modo claro', "Switch to light mode") : L('Cambiar a modo oscuro', "Switch to dark mode")}>
       <Icono n={efectivo === 'dark' ? 'sol' : 'luna'} />
     </button>
   )
@@ -286,16 +286,16 @@ function Instalar() {
   }
   return (
     <>
-      <button className="boton pildora" onClick={tocar}><Icono n="bajar" t={18} />Instalar</button>
-      <Hoja abierta={ayuda} cerrar={cerrar} titulo={`Instala ${NOMBRE} en tu celular`}>
-        <p>Queda como una app: abre sin la barra del navegador y funciona sin señal.</p>
+      <button className="boton pildora" onClick={tocar}><Icono n="bajar" t={18} />{L("Instalar", "Install")}</button>
+      <Hoja abierta={ayuda} cerrar={cerrar} titulo={L(`Instala ${NOMBRE} en tu celular`, `Install ${NOMBRE} on your phone`)}>
+        <p>{L("Queda como una app: abre sin la barra del navegador y funciona sin señal.", "Works like an app: opens without the browser bar and works offline.")}</p>
         <ol className="receta larga">
           {ios
-            ? <li><b>iPhone o iPad:</b> toca el botón Compartir (el cuadro con la flecha hacia arriba) y luego «Agregar a inicio».</li>
-            : <li><b>Android (Chrome, Brave, Edge):</b> toca el menú ⋮ y luego «Instalar app» o «Agregar a la pantalla principal».</li>}
-          <li><b>Samsung Internet:</b> menú ☰, «Agregar página a» y «Pantalla de inicio».</li>
-          <li><b>Firefox en Android:</b> menú ⋮ y «Instalar».</li>
-          <li><b>Computadora:</b> en Chrome, Edge o Brave, el ícono de instalar a la derecha de la dirección.</li>
+            ? <li>{L(<><b>iPhone o iPad:</b> toca el botón Compartir (el cuadro con la flecha hacia arriba) y luego «Agregar a inicio».</>, <><b>iPhone or iPad:</b> tap Share (the square with an upward arrow), then “Add to Home Screen”.</>)}</li>
+            : <li>{L(<><b>Android (Chrome, Brave, Edge):</b> toca el menú ⋮ y luego «Instalar app» o «Agregar a la pantalla principal».</>, <><b>Android (Chrome, Brave, Edge):</b> tap the ⋮ menu, then “Install app” or “Add to Home screen”.</>)}</li>}
+          <li>{L(<><b>Samsung Internet:</b> menú ☰, «Agregar página a» y «Pantalla de inicio».</>, <><b>Samsung Internet:</b> ☰ menu, “Add page to”, then “Home screen”.</>)}</li>
+          <li>{L(<><b>Firefox en Android:</b> menú ⋮ y «Instalar».</>, <><b>Firefox on Android:</b> ⋮ menu, then “Install”.</>)}</li>
+          <li>{L(<><b>Computadora:</b> en Chrome, Edge o Brave, el ícono de instalar a la derecha de la dirección.</>, <><b>Computer:</b> in Chrome, Edge or Brave, use the install icon to the right of the address.</>)}</li>
         </ol>
       </Hoja>
     </>

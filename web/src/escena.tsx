@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { L } from './i18n'
 
 /* La idea de la app en una escena: el mismo año sobre dos pedazos de suelo.
    Verano (dic–abr): el pelado se agrieta, el tapado guarda la humedad bajo las hojas.
    Lluvias (may–nov): al pelado el aguacero le arrastra la tierra; en el tapado el agua entra y las matas crecen.
    Arriba pasa el satélite: es lo que la app lee de la NASA. */
 
-const NOMBRE_MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const NOMBRE_MES = L(['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+  ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
 const esSeco = (m: number) => m <= 3 || m === 11
 const SUELO = 128
 const muelle = { type: 'spring', bounce: 0, duration: 0.6 } as const
@@ -28,7 +30,7 @@ export function Escena({ mes }: { mes: number }) {
   const crece = seco ? 0.4 : Math.min(1, 0.6 + (mes - 4) * 0.08)
   return (
     <figure className="escena-fig">
-      <svg viewBox="0 0 320 190" role="img" aria-label="El mismo año en dos pedazos de suelo: el pelado se agrieta en verano y el aguacero le arrastra la tierra; el tapado con hojas guarda la humedad y las matas crecen.">
+      <svg viewBox="0 0 320 190" role="img" aria-label={L('El mismo año en dos pedazos de suelo: el pelado se agrieta en verano y el aguacero le arrastra la tierra; el tapado con hojas guarda la humedad y las matas crecen.', 'The same year on two patches of soil: the bare one cracks in the dry season and heavy rain washes its soil away; the one covered with dry leaves keeps its moisture and the plants grow.')}>
         {/* cielo */}
         <rect x="0" y="0" width="320" height={SUELO + 6} rx="14" fill="var(--cielo-lluvia)" />
         <motion.rect x="0" y="0" width="320" height={SUELO + 6} rx="14" fill="var(--cielo-seco)" initial={false} animate={{ opacity: seco ? 1 : 0 }} transition={muelle} />
@@ -82,8 +84,8 @@ export function Escena({ mes }: { mes: number }) {
         </g>
         <g fill="var(--rastrojo)">{Array.from({ length: 13 }, (_, i) => <ellipse key={i} cx={170 + i * 11.5} cy={SUELO - 2 + (i % 2)} rx="7" ry="3" transform={`rotate(${(i * 37) % 30 - 15} ${170 + i * 11.5} ${SUELO})`} />)}</g>
 
-        <text x="78" y="182" textAnchor="middle" className="esc-etq">Suelo pelado</text>
-        <text x="242" y="182" textAnchor="middle" className="esc-etq">Tapado con hojas</text>
+        <text x="78" y="182" textAnchor="middle" className="esc-etq">{L('Suelo pelado', 'Bare soil')}</text>
+        <text x="242" y="182" textAnchor="middle" className="esc-etq">{L('Tapado con hojas', 'Covered with dry leaves')}</text>
       </svg>
       <figcaption>
         <AnimatePresence mode="popLayout" initial={false}>
@@ -91,7 +93,7 @@ export function Escena({ mes }: { mes: number }) {
             {NOMBRE_MES[mes]}
           </motion.span>
         </AnimatePresence>
-        <b>{seco ? 'verano' : 'lluvias'}</b>
+        <b>{seco ? L('verano', 'dry season') : L('lluvias', 'rainy season')}</b>
       </figcaption>
     </figure>
   )

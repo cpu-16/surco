@@ -1,3 +1,4 @@
+import { L } from './i18n'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useDragControls } from 'motion/react'
@@ -53,7 +54,7 @@ export function Hoja({ abierta, cerrar, titulo, children }: { abierta: boolean; 
             <div className="asa" onPointerDown={(e) => asa.start(e)} style={{ touchAction: 'none' }} aria-hidden="true"><span /></div>
             <div className="hoja-cab">
               <h2 id="hoja-t" ref={cab} tabIndex={-1}>{titulo}</h2>
-              <button className="icono-btn" onClick={cerrar} aria-label="Cerrar"><Icono n="cerrar" /></button>
+              <button className="icono-btn" onClick={cerrar} aria-label={L("Cerrar", "Close")}><Icono n="cerrar" /></button>
             </div>
             <div className="hoja-cuerpo">{children}</div>
           </motion.div>
@@ -79,8 +80,13 @@ export const Fuente = ({ children, titulo }: { children: ReactNode; titulo?: str
 
 export const fecha = (iso: string) => {
   const [a, m, d] = iso.split('-').map(Number)
-  return `${d} de ${['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1]}${a !== new Date().getFullYear() ? ` de ${a}` : ''}`
+  return L(`${d} de ${['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1]}${a !== new Date().getFullYear() ? ` de ${a}` : ''}`, `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m - 1]} ${d}${a !== new Date().getFullYear() ? `, ${a}` : ''}`)
 }
 
 /** «del 8 al 11 de noviembre» o «del 28 de octubre al 3 de noviembre» */
-export const rango = (a: string, b: string) => a.slice(0, 7) === b.slice(0, 7) ? `del ${Number(a.slice(8))} al ${fecha(b)}` : `del ${fecha(a)} al ${fecha(b)}`
+export const rango = (a: string, b: string) => L(
+  a.slice(0, 7) === b.slice(0, 7) ? `del ${Number(a.slice(8))} al ${fecha(b)}` : `del ${fecha(a)} al ${fecha(b)}`,
+  a.slice(0, 7) === b.slice(0, 7)
+    ? `from ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][Number(a.slice(5, 7)) - 1]} ${Number(a.slice(8))} to ${Number(b.slice(8))}${Number(b.slice(0, 4)) !== new Date().getFullYear() ? `, ${b.slice(0, 4)}` : ''}`
+    : `from ${fecha(a)} to ${fecha(b)}`,
+)
