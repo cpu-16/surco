@@ -1,0 +1,3692 @@
+{
+  "consultado": "2026-11-14",
+  "fuentes": {
+    "F56": {
+      "titulo": "FAO-56, capítulo 6, tablas 11–12: etapas y Kc",
+      "autor": "Allen, Pereira, Raes y Smith / FAO",
+      "anio": 1998,
+      "url": "https://www.fao.org/4/x0490e/x0490e0b.htm",
+      "doi": null
+    },
+    "F56R": {
+      "titulo": "FAO-56, capítulo 8, tabla 22: profundidad radicular y estrés",
+      "autor": "Allen, Pereira, Raes y Smith / FAO",
+      "anio": 1998,
+      "url": "https://www.fao.org/4/x0490e/x0490e0e.htm",
+      "doi": null
+    },
+    "IMA": {
+      "titulo": "Catálogo de rubros cultivados en Panamá",
+      "autor": "Instituto de Mercadeo Agropecuario",
+      "anio": 2020,
+      "url": "https://ima.gob.pa/wp-content/uploads/2025/04/CATALOGO-RUBROS-2020-.pdf",
+      "doi": null
+    },
+    "ML": {
+      "titulo": "Fichas técnicas de leguminosas: poroto, frijol Vigna y guandú",
+      "autor": "MIDA, Dirección de Agricultura",
+      "anio": 2021,
+      "url": "https://mida.gob.pa/wp-content/uploads/2021/08/Ficha-de-leguminosas-2021revisadas-por-el-tecnico-1.pdf",
+      "doi": null
+    },
+    "MR": {
+      "titulo": "Fichas técnicas de raíces y tubérculos: yuca y camote",
+      "autor": "MIDA, Dirección de Agricultura",
+      "anio": 2021,
+      "url": "https://mida.gob.pa/wp-content/uploads/2021/08/Fichas-de-raices-y-tub.-2021-abril-Revisadas-1.pdf",
+      "doi": null
+    },
+    "MM": {
+      "titulo": "Ficha técnica del cultivo de maíz mecanizado",
+      "autor": "MIDA, Dirección de Agricultura",
+      "anio": 2026,
+      "url": "https://mida.gob.pa/wp-content/uploads/2026/05/Ficha-tecnica-del-cultivo-de-maiz-2026.pdf",
+      "doi": null
+    },
+    "IY": {
+      "titulo": "El encalamiento y la producción de yuca",
+      "autor": "IDIAP",
+      "anio": null,
+      "url": "https://www.idiap.gob.pa/el-encalamiento-y-la-produccion-de-yuca/",
+      "doi": null
+    },
+    "IP": {
+      "titulo": "Producción de semilla de frijol poroto de buena calidad",
+      "autor": "IDIAP",
+      "anio": null,
+      "url": "https://www.idiap.gob.pa/download/manual-de-semilla-de-frijol-poroto-de-buena-calidad/?wpdmdl=5233",
+      "doi": null
+    },
+    "TG": {
+      "titulo": "Cajanus cajan — Tropical Forages",
+      "autor": "Tropical Forages / Alliance Bioversity International–CIAT e instituciones colaboradoras",
+      "anio": null,
+      "url": "https://tropicalforages.info/text/entities/cajanus_cajan.htm",
+      "doi": null
+    },
+    "TV": {
+      "titulo": "Vigna unguiculata — Tropical Forages",
+      "autor": "Tropical Forages / Alliance Bioversity International–CIAT e instituciones colaboradoras",
+      "anio": null,
+      "url": "https://tropicalforages.info/text/entities/vigna_unguiculata.htm",
+      "doi": null
+    },
+    "TM": {
+      "titulo": "Mucuna pruriens — Tropical Forages",
+      "autor": "Tropical Forages / Alliance Bioversity International–CIAT e instituciones colaboradoras",
+      "anio": null,
+      "url": "https://tropicalforages.info/text/entities/mucuna_pruriens.htm",
+      "doi": null
+    },
+    "TA": {
+      "titulo": "Arachis pintoi — Tropical Forages",
+      "autor": "Tropical Forages / Alliance Bioversity International–CIAT e instituciones colaboradoras",
+      "anio": null,
+      "url": "https://tropicalforages.info/text/entities/arachis_pintoi.htm",
+      "doi": null
+    },
+    "CI": {
+      "titulo": "Especies forrajeras multipropósito: opciones para productores del trópico americano, pp. 98–99",
+      "autor": "Peters, Franco, Schmidt e Hincapié / CIAT",
+      "anio": null,
+      "url": "https://ciat-library.ciat.cgiar.org/Forrajes_Tropicales/pdf/Books/Especies%20Forrajeras%20MultipropositoTropico%20Americano.pdf",
+      "doi": null
+    },
+    "NF": {
+      "titulo": "Guidelines and reference material on integrated soil and nutrient management and conservation for farmer field schools, apéndice 7",
+      "autor": "FAO",
+      "anio": 2000,
+      "url": "https://www.fao.org/fileadmin/templates/nr/images/resources/pdf_documents/misc27.pdf",
+      "doi": null
+    },
+    "NH": {
+      "titulo": "Biological nitrogen fixation, presentación INSOILFER; tabla atribuida a Ormeño-Orrillo et al. 2013",
+      "autor": "Mariangela Hungria / Embrapa / FAO",
+      "anio": 2023,
+      "url": "https://www.fao.org/fileadmin/user_upload/GSP/INSOILFER/2023_FAO_Julho_MHungria.pdf",
+      "doi": null
+    },
+    "NA": {
+      "titulo": "Determinação da Fixação Biológica de Nitrogênio no Amendoim Forrageiro (Arachis spp.) por Intermédio da Abundância Natural de 15N",
+      "autor": "C. H. B. Miranda, A. Vieira y G. Cadisch",
+      "anio": 2003,
+      "url": "https://www.sbz.org.br/revista/artigos/3674.pdf",
+      "doi": null
+    },
+    "PN": {
+      "titulo": "Pineapple Growing in the Florida Home Landscape, HS7",
+      "autor": "Jonathan H. Crane / UF IFAS",
+      "anio": null,
+      "url": "https://edis.ifas.ufl.edu/publication/MG055/pdf",
+      "doi": null
+    },
+    "PC": {
+      "titulo": "Pineapple Mealybug, Dysmicoccus brevipes, EENY635",
+      "autor": "Ashley A. Egelie y Jennifer L. Gillett-Kaufman / UF IFAS",
+      "anio": 2015,
+      "url": "https://edis.ifas.ufl.edu/publication/IN1106/pdf",
+      "doi": null
+    },
+    "NE": {
+      "titulo": "Nematode Management in the Vegetable Garden, ENY-012",
+      "autor": "UF IFAS",
+      "anio": null,
+      "url": "https://edis.ifas.ufl.edu/publication/NG005/pdf",
+      "doi": null
+    },
+    "NC": {
+      "titulo": "Cover Crops for Managing Root-Knot Nematodes, ENY063",
+      "autor": "Harsimran K. Gill, Zane J. Grabau y Robert McSorley / UF IFAS",
+      "anio": null,
+      "url": "https://edis.ifas.ufl.edu/publication/IN892/pdf",
+      "doi": null
+    },
+    "SC": {
+      "titulo": "Soil organic cover — Conservation Agriculture",
+      "autor": "FAO",
+      "anio": null,
+      "url": "https://www.fao.org/conservation-agriculture/in-practice/soil-organic-cover/en",
+      "doi": null
+    },
+    "WA": {
+      "titulo": "Crop water needs, tabla 14: sensibilidad a sequía",
+      "autor": "FAO",
+      "anio": null,
+      "url": "https://www.fao.org/4/s2022e/s2022e07.htm",
+      "doi": null
+    },
+    "CC": {
+      "titulo": "Manual técnico: siembra de cacao fino y de aroma",
+      "autor": null,
+      "anio": null,
+      "url": "https://platicar.go.cr/images/buscador/documents/pdf/2019/Cacao_1_min.pdf",
+      "doi": null,
+      "nota": "Documento alojado en PLATICAR; autoría y año no confirmados en el texto consultado."
+    },
+    "KW": {
+      "titulo": "Theobroma cacao L., taxonomía",
+      "autor": "Royal Botanic Gardens, Kew / POWO",
+      "anio": null,
+      "url": "https://powo.science.kew.org/taxon/320783-2",
+      "doi": null
+    },
+    "NO": {
+      "titulo": "ENSO Diagnostic Discussion, 12 November 2026",
+      "autor": "NOAA CPC / NCEP / NWS",
+      "anio": 2026,
+      "url": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_disc_nov2026/ensodisc.pdf",
+      "doi": null
+    },
+    "IM": {
+      "titulo": "Boletín de pronóstico climático, publicación 59, noviembre de 2026",
+      "autor": "IMHPA",
+      "anio": 2026,
+      "url": "https://www.imhpa.gob.pa/uploads/documentos/boletn_de_pronstico_climtico_noviembre_2026-272055820.pdf",
+      "doi": null
+    },
+    "CA": {
+      "titulo": "Canopeo: A Powerful New Tool for Measuring Fractional Green Canopy Cover",
+      "autor": "Andrés Patrignani y Tyson E. Ochsner",
+      "anio": 2015,
+      "url": "https://acsess.onlinelibrary.wiley.com/doi/10.2134/agronj15.0150",
+      "doi": "10.2134/agronj15.0150"
+    }
+  },
+  "cultivos": {
+    "yuca": {
+      "nombre": "Yuca",
+      "cientifico": "Manihot esculenta",
+      "familia": "Euphorbiaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        240,
+        300
+      ],
+      "siembra_meses": [
+        4,
+        5
+      ],
+      "kc": {
+        "ini": 0.3,
+        "mid": 0.8,
+        "end": 0.3
+      },
+      "etapas_dias": [
+        20,
+        40,
+        90,
+        60
+      ],
+      "raiz_m": 0.5,
+      "tolerancia_sequia": "alta",
+      "fija_n_kg_ha": null,
+      "cobertura": "media",
+      "residuo": "medio",
+      "plagas_compartidas": null,
+      "mercado_pa": "Consumo familiar y venta de raíz; mercado nacional documentado (IMA).",
+      "notas": "Manejo anual de arbusto perenne. MR: 8–10 meses; IMA da 9–12, no se fusionan ambos rangos. F56: año 1, etapas tropicales de 210 días, distintas del ciclo local; raíz 0.5–0.8 m. IY respalda tolerancia de Brasileña, no identifica el clon del patio. Suelo inicialmente expuesto: conservar residuos sanos. Pares de plagas concretos no verificados: null.",
+      "fuentes": [
+        "MR",
+        "IMA",
+        "IY",
+        "F56",
+        "F56R",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "MR"
+        ],
+        "familia": [
+          "MR"
+        ],
+        "tipo": [
+          "MR"
+        ],
+        "ciclo_dias": [
+          "MR"
+        ],
+        "siembra_meses": [
+          "MR"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "IY"
+        ],
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": null,
+        "fija_n_kg_ha": null
+      }
+    },
+    "pina": {
+      "nombre": "Piña",
+      "cientifico": "Ananas comosus",
+      "familia": "Bromeliaceae",
+      "tipo": "perenne",
+      "ciclo_dias": [
+        540,
+        720
+      ],
+      "siembra_meses": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "kc": {
+        "ini": 0.5,
+        "mid": 0.3,
+        "end": 0.3
+      },
+      "etapas_dias": [
+        60,
+        120,
+        600,
+        10
+      ],
+      "raiz_m": 0.3,
+      "tolerancia_sequia": "alta",
+      "fija_n_kg_ha": null,
+      "cobertura": "media",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Dysmicoccus brevipes: piña, Musa (referencia banano), cacao, Citrus y zapallo; PC. Hospedante compartido de cochinilla, no prueba de que todos hospeden el virus de marchitez de piña.",
+        "Meloidogyne spp.: piña, caupí, frijol común, maíz, camote y zapallo; PN/TV/NE. Identificar especie y cultivar antes de elegir rotación.",
+        "Rotylenchulus reniformis: también camote y frijoles; PN/NE."
+      ],
+      "mercado_pa": "Fruta para autoconsumo; venta fresca y transformación documentadas (IMA).",
+      "notas": "PN: 18–24 meses en patios de Florida, referencia externa, no ciclo comprobado aquí. F56: suelo desnudo; con cubierta de gramínea sería 0.5/0.5/0.5. Etapas de Hawái suman 790 días; no equivalen al rango de PN. Raíz 0.3–0.6 m. Mantener lote separado de rotación corta y evitar sombra de guandú o bejucos.",
+      "fuentes": [
+        "PN",
+        "PC",
+        "NE",
+        "IMA",
+        "F56",
+        "F56R",
+        "TV"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "PN"
+        ],
+        "familia": [
+          "IMA"
+        ],
+        "tipo": [
+          "PN"
+        ],
+        "ciclo_dias": [
+          "PN"
+        ],
+        "siembra_meses": [
+          "IMA"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "PN"
+        ],
+        "cobertura": [
+          "PN"
+        ],
+        "residuo": [
+          "PN"
+        ],
+        "plagas_compartidas": [
+          "PC",
+          "PN",
+          "TV",
+          "NE"
+        ],
+        "fija_n_kg_ha": null
+      }
+    },
+    "platano": {
+      "nombre": "Plátano",
+      "cientifico": "Musa × paradisiaca (grupo de cultivo por confirmar)",
+      "familia": "Musaceae",
+      "tipo": "perenne",
+      "ciclo_dias": [
+        300,
+        360
+      ],
+      "siembra_meses": [
+        5,
+        6
+      ],
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.1,
+        "end": 1.0
+      },
+      "etapas_dias": [
+        120,
+        90,
+        120,
+        60
+      ],
+      "raiz_m": 0.5,
+      "tolerancia_sequia": "baja",
+      "fija_n_kg_ha": null,
+      "cobertura": "media",
+      "residuo": "alto",
+      "plagas_compartidas": [
+        "Dysmicoccus brevipes: piña, Musa (referencia banano), cacao, Citrus y zapallo; PC. Hospedante compartido de cochinilla, no prueba de que todos hospeden el virus de marchitez de piña."
+      ],
+      "mercado_pa": "Consumo cocinado y comercio alimentario nacional (IMA).",
+      "notas": "Primera cosecha 10–12 meses (IMA), luego sucesión de hijos; no arrancar la mata anualmente. F56 corresponde a banana año 1: proxy explícito, no valor específico de plátano local; etapas mediterráneas, no tropicales. Año 2: 1.0/1.2/1.1. Raíz 0.5–0.9 m. Hojas y pseudotallo sanos pueden cubrir suelo; revisar sanidad antes de moverlos.",
+      "fuentes": [
+        "IMA",
+        "F56",
+        "F56R",
+        "WA",
+        "PC",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "IMA"
+        ],
+        "familia": [
+          "IMA"
+        ],
+        "tipo": [
+          "IMA"
+        ],
+        "ciclo_dias": [
+          "IMA"
+        ],
+        "siembra_meses": [
+          "IMA"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "WA"
+        ],
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "PC"
+        ],
+        "fija_n_kg_ha": null
+      }
+    },
+    "cacao": {
+      "nombre": "Cacao",
+      "cientifico": "Theobroma cacao",
+      "familia": "Malvaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": 1,
+        "mid": 1.05,
+        "end": 1.05
+      },
+      "etapas_dias": null,
+      "raiz_m": 0.7,
+      "tolerancia_sequia": "baja",
+      "fija_n_kg_ha": null,
+      "cobertura": "baja",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Dysmicoccus brevipes: piña, Musa (referencia banano), cacao, Citrus y zapallo; PC. Hospedante compartido de cochinilla, no prueba de que todos hospeden el virus de marchitez de piña."
+      ],
+      "mercado_pa": null,
+      "notas": "KW respalda taxonomía actual. CC respalda sombra y humedad distribuida; tolerancia baja es síntesis cualitativa. Raíz F56R 0.7–1.0 m. No se verificaron ciclo siembra–primera cosecha, meses específicos del Pacífico panameño ni mercado local: null. Copa no sustituye hojarasca; priorizar conservación de humedad durante seca.",
+      "fuentes": [
+        "KW",
+        "CC",
+        "F56",
+        "F56R",
+        "PC",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "KW"
+        ],
+        "familia": [
+          "KW"
+        ],
+        "tipo": [
+          "KW"
+        ],
+        "ciclo_dias": null,
+        "siembra_meses": null,
+        "mercado_pa": null,
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": null,
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "CC"
+        ],
+        "cobertura": [
+          "CC",
+          "SC"
+        ],
+        "residuo": [
+          "CC",
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "PC"
+        ],
+        "fija_n_kg_ha": null
+      }
+    },
+    "naranja": {
+      "nombre": "Naranja",
+      "cientifico": "Citrus × sinensis",
+      "familia": "Rutaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "kc": {
+        "ini": 0.65,
+        "mid": 0.6,
+        "end": 0.65
+      },
+      "etapas_dias": [
+        60,
+        90,
+        120,
+        95
+      ],
+      "raiz_m": 1.1,
+      "tolerancia_sequia": "media",
+      "fija_n_kg_ha": null,
+      "cobertura": "baja",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Dysmicoccus brevipes: piña, Musa (referencia banano), cacao, Citrus y zapallo; PC. Hospedante compartido de cochinilla, no prueba de que todos hospeden el virus de marchitez de piña."
+      ],
+      "mercado_pa": "Fruta fresca y jugo; comercio nacional documentado (IMA).",
+      "notas": "F56: escenario de referencia con 50% de copa y suelo sin cubierta; cobertura real desconocida. Con 50% de copa y cubierta activa: 0.8/0.8/0.8; no usar el primer Kc para ambas estrategias. Etapas mediterráneas anuales, no edad a primera cosecha; esta queda null sin material/portainjerto. Raíz 1.1–1.5 m para el mismo escenario. Mantener cobertura seca separada del tronco; revisar adaptación del material a tierras bajas.",
+      "fuentes": [
+        "IMA",
+        "F56",
+        "F56R",
+        "WA",
+        "PC",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "IMA"
+        ],
+        "familia": [
+          "IMA"
+        ],
+        "tipo": [
+          "IMA"
+        ],
+        "ciclo_dias": null,
+        "siembra_meses": [
+          "IMA"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "WA"
+        ],
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "PC"
+        ],
+        "fija_n_kg_ha": null
+      }
+    },
+    "toronja": {
+      "nombre": "Toronja",
+      "cientifico": "Citrus × paradisi",
+      "familia": "Rutaceae",
+      "tipo": "perenne",
+      "ciclo_dias": null,
+      "siembra_meses": [
+        5,
+        6
+      ],
+      "kc": {
+        "ini": 0.65,
+        "mid": 0.6,
+        "end": 0.65
+      },
+      "etapas_dias": [
+        60,
+        90,
+        120,
+        95
+      ],
+      "raiz_m": 1.1,
+      "tolerancia_sequia": "media",
+      "fija_n_kg_ha": null,
+      "cobertura": "baja",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Dysmicoccus brevipes: piña, Musa (referencia banano), cacao, Citrus y zapallo; PC. Hospedante compartido de cochinilla, no prueba de que todos hospeden el virus de marchitez de piña."
+      ],
+      "mercado_pa": "Fruta fresca y jugo; comercio nacional documentado (IMA).",
+      "notas": "F56: escenario de referencia con 50% de copa y suelo sin cubierta; cobertura real desconocida. Con 50% de copa y cubierta activa: 0.8/0.8/0.8; no usar el primer Kc para ambas estrategias. Etapas mediterráneas anuales, no edad a primera cosecha; esta queda null sin material/portainjerto. Raíz 1.1–1.5 m para el mismo escenario. Mantener cobertura seca separada del tronco; revisar adaptación del material a tierras bajas.",
+      "fuentes": [
+        "IMA",
+        "F56",
+        "F56R",
+        "WA",
+        "PC",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "IMA"
+        ],
+        "familia": [
+          "IMA"
+        ],
+        "tipo": [
+          "IMA"
+        ],
+        "ciclo_dias": null,
+        "siembra_meses": [
+          "IMA"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "WA"
+        ],
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "PC"
+        ],
+        "fija_n_kg_ha": null
+      }
+    },
+    "guandu": {
+      "nombre": "Guandú",
+      "cientifico": "Cajanus cajan",
+      "familia": "Fabaceae",
+      "tipo": "perenne",
+      "ciclo_dias": [
+        120,
+        270
+      ],
+      "siembra_meses": [
+        5
+      ],
+      "kc": {
+        "ini": null,
+        "mid": null,
+        "end": null
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": "alta",
+      "fija_n_kg_ha": [
+        96,
+        280
+      ],
+      "cobertura": "media",
+      "residuo": "alto",
+      "plagas_compartidas": [
+        "Maruca vitrata (sinónimo M. testulalis): compartida con caupí; TG/TV."
+      ],
+      "mercado_pa": "Grano verde o seco, consumo y comercio panameños (IMA).",
+      "notas": "ML: variedades de 4–5, 5–6 y 8–9 meses; rango convertido a días. No confundir primera cosecha con vida del arbusto. NF: fijación histórica externa sin periodo definido; no anualizar ni acreditar todo al suelo. TG: arbusto, drenaje y pleno sol. En patio, pocos individuos en borde soleado; podar y retirar al concluir el uso previsto. Kc, etapas y raíz efectiva cuantificada no verificados.",
+      "fuentes": [
+        "ML",
+        "IMA",
+        "TG",
+        "TV",
+        "NF"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "ML"
+        ],
+        "familia": [
+          "TG"
+        ],
+        "tipo": [
+          "TG"
+        ],
+        "ciclo_dias": [
+          "ML"
+        ],
+        "siembra_meses": [
+          "ML"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": null,
+        "etapas_dias": null,
+        "raiz_m": null,
+        "tolerancia_sequia": [
+          "TG"
+        ],
+        "fija_n_kg_ha": [
+          "NF"
+        ],
+        "cobertura": [
+          "TG"
+        ],
+        "residuo": [
+          "TG"
+        ],
+        "plagas_compartidas": [
+          "TG",
+          "TV"
+        ]
+      }
+    },
+    "caupi": {
+      "nombre": "Frijol caupí (frijol Vigna)",
+      "cientifico": "Vigna unguiculata",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        90,
+        90
+      ],
+      "siembra_meses": [
+        9,
+        10,
+        11
+      ],
+      "kc": {
+        "ini": 0.4,
+        "mid": 1.05,
+        "end": 0.35
+      },
+      "etapas_dias": [
+        20,
+        30,
+        30,
+        20
+      ],
+      "raiz_m": 0.6,
+      "tolerancia_sequia": "media",
+      "fija_n_kg_ha": [
+        73,
+        240
+      ],
+      "cobertura": "alta",
+      "residuo": "alto",
+      "plagas_compartidas": [
+        "Meloidogyne spp.: piña, caupí, frijol común, maíz, camote y zapallo; PN/TV/NE. Identificar especie y cultivar antes de elegir rotación.",
+        "Rhizoctonia solani: caupí, frijol común y Arachis pintoi; TV/IP/TA. Complejo con grupos de anastomosis distintos: transmisión cruzada no demostrada para este patio.",
+        "Maruca vitrata: también guandú; TG/TV."
+      ],
+      "mercado_pa": "Frijol Vigna de consumo y comercialización nacionales (IMA/ML).",
+      "notas": "ML: Vita 3, 90 días; meses de segunda coa, noviembre solo donde continúan lluvias. No iniciar ahora sin agua. Propuesta mayo como abono verde es ensayo, no ventana comercial local validada; TV permite corte a 8–10 semanas. F56: cosecha seca; para verde Kc end 0.60. La fila de etapas suma 100 aunque imprime total 110: se conservan etapas, no ese total. Raíz 0.6–1.0 m; NF no especifica periodo del rango N.",
+      "fuentes": [
+        "ML",
+        "IMA",
+        "TV",
+        "TG",
+        "IP",
+        "TA",
+        "NF",
+        "F56",
+        "F56R",
+        "NE",
+        "PN"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "ML"
+        ],
+        "familia": [
+          "ML"
+        ],
+        "tipo": [
+          "ML"
+        ],
+        "ciclo_dias": [
+          "ML"
+        ],
+        "siembra_meses": [
+          "ML"
+        ],
+        "mercado_pa": [
+          "IMA",
+          "ML"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "TV"
+        ],
+        "fija_n_kg_ha": [
+          "NF"
+        ],
+        "cobertura": [
+          "TV"
+        ],
+        "residuo": [
+          "TV"
+        ],
+        "plagas_compartidas": [
+          "TV",
+          "TG",
+          "IP",
+          "TA",
+          "NE",
+          "PN"
+        ]
+      }
+    },
+    "frijol_comun": {
+      "nombre": "Frijol común / poroto",
+      "cientifico": "Phaseolus vulgaris",
+      "familia": "Fabaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        64,
+        81
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": 0.4,
+        "mid": 1.15,
+        "end": 0.35
+      },
+      "etapas_dias": [
+        20,
+        30,
+        40,
+        20
+      ],
+      "raiz_m": 0.6,
+      "tolerancia_sequia": "baja",
+      "fija_n_kg_ha": [
+        0,
+        165
+      ],
+      "cobertura": "media",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Meloidogyne spp.: piña, caupí, frijol común, maíz, camote y zapallo; PN/TV/NE. Identificar especie y cultivar antes de elegir rotación.",
+        "Rhizoctonia solani: caupí, frijol común y Arachis pintoi; TV/IP/TA. Complejo con grupos de anastomosis distintos: transmisión cruzada no demostrada para este patio."
+      ],
+      "mercado_pa": "Poroto para consumo y venta nacional (IMA).",
+      "notas": "ML: Mantequilla 64 días, Chileno 68, R2 81; no ciclo garantizado a 80–100 m. Fechas octubre–noviembre de ML/IP son de zonas productoras diferentes: siembra local null. No es candidato preferente para este patio cálido sin ensayo varietal. F56: frijol seco, etapas de clima continental; raíz 0.6–0.9 m. NH: rango bibliográfico general sin periodo explícito. No rotar caupí→poroto suponiendo ruptura de mustia.",
+      "fuentes": [
+        "ML",
+        "IP",
+        "IMA",
+        "F56",
+        "F56R",
+        "WA",
+        "NH",
+        "TV",
+        "TA",
+        "NE",
+        "PN",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "ML"
+        ],
+        "familia": [
+          "ML"
+        ],
+        "tipo": [
+          "ML"
+        ],
+        "ciclo_dias": [
+          "ML"
+        ],
+        "siembra_meses": null,
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "WA"
+        ],
+        "fija_n_kg_ha": [
+          "NH"
+        ],
+        "cobertura": [
+          "F56"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "IP",
+          "TV",
+          "TA",
+          "NE",
+          "PN"
+        ]
+      }
+    },
+    "canavalia": {
+      "nombre": "Canavalia",
+      "cientifico": "Canavalia ensiformis",
+      "familia": "Fabaceae",
+      "tipo": "cobertura",
+      "ciclo_dias": [
+        170,
+        240
+      ],
+      "siembra_meses": null,
+      "kc": {
+        "ini": null,
+        "mid": null,
+        "end": null
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": "alta",
+      "fija_n_kg_ha": null,
+      "cobertura": "alta",
+      "residuo": "alto",
+      "plagas_compartidas": null,
+      "mercado_pa": null,
+      "notas": "CI: anual a perenne, cosecha 170–240 días, no duración obligatoria para corte como abono verde. Tolerante a sequía; no garantiza establecimiento sin humedad. CI advierte toxicidad: no usar como frijol de cocina. NF solo ofrece 49 kg N/ha, no rango ni periodo; fija_n queda null y se conserva el dato puntual aquí. Mercado panameño, ventana local, Kc, etapas, raíz y pares sanitarios no verificados. Ensayar superficie pequeña y cortar antes de semillar.",
+      "fuentes": [
+        "CI",
+        "NF",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "CI"
+        ],
+        "familia": [
+          "CI"
+        ],
+        "tipo": [
+          "CI"
+        ],
+        "ciclo_dias": [
+          "CI"
+        ],
+        "siembra_meses": null,
+        "mercado_pa": null,
+        "kc": null,
+        "etapas_dias": null,
+        "raiz_m": null,
+        "tolerancia_sequia": [
+          "CI"
+        ],
+        "fija_n_kg_ha": [
+          "NF"
+        ],
+        "cobertura": [
+          "CI"
+        ],
+        "residuo": [
+          "CI"
+        ],
+        "plagas_compartidas": null
+      }
+    },
+    "mucuna": {
+      "nombre": "Mucuna",
+      "cientifico": "Mucuna pruriens var. utilis",
+      "familia": "Fabaceae",
+      "tipo": "cobertura",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": null,
+        "mid": null,
+        "end": null
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": "media",
+      "fija_n_kg_ha": null,
+      "cobertura": "alta",
+      "residuo": "alto",
+      "plagas_compartidas": null,
+      "mercado_pa": null,
+      "notas": "TM: trepadora vigorosa que puede ahogar acompañantes; no recomendar debajo de perennes de este patio. Elegir material sin pelos urticantes; semillas con antinutrientes, no alimento doméstico. Sin rango de fijación verificado, ciclo siembra–cosecha ni ventana local. NE/NC describen supresión de ciertos nematodos, no inmunidad universal ni evidencia del patio. Kc, etapas y raíz efectiva: null.",
+      "fuentes": [
+        "TM",
+        "NE",
+        "NC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "TM"
+        ],
+        "familia": [
+          "TM"
+        ],
+        "tipo": [
+          "TM"
+        ],
+        "ciclo_dias": null,
+        "siembra_meses": null,
+        "mercado_pa": null,
+        "kc": null,
+        "etapas_dias": null,
+        "raiz_m": null,
+        "tolerancia_sequia": [
+          "TM"
+        ],
+        "fija_n_kg_ha": null,
+        "cobertura": [
+          "TM"
+        ],
+        "residuo": [
+          "TM"
+        ],
+        "plagas_compartidas": null
+      }
+    },
+    "mani_forrajero": {
+      "nombre": "Maní forrajero",
+      "cientifico": "Arachis pintoi",
+      "familia": "Fabaceae",
+      "tipo": "cobertura",
+      "ciclo_dias": null,
+      "siembra_meses": null,
+      "kc": {
+        "ini": null,
+        "mid": null,
+        "end": null
+      },
+      "etapas_dias": null,
+      "raiz_m": null,
+      "tolerancia_sequia": "media",
+      "fija_n_kg_ha": [
+        26,
+        99
+      ],
+      "cobertura": "alta",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Rhizoctonia solani: caupí, frijol común y Arachis pintoi; TV/IP/TA. Complejo con grupos de anastomosis distintos: transmisión cruzada no demostrada para este patio."
+      ],
+      "mercado_pa": null,
+      "notas": "Perenne rastrero tolerante a sombra; TA registra supervivencia de seca de 4 meses, no garantía para 5 meses o El Niño. NA tabla 2: cinco accesiones de A. pintoi, biomasa aérea cosechada en enero de 2000 en Cerrado; no tasa anual. Métodos indican establecimiento dic-1998 y resumen nov-1999: discrepancia temporal, no anualizar. Fijación no equivale a transferencia al árbol. No usar Kc/raíz de A. hypogaea. Ensayar parche en lluvias, recortar si compite; mercado/siembra local/ciclo/etapas/raíz null.",
+      "fuentes": [
+        "TA",
+        "NA",
+        "TV",
+        "IP",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "TA"
+        ],
+        "familia": [
+          "TA"
+        ],
+        "tipo": [
+          "TA"
+        ],
+        "ciclo_dias": null,
+        "siembra_meses": null,
+        "mercado_pa": null,
+        "kc": null,
+        "etapas_dias": null,
+        "raiz_m": null,
+        "tolerancia_sequia": [
+          "TA"
+        ],
+        "fija_n_kg_ha": [
+          "NA"
+        ],
+        "cobertura": [
+          "TA"
+        ],
+        "residuo": [
+          "TA"
+        ],
+        "plagas_compartidas": [
+          "TA",
+          "TV",
+          "IP"
+        ]
+      }
+    },
+    "maiz": {
+      "nombre": "Maíz",
+      "cientifico": "Zea mays",
+      "familia": "Poaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        130,
+        150
+      ],
+      "siembra_meses": [
+        5,
+        8,
+        9
+      ],
+      "kc": {
+        "ini": 0.3,
+        "mid": 1.2,
+        "end": 0.35
+      },
+      "etapas_dias": [
+        20,
+        35,
+        40,
+        30
+      ],
+      "raiz_m": 1.0,
+      "tolerancia_sequia": "baja",
+      "fija_n_kg_ha": null,
+      "cobertura": "media",
+      "residuo": "alto",
+      "plagas_compartidas": [
+        "Meloidogyne spp.: piña, caupí, frijol común, maíz, camote y zapallo; PN/TV/NE. Identificar especie y cultivar antes de elegir rotación."
+      ],
+      "mercado_pa": "Grano y mazorca para alimentación y mercado nacional (IMA).",
+      "notas": "MM: ciclo de grano 130–150 días y coa de mayo/agosto–septiembre. F56: grano secado en campo, etapas Nigeria húmeda (125 días), no ciclo local; raíz 1.0–1.7 m. En decenas de m², revisar espacio soleado y polinización; no aumentar densidad para compensar falta de terreno. Dejar tallos sanos cortados en superficie; no asumir que elimina nematodos.",
+      "fuentes": [
+        "MM",
+        "IMA",
+        "F56",
+        "F56R",
+        "WA",
+        "NE",
+        "PN",
+        "TV",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "MM"
+        ],
+        "familia": [
+          "MM"
+        ],
+        "tipo": [
+          "MM"
+        ],
+        "ciclo_dias": [
+          "MM"
+        ],
+        "siembra_meses": [
+          "MM"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": [
+          "WA"
+        ],
+        "fija_n_kg_ha": null,
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "NE",
+          "PN",
+          "TV"
+        ]
+      }
+    },
+    "camote": {
+      "nombre": "Camote",
+      "cientifico": "Ipomoea batatas",
+      "familia": "Convolvulaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        90,
+        120
+      ],
+      "siembra_meses": [
+        5,
+        6
+      ],
+      "kc": {
+        "ini": 0.5,
+        "mid": 1.15,
+        "end": 0.65
+      },
+      "etapas_dias": [
+        15,
+        30,
+        50,
+        30
+      ],
+      "raiz_m": 1.0,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": "alta",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Meloidogyne spp.: piña, caupí, frijol común, maíz, camote y zapallo; PN/TV/NE. Identificar especie y cultivar antes de elegir rotación.",
+        "Rotylenchulus reniformis: también piña y frijoles; PN/NE."
+      ],
+      "mercado_pa": "Raíz para consumo y mercado panameño (IMA).",
+      "notas": "IMA: 90–120 días; MR: referencia 120 días. Manejo anual de planta perenne. F56: etapas tropicales de 125 días; raíz 1.0–1.5 m, no profundidad de las raíces de reserva. Guiar bejucos sin invadir piña ni paso. Sequía no clasificada con evidencia suficiente: null; no deducir tolerancia de profundidad radicular.",
+      "fuentes": [
+        "IMA",
+        "MR",
+        "F56",
+        "F56R",
+        "NE",
+        "PN",
+        "TV",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "MR"
+        ],
+        "familia": [
+          "MR"
+        ],
+        "tipo": [
+          "IMA"
+        ],
+        "ciclo_dias": [
+          "IMA"
+        ],
+        "siembra_meses": [
+          "IMA"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": null,
+        "fija_n_kg_ha": null,
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "NE",
+          "PN",
+          "TV"
+        ]
+      }
+    },
+    "zapallo": {
+      "nombre": "Zapallo",
+      "cientifico": "Cucurbita maxima (identidad del material por confirmar)",
+      "familia": "Cucurbitaceae",
+      "tipo": "anual",
+      "ciclo_dias": [
+        90,
+        125
+      ],
+      "siembra_meses": [
+        5,
+        6
+      ],
+      "kc": {
+        "ini": 0.5,
+        "mid": 1,
+        "end": 0.8
+      },
+      "etapas_dias": [
+        20,
+        30,
+        30,
+        20
+      ],
+      "raiz_m": 1.0,
+      "tolerancia_sequia": null,
+      "fija_n_kg_ha": null,
+      "cobertura": "alta",
+      "residuo": "medio",
+      "plagas_compartidas": [
+        "Meloidogyne spp.: piña, caupí, frijol común, maíz, camote y zapallo; PN/TV/NE. Identificar especie y cultivar antes de elegir rotación.",
+        "Dysmicoccus brevipes: piña, Musa (referencia banano), cacao, Citrus y zapallo; PC. Hospedante compartido de cochinilla, no prueba de que todos hospeden el virus de marchitez de piña."
+      ],
+      "mercado_pa": "Fruto para autoconsumo y mercado nacional (IMA).",
+      "notas": "IMA lo identifica como C. maxima pero reúne nombres varietales de diferentes especies; no asumir que todo zapallo panameño es C. maxima. Confirmar semilla, incluso posible C. moschata. F56 usa grupo pumpkin/winter squash, etapas mediterráneas; raíz 1.0–1.5 m. Limitar guías y verificar espacio/polinización. Clasificación de sequía no verificada: null.",
+      "fuentes": [
+        "IMA",
+        "F56",
+        "F56R",
+        "PC",
+        "NE",
+        "PN",
+        "TV",
+        "SC"
+      ],
+      "fuentes_por_campo": {
+        "cientifico": [
+          "IMA"
+        ],
+        "familia": [
+          "IMA"
+        ],
+        "tipo": [
+          "IMA"
+        ],
+        "ciclo_dias": [
+          "IMA"
+        ],
+        "siembra_meses": [
+          "IMA"
+        ],
+        "mercado_pa": [
+          "IMA"
+        ],
+        "kc": [
+          "F56"
+        ],
+        "etapas_dias": [
+          "F56"
+        ],
+        "raiz_m": [
+          "F56R"
+        ],
+        "tolerancia_sequia": null,
+        "fija_n_kg_ha": null,
+        "cobertura": [
+          "F56",
+          "SC"
+        ],
+        "residuo": [
+          "SC"
+        ],
+        "plagas_compartidas": [
+          "PC",
+          "NE",
+          "PN",
+          "TV"
+        ]
+      }
+    }
+  },
+  "piña_no_crece": [
+    {
+      "hipotesis": "Déficit hídrico: sobrevivir no equivale a crecer.",
+      "como_distinguirla_en_campo": "Registrar lluvia/riego, humedad de suelo y hojas nuevas; comparar con una planta de igual material que tenga humedad adecuada.",
+      "fuentes": [
+        "PN",
+        "F56R"
+      ]
+    },
+    {
+      "hipotesis": "Encharcamiento y posible pudrición de raíz/corazón.",
+      "como_distinguirla_en_campo": "Observar agua retenida tras lluvia, raíces oscuras y blandas; examinar base/corazón. Pedir diagnóstico si hay pudrición.",
+      "fuentes": [
+        "PN"
+      ]
+    },
+    {
+      "hipotesis": "Compactación o poco volumen de suelo explorable (hipótesis física).",
+      "como_distinguirla_en_campo": "Calicata pequeña fuera de raíces gruesas: capa dura, raíces desviadas y contraste de infiltración con igual humedad. La sequedad también endurece el suelo.",
+      "fuentes": [
+        "F56R",
+        "SC"
+      ]
+    },
+    {
+      "hipotesis": "Sombra excesiva de árboles o plátano.",
+      "como_distinguirla_en_campo": "Registrar horas de sol y comparar expansión foliar de plantas equivalentes en sitios más iluminados.",
+      "fuentes": [
+        "PN"
+      ]
+    },
+    {
+      "hipotesis": "Nematodos fitoparásitos.",
+      "como_distinguirla_en_campo": "Inspeccionar raíces por agallas/lesiones; muestrear suelo y raíces para laboratorio. Ausencia de agallas no descarta reniforme.",
+      "fuentes": [
+        "PN",
+        "NE"
+      ]
+    },
+    {
+      "hipotesis": "Cochinilla y posible marchitez asociada a virus.",
+      "como_distinguirla_en_campo": "Buscar masas cerosas en bases/raíces y hormigas; hojas rojizas y flácidas orientan, pero no confirman virus. Identificación entomológica y prueba de laboratorio.",
+      "fuentes": [
+        "PC"
+      ]
+    },
+    {
+      "hipotesis": "Material pequeño, dañado o mal enraizado.",
+      "como_distinguirla_en_campo": "Anotar origen, fecha, tamaño y tipo de propágulo; comparar plantas del mismo lote y revisar anclaje/raíces.",
+      "fuentes": [
+        "PN"
+      ]
+    },
+    {
+      "hipotesis": "Nutrición o pH limitantes.",
+      "como_distinguirla_en_campo": "Registrar clorosis y crecimiento; análisis de suelo y, con asesoría, tejido. No diagnosticar una deficiencia solo por color.",
+      "fuentes": [
+        "PN",
+        "IMA"
+      ]
+    },
+    {
+      "hipotesis": "Confusión entre no crecer y no florecer.",
+      "como_distinguirla_en_campo": "Medir hojas nuevas y tamaño de roseta. Planta vigorosa sin flor: revisar edad/material y madurez. La inducción regula floración; no remedia enanismo ni es requisito universal.",
+      "fuentes": [
+        "PN"
+      ]
+    }
+  ],
+  "estrategias": [
+    {
+      "id": "actual",
+      "nombre": "Actual: yuca/piña y suelo desnudo",
+      "aplica_a": "ambos",
+      "secuencia": [
+        {
+          "cultivo": "pina",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "sector_pina"
+        },
+        {
+          "cultivo": "platano",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "cacao",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "naranja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "toronja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "yuca",
+          "desde": "2026-11",
+          "hasta": "2027-04",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "yuca",
+          "desde": "2027-05",
+          "hasta": "2028-02",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "yuca",
+          "desde": "2028-05",
+          "hasta": "2028-10",
+          "zona": "cama_anual"
+        }
+      ],
+      "razon": "Referencia declarada por el usuario. La proyección de cosecha de yuca a abril de 2027 es solo supuesto de planificación; nuevas siembras de mayo siguen MR. Piña y perennes permanecen, sin atribuirles una rotación anual.",
+      "evidencia": [
+        "MR",
+        "F56",
+        "SC",
+        "NO",
+        "IM"
+      ],
+      "beneficios": [
+        "N: sin incorporación planificada de leguminosa.",
+        "Materia orgánica: aporte limitado si se retiran residuos.",
+        "Erosión/infiltración: suelo descubierto vulnerable a impacto de lluvia y sellado (SC).",
+        "Plagas: repetición de hospedantes; ningún corte sanitario demostrado."
+      ],
+      "agua_relativa": "media",
+      "vacios": [
+        "Sin análisis de suelo, textura, compactación, área útil, horas de sol ni capacidad de riego.",
+        "Edad, variedad y fecha de cosecha de yuca/piña desconocidas; liberar cama solo tras cosecha o decisión sanitaria.",
+        "Sin ensayos comparativos locales ni mediciones de N, materia orgánica, infiltración o erosión; no se asignan porcentajes de mejora.",
+        "Clima de 2027–2028 posterior al horizonte del boletín: actualizar IMHPA antes de cada siembra."
+      ],
+      "riesgos_revision_local": [
+        "Pérdida de humedad superficial durante seca; menor transpiración de malezas no equivale a mejor salud del suelo.",
+        "Retirar cobertura no se recomienda: escenario comparativo, no tratamiento que haya que imponer al patio.",
+        "No cosechar yuca inmadura para cumplir calendario."
+      ],
+      "calendario_mensual": [
+        {
+          "mes": "2026-11",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2026-12",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-01",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-02",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-03",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-04",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-05",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-06",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-07",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-08",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-09",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-10",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-11",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2027-12",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-01",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-02",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-03",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Cama libre y suelo desnudo; no siembra en seca."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-04",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Cama libre y suelo desnudo; no siembra en seca."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-05",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-06",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-07",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-08",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-09",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        },
+        {
+          "mes": "2028-10",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca; cosechar solo si está madura; espacios desnudos."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; espacios desnudos.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Suelo sin cobertura, según caso actual."
+          }
+        }
+      ]
+    },
+    {
+      "id": "caupi_camote_maiz",
+      "nombre": "Caupí de cobertura → camote → maíz; acolchado bajo perennes",
+      "aplica_a": "ambos",
+      "secuencia": [
+        {
+          "cultivo": "pina",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "sector_pina"
+        },
+        {
+          "cultivo": "platano",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "cacao",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "naranja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "toronja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "yuca",
+          "desde": "2026-11",
+          "hasta": "2027-04",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "caupi",
+          "desde": "2027-05",
+          "hasta": "2027-07",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "camote",
+          "desde": "2027-08",
+          "hasta": "2027-11",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "maiz",
+          "desde": "2028-05",
+          "hasta": "2028-09",
+          "zona": "cama_anual"
+        }
+      ],
+      "razon": "Primera opción para ensayo pequeño: proteger el suelo ahora; cortar caupí a 8–10 semanas (TV), antes de la implantación de camote; terminar maíz con residuos. Caupí de mayo y camote de agosto son ventanas experimentales condicionadas a humedad, no calendarios comerciales validados para Santiago. Mantener cobertura muerta diciembre–abril.",
+      "evidencia": [
+        "TV",
+        "NF",
+        "MR",
+        "MM",
+        "F56",
+        "SC",
+        "NE",
+        "NC",
+        "NO",
+        "IM"
+      ],
+      "beneficios": [
+        "N: entrada potencial del caupí si nodula y se retiene biomasa; crédito al siguiente cultivo null.",
+        "Materia orgánica: añadir raíces y residuos de leguminosa, bejuco y cereal.",
+        "Erosión: reducir suelo expuesto; infiltración puede mejorar con cobertura persistente.",
+        "Plagas: diversifica familias, pero caupí/camote/maíz pueden compartir Meloidogyne; no prometer control."
+      ],
+      "agua_relativa": "baja",
+      "vacios": [
+        "Sin análisis de suelo, textura, compactación, área útil, horas de sol ni capacidad de riego.",
+        "Edad, variedad y fecha de cosecha de yuca/piña desconocidas; liberar cama solo tras cosecha o decisión sanitaria.",
+        "Sin ensayos comparativos locales ni mediciones de N, materia orgánica, infiltración o erosión; no se asignan porcentajes de mejora.",
+        "Clima de 2027–2028 posterior al horizonte del boletín: actualizar IMHPA antes de cada siembra."
+      ],
+      "riesgos_revision_local": [
+        "Cortar caupí antes de que consuma humedad necesaria al siguiente cultivo.",
+        "Camote en agosto requiere confirmar drenaje, variedad y suficiente temporada húmeda.",
+        "Maíz necesita sol, espacio y agua durante floración; omitirlo si el patio no ofrece esas condiciones.",
+        "Cobertura con material enfermo puede mover plagas; no trasladar suelo de la piña afectada."
+      ],
+      "calendario_mensual": [
+        {
+          "mes": "2026-11",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2026-12",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-01",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-02",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-03",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-04",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-05",
+          "cama_anual": {
+            "cultivos": [
+              "caupi"
+            ],
+            "manejo": "Manejo de caupi; conservar residuos sanos en superficie. Sembrar solo con lluvias efectivas establecidas; si no llegan, prolongar acolchado."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-06",
+          "cama_anual": {
+            "cultivos": [
+              "caupi"
+            ],
+            "manejo": "Manejo de caupi; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-07",
+          "cama_anual": {
+            "cultivos": [
+              "caupi"
+            ],
+            "manejo": "Manejo de caupi; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-08",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-09",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-10",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-11",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-12",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-01",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-02",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-03",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-04",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-05",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie. Sembrar solo con lluvias efectivas establecidas; si no llegan, prolongar acolchado."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-06",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-07",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-08",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-09",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-10",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        }
+      ]
+    },
+    {
+      "id": "canavalia_maiz_caupi",
+      "nombre": "Canavalia de abono → maíz → caupí; acolchado bajo perennes",
+      "aplica_a": "ambos",
+      "secuencia": [
+        {
+          "cultivo": "pina",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "sector_pina"
+        },
+        {
+          "cultivo": "platano",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "cacao",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "naranja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "toronja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "yuca",
+          "desde": "2026-11",
+          "hasta": "2027-04",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "canavalia",
+          "desde": "2027-05",
+          "hasta": "2027-07",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "maiz",
+          "desde": "2027-08",
+          "hasta": "2027-12",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "caupi",
+          "desde": "2028-09",
+          "hasta": "2028-10",
+          "zona": "cama_anual"
+        }
+      ],
+      "razon": "Alternativa orientada a biomasa: canavalia con lluvias, corte experimental antes de semillar en julio; maíz segunda coa (MM). Mantener cama acolchada enero–agosto de 2028 y sembrar caupí en septiembre (ML); cosecha a finales de 2028 fuera del horizonte. Duración de corte de canavalia por verificar: no es su ciclo de cosecha 170–240 días.",
+      "evidencia": [
+        "CI",
+        "NF",
+        "MM",
+        "ML",
+        "SC",
+        "NE",
+        "NC",
+        "NO",
+        "IM"
+      ],
+      "beneficios": [
+        "N: canavalia puede fijar N; rango y crédito local null.",
+        "Materia orgánica: abono verde y rastrojo de maíz retenidos.",
+        "Erosión/infiltración: cubrir intervalos largos sin sembrar ni remover innecesariamente.",
+        "Plagas: alternancia Fabaceae–Poaceae; no demostrar ruptura sin diagnóstico."
+      ],
+      "agua_relativa": "media",
+      "vacios": [
+        "Sin análisis de suelo, textura, compactación, área útil, horas de sol ni capacidad de riego.",
+        "Edad, variedad y fecha de cosecha de yuca/piña desconocidas; liberar cama solo tras cosecha o decisión sanitaria.",
+        "Sin ensayos comparativos locales ni mediciones de N, materia orgánica, infiltración o erosión; no se asignan porcentajes de mejora.",
+        "Clima de 2027–2028 posterior al horizonte del boletín: actualizar IMHPA antes de cada siembra."
+      ],
+      "riesgos_revision_local": [
+        "Canavalia: toxicidad; identificar y separar de frijoles comestibles.",
+        "Maíz de agosto puede enfrentar déficit antes de cosecha; decidir según pronóstico y agua disponible.",
+        "Caupí septiembre de 2028 solo si quedan lluvias suficientes; no extrapolar El Niño de 2026.",
+        "Verificar disponibilidad de semilla y capacidad de corte manual; canavalia no validada en este patio."
+      ],
+      "calendario_mensual": [
+        {
+          "mes": "2026-11",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2026-12",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-01",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-02",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-03",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-04",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-05",
+          "cama_anual": {
+            "cultivos": [
+              "canavalia"
+            ],
+            "manejo": "Manejo de canavalia; conservar residuos sanos en superficie. Sembrar solo con lluvias efectivas establecidas; si no llegan, prolongar acolchado."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-06",
+          "cama_anual": {
+            "cultivos": [
+              "canavalia"
+            ],
+            "manejo": "Manejo de canavalia; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-07",
+          "cama_anual": {
+            "cultivos": [
+              "canavalia"
+            ],
+            "manejo": "Manejo de canavalia; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-08",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-09",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-10",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-11",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-12",
+          "cama_anual": {
+            "cultivos": [
+              "maiz"
+            ],
+            "manejo": "Manejo de maiz; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-01",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-02",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-03",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-04",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-05",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo. Sembrar solo con lluvias efectivas establecidas; si no llegan, prolongar acolchado."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-06",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-07",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-08",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-09",
+          "cama_anual": {
+            "cultivos": [
+              "caupi"
+            ],
+            "manejo": "Manejo de caupi; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2028-10",
+          "cama_anual": {
+            "cultivos": [
+              "caupi"
+            ],
+            "manejo": "Manejo de caupi; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        }
+      ]
+    },
+    {
+      "id": "guandu_mani",
+      "nombre": "Guandú → camote; parche de maní forrajero bajo perennes",
+      "aplica_a": "ambos",
+      "secuencia": [
+        {
+          "cultivo": "pina",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "sector_pina"
+        },
+        {
+          "cultivo": "platano",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "cacao",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "naranja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "toronja",
+          "desde": "2026-11",
+          "hasta": "2028-10",
+          "zona": "perennes"
+        },
+        {
+          "cultivo": "yuca",
+          "desde": "2026-11",
+          "hasta": "2027-04",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "guandu",
+          "desde": "2027-05",
+          "hasta": "2028-01",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "camote",
+          "desde": "2028-05",
+          "hasta": "2028-08",
+          "zona": "cama_anual"
+        },
+        {
+          "cultivo": "mani_forrajero",
+          "desde": "2027-05",
+          "hasta": "2028-10",
+          "zona": "bajo_perennes"
+        }
+      ],
+      "razon": "Opción de grano de consumo y cobertura perenne experimental: guandú de ciclo elegido hasta 9 meses, luego retirar tallos dejando raíces y residuos; camote al siguiente inicio de lluvias. Probar Arachis solo en una fracción bajo árboles desde mayo de 2027; resto con hojarasca. No introducir nuevas coberturas vivas durante la seca de 2026–2027.",
+      "evidencia": [
+        "TG",
+        "ML",
+        "MR",
+        "TA",
+        "NA",
+        "SC",
+        "PC",
+        "NO",
+        "IM"
+      ],
+      "beneficios": [
+        "N: fijación potencial de guandú y Arachis, reducida por exportación de grano; no sumar máximos por ha sobre áreas superpuestas.",
+        "Materia orgánica: podas y hojarasca retenidas.",
+        "Erosión/infiltración: protección persistente si el parche prospera.",
+        "Plagas: camote cambia familia tras guandú; perennes siguen como reservorios potenciales de cochinilla."
+      ],
+      "agua_relativa": "media",
+      "vacios": [
+        "Sin análisis de suelo, textura, compactación, área útil, horas de sol ni capacidad de riego.",
+        "Edad, variedad y fecha de cosecha de yuca/piña desconocidas; liberar cama solo tras cosecha o decisión sanitaria.",
+        "Sin ensayos comparativos locales ni mediciones de N, materia orgánica, infiltración o erosión; no se asignan porcentajes de mejora.",
+        "Clima de 2027–2028 posterior al horizonte del boletín: actualizar IMHPA antes de cada siembra."
+      ],
+      "riesgos_revision_local": [
+        "Guandú ocupa espacio y puede sombrear piña; limitar a borde soleado.",
+        "Arachis puede competir por agua con cacao, cítricos y plátano; detener expansión y cortar si hay estrés.",
+        "Sequía de cinco meses puede exceder supervivencia de cuatro meses descrita en TA.",
+        "No usar mucuna como sustituto automático bajo árboles: trepa, compite y complica manejo.",
+        "Revisar Rhizoctonia en maní/caupí/poroto; no asumir que todas las leguminosas son sanitariamente intercambiables."
+      ],
+      "calendario_mensual": [
+        {
+          "mes": "2026-11",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2026-12",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-01",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-02",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-03",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-04",
+          "cama_anual": {
+            "cultivos": [
+              "yuca"
+            ],
+            "manejo": "Mantener yuca existente hasta cosecha; cubrir espacios."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja"
+            ],
+            "manejo": "Conservar hojarasca y añadir cobertura muerta sana; no amontonar en troncos/cormos."
+          }
+        },
+        {
+          "mes": "2027-05",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie. Sembrar solo con lluvias efectivas establecidas; si no llegan, prolongar acolchado."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-06",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-07",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-08",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-09",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-10",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-11",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2027-12",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Maní: comprobar humedad; recortar o suprimir si compite; mantener material cortado como cobertura."
+          }
+        },
+        {
+          "mes": "2028-01",
+          "cama_anual": {
+            "cultivos": [
+              "guandu"
+            ],
+            "manejo": "Manejo de guandu; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Maní: comprobar humedad; recortar o suprimir si compite; mantener material cortado como cobertura."
+          }
+        },
+        {
+          "mes": "2028-02",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Maní: comprobar humedad; recortar o suprimir si compite; mantener material cortado como cobertura."
+          }
+        },
+        {
+          "mes": "2028-03",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Maní: comprobar humedad; recortar o suprimir si compite; mantener material cortado como cobertura."
+          }
+        },
+        {
+          "mes": "2028-04",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Maní: comprobar humedad; recortar o suprimir si compite; mantener material cortado como cobertura."
+          }
+        },
+        {
+          "mes": "2028-05",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie. Sembrar solo con lluvias efectivas establecidas; si no llegan, prolongar acolchado."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2028-06",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2028-07",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2028-08",
+          "cama_anual": {
+            "cultivos": [
+              "camote"
+            ],
+            "manejo": "Manejo de camote; conservar residuos sanos en superficie."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2028-09",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        },
+        {
+          "mes": "2028-10",
+          "cama_anual": {
+            "cultivos": [],
+            "manejo": "Descanso con cobertura muerta; reponer donde se vea suelo."
+          },
+          "sector_pina": "Conservar piña, diagnosticar retraso; acolchar sin tapar corazón ni base; no intercalar trepadoras.",
+          "bajo_perennes": {
+            "cultivos": [
+              "platano",
+              "cacao",
+              "naranja",
+              "toronja",
+              "mani_forrajero"
+            ],
+            "manejo": "Parche de maní forrajero establecido con lluvias; hojarasca en el resto; vigilar competencia."
+          }
+        }
+      ]
+    }
+  ],
+  "canopeo": {
+    "r_g_max": 0.95,
+    "b_g_max": 0.95,
+    "exg_min": 20,
+    "fuente": "CA",
+    "regla": "R/G < 0.95 AND B/G < 0.95 AND (2G−R−B) > 20; desigualdades estrictas y simultáneas.",
+    "escala_rgb": "Canales RGB en escala 0–255; convertir a tipo numérico con signo antes de calcular ExG; G=0 se clasifica no verde para evitar división por cero (convención de implementación).",
+    "interpretacion": "Fracción de cobertura VERDE. No mide materia orgánica, salud del suelo, cobertura de rastrojo seco ni identidad del cultivo. Acompañar con clasificación de residuo/suelo y encuadre fijo cercano al suelo.",
+    "ajustes": "Artículo de 2015: umbrales de cocientes ajustables; umbral ExG fijo en 20. Estos son valores por defecto, no constantes universales de segmentación."
+  },
+  "criterios": {
+    "alcance": "Patio de decenas de m² en Santiago de Veraguas, 80–100 m: ubicación, cultivos y manejo actual aportados por el usuario; no hubo visita ni mediciones. Las estrategias son propuestas de investigación, no resultados de ensayos en el patio.",
+    "null": "Dato no verificado o no representable de manera única. No equivale a cero ni a ausencia de riesgo. Las claves obligatorias se conservan y admiten null cuando falta evidencia. Las extensiones fuentes_por_campo, calendario_mensual y criterios evitan perder procedencia y manejo de meses sin cultivo.",
+    "ciclo_dias": "Siembra a primera cosecha, salvo nota. Conversión aproximada de meses: 30 días/mes; no precisión fenológica. Perenne no significa 365 días hasta cosecha. Tipo anual incluye manejo como anual de plantas botánicamente perennes; cobertura es uso dominante.",
+    "siembra_meses": "Ventanas de secano de fuentes panameñas, no pronóstico ni garantía para Santiago; los meses sin validación adecuada son null. La programación experimental de 2027–2028 puede diferir y queda identificada como tal.",
+    "kc_etapas": "Referencias FAO-56, no calibración de patio. Kc ini/mid/end y etapas inicial/desarrollo/media/final; no mezclar la duración comercial local con una curva extranjera sin recalibrar. Kc depende de mojado, cobertura, clima y manejo. No sumar Kc de árboles y cobertura que ocupan la misma superficie. ETc=Kc×ETo expresa demanda potencial; faltan ETo, lluvia efectiva, suelo, riego y Ks para estimar déficit o litros.",
+    "raiz_m": "Límite inferior del intervalo FAO-56 tabla 22 como referencia conservadora de profundidad efectiva máxima en suelo sin restricciones, no profundidad medida. Intervalo original en notas; raíces de árboles y anuales pueden superponerse.",
+    "cobertura_residuo": "Categorías cualitativas de diseño inferidas de arquitectura y uso descritos por las fuentes, no porcentajes ni toneladas medidos. Cobertura es protección cercana al suelo en rodal establecido: copa arbórea no equivale a suelo cubierto. Residuo supone retención de material sano; cambia con densidad, cosecha y poda.",
+    "sequia": "Categoría cualitativa contextual: alta no significa crecimiento o producción sin agua. En WA sensibilidad media-alta se codifica tolerancia baja; baja-media se codifica media. Se conserva null donde no se verificó una clasificación defendible.",
+    "nitrogeno": "Rangos publicados bajo condiciones externas; no N disponible para el siguiente cultivo ni fertilizante ahorrado. No extrapolar automáticamente a un patio. Rhizobios, P, humedad, biomasa y extracción de grano condicionan el balance. No se acreditó fijación simbiótica a no leguminosas; sus rangos son null, no valores empíricos de cero.",
+    "plagas": "Hospedantes potenciales de bibliografía, no detecciones en Panamá ni diagnóstico. Un género o complejo compartido no demuestra misma especie, raza o grupo de anastomosis. null significa que no se verificó un par concreto; no ausencia de plagas.",
+    "mercado": "Uso alimentario/comercial cualitativo; precio, rentabilidad y comprador de Santiago no verificados. No se actualizaron ni reutilizaron como actuales los precios de 2019 del IMA.",
+    "clima": "NO confirma El Niño fuerte a muy fuerte probable hasta enero–marzo de 2027 (>79%). IM prevé noviembre cercano/superior a normal en ciertos sectores montañosos y déficit en el resto; interpretación regional compatible con Santiago, no pronóstico puntual. No se prolonga ese pronóstico hasta 2028. Calendario seco dic–abr y lluvioso may–nov: contexto aportado, sujeto a observación.",
+    "agua_relativa": "Comparación cualitativa del agua adicional necesaria para el manejo propuesto sobre igual superficie y mismos perennes, frente a actual=media. No es consumo total medido ni ranking hídrico universal.",
+    "seguimiento": "Antes de sembrar: área libre y horas de sol, edad/material de piña, agua disponible, drenaje, textura, pH, materia orgánica, P/K y sanidad. Mensual: fotos fijas de cobertura verde y conteo separado de residuo/suelo desnudo, riego y lluvia; comparar infiltración con misma humedad inicial y conservar historial. No atribuir diferencias solo a rotación sin controles."
+  }
+}

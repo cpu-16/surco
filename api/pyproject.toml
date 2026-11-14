@@ -1,0 +1,11 @@
+[project]
+name = "patio-api"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.163.0",
+    "httpx>=0.28.1",
+    "python-multipart>=0.0.33",
+    "uvicorn[standard]>=0.54.0",
+]

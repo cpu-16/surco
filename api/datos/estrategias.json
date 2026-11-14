@@ -1,0 +1,53 @@
+{
+  "nota": "Versión en lenguaje sencillo de las estrategias de cultivos.json (investigación del 14-nov-2026). Las claves de evidencia apuntan a cultivos.json → fuentes.",
+  "estrategias": [
+    {
+      "id": "actual",
+      "nombre": "Lo que haces hoy: yuca tras yuca",
+      "cama": [{"cultivo": "yuca", "siembra": "existente"}, {"cultivo": "yuca", "siembra": "2027-05"}],
+      "huecos": "desnudo",
+      "arboles": "desnudo",
+      "razon": "Es tu manera actual y sirve de punto de comparación. La yuca aguanta bien la sequía, pero cuando se cosecha y en sus primeros meses deja el suelo al sol. Debajo de los árboles se supone suelo sin cobertura hasta que tu foto diga otra cosa.",
+      "beneficios": ["No cambia tu trabajo ni lo que comes.", "La yuca resiste el verano mejor que casi todo lo de la lista."],
+      "vacios": ["No se sabe cuándo sembraste la yuca ni cuándo la vas a sacar.", "Sin análisis de suelo: no se sabe cuánto nitrógeno o materia orgánica le queda.", "No se sabe qué tan tapado está el suelo debajo de los árboles."],
+      "riesgos": ["Sembrar yuca en el mismo sitio año tras año puede cansar el suelo y mantener las mismas plagas; confírmalo con un técnico."],
+      "evidencia": ["MR", "IY", "SC", "F56"]
+    },
+    {
+      "id": "caupi_camote",
+      "nombre": "Acolchado ahora, frijol caupí y camote en lluvias",
+      "cama": [{"cultivo": "yuca", "siembra": "existente"}, {"cultivo": "caupi", "siembra": "2027-05"}, {"cultivo": "camote", "siembra": "2027-08"}],
+      "huecos": "acolchado",
+      "arboles": "acolchado",
+      "razon": "Lo primero es tapar el suelo antes del verano con hojas, rastrojo o cáscaras sanas, debajo de los árboles y en los huecos. Con las lluvias de mayo entra el caupí, una leguminosa que tapa rápido y le deja nitrógeno al suelo, y después el camote, que también cubre y da comida.",
+      "beneficios": ["El acolchado frena la erosión y guarda humedad en el verano.", "El caupí puede fijar nitrógeno si nodula y se deja su rastrojo en el suelo.", "Tres familias distintas de plantas en vez de una sola."],
+      "vacios": ["Sembrar caupí en mayo y camote en agosto en Santiago es una prueba, no un calendario validado.", "No se sabe si tu yuca estará cosechada para mayo."],
+      "riesgos": ["El caupí, el camote y la piña pueden compartir el nematodo de las agallas (Meloidogyne). Si la piña tiene nematodos, revísalo antes con un técnico.", "Usa solo material sano para acolchar: no muevas tierra ni hojas de la piña enferma."],
+      "evidencia": ["TV", "ML", "MR", "SC", "NF", "NE", "NC"]
+    },
+    {
+      "id": "canavalia_maiz",
+      "nombre": "Acolchado ahora, canavalia de abono y maíz",
+      "cama": [{"cultivo": "yuca", "siembra": "existente"}, {"cultivo": "canavalia", "siembra": "2027-05", "corte_dias": 80}, {"cultivo": "maiz", "siembra": "2027-08"}],
+      "huecos": "acolchado",
+      "arboles": "acolchado",
+      "razon": "Se acolcha en el verano igual que en la anterior. En mayo se siembra canavalia, una leguminosa resistente a la sequía que hace mucha biomasa y se corta como abono verde a los dos o tres meses. Sobre ese rastrojo se siembra maíz de segunda coa en agosto.",
+      "beneficios": ["La canavalia hace mucho rastrojo para la materia orgánica.", "Aguanta la sequía mejor que el caupí.", "El maíz aprovecha el nitrógeno que deja."],
+      "vacios": ["Cuántos días dejar la canavalia antes de cortarla en un patio no está validado aquí.", "En unas decenas de metros cuadrados el maíz necesita sol pleno y suficientes plantas para polinizar bien."],
+      "riesgos": ["La semilla de canavalia es tóxica: no se cocina como frijol.", "El maíz pide mucha agua en la floración; si el patio tiene sombra, mejor no."],
+      "evidencia": ["CI", "NF", "MM", "SC", "F56"]
+    },
+    {
+      "id": "guandu_mani",
+      "nombre": "Guandú en la cama y maní forrajero bajo los árboles",
+      "cama": [{"cultivo": "yuca", "siembra": "existente"}, {"cultivo": "guandu", "siembra": "2027-05"}],
+      "huecos": "acolchado",
+      "arboles": "mani_forrajero",
+      "razon": "El guandú es un arbusto de raíz profunda que aguanta el verano, fija nitrógeno y da grano para la casa. Debajo de los árboles se prueba un parche de maní forrajero, una cobertura rastrera que tolera la sombra y deja el suelo tapado todo el año.",
+      "beneficios": ["Suelo tapado todo el año debajo de los árboles cuando el maní forrajero se establece.", "Raíz profunda que puede ayudar en suelos duros.", "Grano de guandú para comer o vender en diciembre y enero."],
+      "vacios": ["La fijación de nitrógeno del guandú y del maní forrajero publicada viene de otros lugares; no se mide en tu patio.", "No se sabe cómo le va al maní forrajero con 5 meses de seca y El Niño."],
+      "riesgos": ["El maní forrajero compite por agua con los árboles jóvenes; pruébalo en un pedazo pequeño.", "El guandú hace sombra: no lo pongas al lado de la piña."],
+      "evidencia": ["TG", "ML", "TA", "NA", "CI", "NF"]
+    }
+  ]
+}

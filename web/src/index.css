@@ -1,0 +1,111 @@
+/* Libreta de campo + tabla de colores de suelo (Munsell). Colores con nombre de lo que representan. */
+:root {
+  --papel: #f1f2ec;      /* cal */
+  --papel-2: #e6e8de;
+  --tinta: #23291f;      /* tinta oliva */
+  --tinta-2: #4f5748;
+  --linea: #c9ccbf;
+  --laterita: #a04b2c;   /* 2.5YR 4/6: suelo rojo desnudo */
+  --humus: #5b4433;      /* 10YR 3/3 */
+  --hoja: #3d7638;       /* cobertura alta */
+  --brote: #8fae55;      /* cobertura media */
+  --rastrojo: #c4a46a;   /* residuo / cobertura baja */
+  --lluvia: #2e6a93;
+  --seco: #c08a2e;       /* demanda de agua, estación seca */
+  --alerta: #8a2f1d;
+  --radio-muestra: 3px;
+  --radio: 10px;
+  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --texto: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --papel: #1b1e18; --papel-2: #252920; --tinta: #e7e9df; --tinta-2: #b4b9aa; --linea: #3b4035;
+    --laterita: #c8653f; --humus: #a88a70; --hoja: #5fa257; --brote: #a5c46c; --rastrojo: #c9ad78;
+    --lluvia: #6aa6d1; --seco: #d9a54a; --alerta: #e0806a;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--papel); color: var(--tinta);
+  font: 1rem/1.5 var(--texto);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; line-height: 1.05; margin: 0; letter-spacing: 0.005em; }
+h1 { font-size: 2.6rem; }
+h2 { font-size: 1.9rem; }
+h3 { font-size: 1.3rem; font-weight: 600; }
+p { margin: 0.4em 0; max-width: 34em; }
+a { color: var(--lluvia); }
+:focus-visible { outline: 3px solid var(--lluvia); outline-offset: 2px; }
+
+.app { max-width: 46em; margin: 0 auto; padding: max(1rem, env(safe-area-inset-top)) 1rem 6rem; }
+.seccion { padding: 2rem 0 1rem; border-top: 2px solid var(--tinta); margin-top: 1.5rem; }
+.seccion > header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+.estado { font-family: var(--display); font-size: 1.05rem; font-weight: 600; white-space: nowrap; }
+.estado.falta { color: var(--alerta); }
+.estado.listo { color: var(--hoja); }
+.nota { color: var(--tinta-2); font-size: 0.92rem; }
+.cifra { font-family: var(--display); font-weight: 700; font-size: 2.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.fila { display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: flex-end; }
+.fila > div { min-width: 7em; }
+
+/* chip de fuente: cada número dice de dónde sale */
+.fuente {
+  display: inline-flex; gap: 0.3em; align-items: center; border: 1px solid var(--linea); border-radius: 999px;
+  padding: 0.05em 0.6em; font-size: 0.8rem; color: var(--tinta-2); background: var(--papel); cursor: pointer;
+}
+.fuente:hover { border-color: var(--tinta-2); }
+
+.boton {
+  border: 2px solid var(--tinta); background: var(--tinta); color: var(--papel); border-radius: var(--radio);
+  padding: 0.6em 1.1em; font-weight: 700; cursor: pointer; min-height: 2.75rem;
+}
+.boton.claro { background: transparent; color: var(--tinta); }
+.boton:disabled { opacity: 0.5; cursor: default; }
+.boton:active:not(:disabled) { transform: translateY(1px); }
+
+/* muestras de suelo: la tira del año */
+.tira { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
+.muestra {
+  aspect-ratio: 1 / 1.1; border-radius: var(--radio-muestra); display: grid; place-items: end center;
+  font: 600 0.72rem/1 var(--display); color: #fff; padding: 0 0 0.25em; border: 0; min-width: 0; overflow: hidden; cursor: pointer; text-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
+}
+.muestra[data-sel='1'] { outline: 3px solid var(--tinta); outline-offset: 1px; }
+.meses { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; font: 600 0.8rem/1 var(--display); color: var(--tinta-2); text-align: center; }
+
+.estrategia { margin: 1.6rem 0; }
+.fila-tira { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 0.3rem; align-items: center; margin-top: 3px; }
+.etq { font: 600 0.85rem/1 var(--display); color: var(--tinta-2); }
+.muestra[data-medido='1'] { box-shadow: inset 0 0 0 2px var(--papel), inset 0 0 0 4px var(--tinta); }
+.abrir { font-weight: 700; color: var(--lluvia); margin-top: 0.6rem; }
+.abrir::before { content: '+ '; }
+details[open] .abrir::before { content: '− '; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--tinta-2); margin: 0.8rem 0; }
+.leyenda i { display: inline-block; width: 0.9em; height: 1.1em; border-radius: var(--radio-muestra); vertical-align: -0.2em; margin-right: 0.35em; }
+.leyenda i.medido { box-shadow: inset 0 0 0 2px var(--papel), inset 0 0 0 4px var(--tinta); background: var(--brote); }
+.estrategia > summary { list-style: none; cursor: pointer; }
+.estrategia > summary::-webkit-details-marker { display: none; }
+.campos { display: grid; gap: 0.9rem; margin-top: 0.9rem; padding-left: 0.9rem; border-left: 3px solid var(--linea); }
+.campos h4 { margin: 0; font: 700 1rem/1.2 var(--texto); }
+.campos ul { margin: 0.2em 0 0; padding-left: 1.1em; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  border: 2px solid var(--linea); border-radius: 999px; padding: 0.35em 0.9em; background: transparent; cursor: pointer; min-height: 2.5rem;
+}
+.chip[aria-pressed='true'] { border-color: var(--hoja); background: color-mix(in srgb, var(--hoja) 14%, transparent); font-weight: 700; }
+
+.falta-lista { list-style: none; padding: 0; margin: 0.6rem 0; display: grid; gap: 0.6rem; }
+.falta-lista li { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 1rem; align-items: center; padding: 0.7rem 0.9rem; background: var(--papel-2); border-radius: var(--radio); }
+
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 30em) { .dos { grid-template-columns: 1fr; } h1 { font-size: 2.2rem; } }
+
+svg text { font-family: var(--display); fill: var(--tinta-2); }
+.mapa { height: 18rem; border-radius: var(--radio); overflow: hidden; border: 1px solid var(--linea); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
