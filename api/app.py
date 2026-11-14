@@ -1,5 +1,6 @@
 """API de la herramienta. Uso: uv run uvicorn app:app --port 8787"""
 import datetime as dt
+import hashlib
 import json
 import secrets
 import sqlite3
@@ -7,7 +8,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
@@ -101,39 +102,101 @@ def lugar(lat: float = Query(...), lon: float = Query(...)):
 def _db():
     c = sqlite3.connect(AQUI / "expedientes.sqlite", timeout=30)
     c.execute("create table if not exists exp(id text primary key, datos text, actualizado real)")
+    if "clave" not in {r[1] for r in c.execute("pragma table_info(exp)")}:
+        c.execute("alter table exp add column clave text")  # sha256 de la clave de edición; null = expediente viejo
+    c.execute("create table if not exists version(id text, n integer, datos text, fecha real, primary key (id, n))")
     return c
+
+
+def _hash(clave: str) -> str:
+    return hashlib.sha256(clave.encode()).hexdigest()
+
+
+def _version(c, i, datos):
+    """Cada guardado queda como versión fechada: la decisión de hoy no se pierde aunque mañana cambie."""
+    n = c.execute("select coalesce(max(n), 0) + 1 from version where id=?", (i,)).fetchone()[0]
+    c.execute("insert into version values (?,?,?,?)", (i, n, json.dumps(datos), time.time()))
+    return n
 
 
 class Expediente(BaseModel):
     datos: dict
 
 
+def _tope(datos):
+    if len(json.dumps(datos)) > 200_000:
+        raise HTTPException(413, "Expediente demasiado grande")
+
+
 @app.post("/api/expediente")
 def crear(e: Expediente):
-    i = secrets.token_urlsafe(8)
+    """Sin cuentas: el que crea recibe una clave de edición que se queda en su celular; el enlace solo deja consultar y dejar notas."""
+    _tope(e.datos)
+    i, clave = secrets.token_urlsafe(8), secrets.token_urlsafe(16)
     with _db() as c:
-        c.execute("insert into exp values (?,?,?)", (i, json.dumps(e.datos), time.time()))
-    return {"id": i}
+        c.execute("insert into exp values (?,?,?,?)", (i, json.dumps(e.datos), time.time(), _hash(clave)))
+        n = _version(c, i, e.datos)
+    return {"id": i, "clave": clave, "version": n}
 
 
 @app.get("/api/expediente/{i}")
 def leer(i: str):
     with _db() as c:
         r = c.execute("select datos, actualizado from exp where id=?", (i,)).fetchone()
+        vs = c.execute("select n, fecha from version where id=? order by n", (i,)).fetchall()
     if not r:
         raise HTTPException(404, "No existe ese expediente")
-    return {"id": i, "datos": json.loads(r[0]), "actualizado": r[1]}
+    return {"id": i, "datos": json.loads(r[0]), "actualizado": r[1], "versiones": [{"n": n, "fecha": f} for n, f in vs]}
+
+
+@app.get("/api/expediente/{i}/version/{n}")
+def leer_version(i: str, n: int):
+    with _db() as c:
+        r = c.execute("select datos, fecha from version where id=? and n=?", (i, n)).fetchone()
+    if not r:
+        raise HTTPException(404, "No existe esa versión")
+    return {"id": i, "n": n, "datos": json.loads(r[0]), "fecha": r[1]}
 
 
 @app.put("/api/expediente/{i}")
-def guardar(i: str, e: Expediente):
-    if len(json.dumps(e.datos)) > 200_000:
-        raise HTTPException(413, "Expediente demasiado grande")
+def guardar(i: str, e: Expediente, x_clave: str = Header("")):
+    _tope(e.datos)
     with _db() as c:
-        n = c.execute("update exp set datos=?, actualizado=? where id=?", (json.dumps(e.datos), time.time(), i)).rowcount
-    if not n:
-        raise HTTPException(404, "No existe ese expediente")
-    return {"ok": True}
+        r = c.execute("select clave, datos from exp where id=?", (i,)).fetchone()
+        if not r:
+            raise HTTPException(404, "No existe ese expediente")
+        if r[0] and not secrets.compare_digest(r[0], _hash(x_clave)):
+            raise HTTPException(403, "Solo quien creó el registro puede cambiarlo. Puedes dejar una nota.")
+        notas = json.loads(r[1]).get("notas", [])  # las notas del técnico viven en el servidor: el celular no las borra
+        datos = {**e.datos, "notas": notas + [x for x in e.datos.get("notas", []) if x not in notas]}
+        c.execute("update exp set datos=?, actualizado=? where id=?", (json.dumps(datos), time.time(), i))
+        n = _version(c, i, datos)
+    return {"ok": True, "version": n}
+
+
+class Nota(BaseModel):
+    quien: str = "tecnico"
+    nombre: str = ""
+    texto: str
+
+
+@app.post("/api/expediente/{i}/nota")
+def anotar(i: str, nota: Nota):
+    """Quien tenga el enlace (el técnico, la cooperativa) deja una nota fechada. No cambia nada más del registro."""
+    texto = nota.texto.strip()[:1000]
+    if not texto:
+        raise HTTPException(400, "La nota está vacía")
+    with _db() as c:
+        r = c.execute("select datos from exp where id=?", (i,)).fetchone()
+        if not r:
+            raise HTTPException(404, "No existe ese expediente")
+        datos = json.loads(r[0])
+        if len(datos.get("notas", [])) >= 200:
+            raise HTTPException(413, "Este registro ya tiene demasiadas notas")
+        datos.setdefault("notas", []).append({"quien": "tecnico" if nota.quien != "productor" else "productor", "nombre": nota.nombre.strip()[:80],
+                                              "texto": texto, "fecha": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")})
+        c.execute("update exp set datos=?, actualizado=? where id=?", (json.dumps(datos), time.time(), i))
+    return {"ok": True, "notas": datos["notas"]}
 
 
 # ---------- Comparación e IA ----------

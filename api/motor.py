@@ -144,6 +144,9 @@ NOMBRES_EN = {"yuca": "Cassava", "caupi": "Cowpea", "camote": "Sweet potato", "c
 CLASES_INFIL_EN = ["very rapid", "rapid", "moderately rapid", "moderate", "moderately slow", "slow", "very slow"]
 
 
+VERSION_CALCULO = "2026-11-14b"  # se guarda en cada registro: dice con qué reglas salió la comparación
+
+
 def _texto(es, en, lang):
     return en if lang == "en" else es
 
@@ -236,14 +239,15 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             else:
                 ajustes.append(t(f"Tu foto confirma el suelo desnudo debajo de los árboles ({pct}% de planta verde). El satélite no lo puede ver porque mira la copa.", f"Your photo confirms bare soil under the trees ({pct}% green plant cover). The satellite cannot see it because it sees the tree canopy."))
         # agua: lo que pide el cultivo de la cama contra la lluvia efectiva, en año normal y en uno como los Niños
-        def deficit(factor):
+        seca = [m for m in tira if m["mes"] in (12, 1, 2, 3, 4)]
+
+        def deficit(factor):  # solo dic–abr: la pantalla dice «lo que falta en la seca»
             tot = 0
-            for m in tira:
+            for m in seca:
                 n = normales[m["mes"] - 1]
                 p = n["lluvia"] * (factor.get(m["mes"], 1) if factor else 1)
                 tot += max(0, m["kc"] * n["et0"] - lluvia_efectiva(p))
             return round(tot)
-        seca = [m for m in tira if m["mes"] in (12, 1, 2, 3, 4)]
         n_fij = [AGRO["cultivos"][c]["fija_n_kg_ha"] for c in {m["cultivo"] for m in tira if m["cultivo"]} | ({"mani_forrajero"} if e["arboles"] == "mani_forrajero" else set())
                  if AGRO["cultivos"][c].get("fija_n_kg_ha")]
         familias = {AGRO["cultivos"][m["cultivo"]]["familia"] for m in tira if m["cultivo"]}
@@ -268,18 +272,23 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             "id": e["id"], "nombre": e["nombre"], "aplica_a": t("huerto y árboles", "garden plot and trees"),
             "tira": tira, "arboles": arboles, "meses_desnudo": desn_cama + desn_arb,
             "desnudo_cama": desn_cama, "desnudo_arboles": desn_arb,
-            "n_kg_ha": [sum(x[0] for x in n_fij), sum(x[1] for x in n_fij)] if n_fij else None,
+            "n_kg_ha": [sum(x[0] for x in n_fij), sum(x[1] for x in n_fij)] if n_fij else None,  # ponytail: solo para ordenar; la pantalla usa n_por_planta
+            "n_por_planta": [{"nombre": (NOMBRES_EN if lang == "en" else NOMBRES).get(c, AGRO["cultivos"][c]["nombre"]), "kg_ha": AGRO["cultivos"][c]["fija_n_kg_ha"]}
+                             for c in dict.fromkeys([x["cultivo"] for x in e["cama"]] + (["mani_forrajero"] if e["arboles"] == "mani_forrajero" else []))
+                             if AGRO["cultivos"][c].get("fija_n_kg_ha")],
             "familias": len(familias),
             "agua": {"demanda_seca_mm": round(sum(m["kc"] * normales[m["mes"] - 1]["et0"] for m in seca)),
                      "deficit_normal_mm": deficit(None), "deficit_nino_mm": deficit(pct_nino)},
             # nombre científico al lado: en otro país la misma planta se llama distinto
             "plantas": [{"nombre": (NOMBRES_EN if lang == "en" else NOMBRES).get(c, AGRO["cultivos"][c]["nombre"]), "cientifico": AGRO["cultivos"][c]["cientifico"]}
                         for c in dict.fromkeys([x["cultivo"] for x in e["cama"]] + (["mani_forrajero"] if e["arboles"] == "mani_forrajero" else []))],
-            "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"] + ([] if exp.get("siembras", {}).get("yuca") else [t("Se supuso que la yuca se sembró en mayo de 2026.", "We assumed the cassava was planted in May 2026.")]),
+            "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"] + ([] if exp.get("siembras", {}).get("yuca") else [t("Se supuso que la yuca se sembró en mayo de 2026.", "We assumed the cassava was planted in May 2026.")])
+                      + ([t("Se supone que lo que muestra tu foto de hoy debajo de los árboles se mantiene todo el año.", "We assume what today's photo under the trees shows stays the same all year.")]
+                         if e["id"] == "actual" and "perennes" in fotos else []),
             "riesgos": riesgos, "ajustes": [a for a in ajustes if a],
             "evidencia": [{"id": k, "titulo": AGRO["fuentes"][k]["titulo"], "url": AGRO["fuentes"][k]["url"]} for k in dict.fromkeys(evid) if k in AGRO["fuentes"]],
         })
-    return {"estrategias": res, "faltan": faltan(exp, lang), "lectura": lectura(res, prior, lang)}
+    return {"version": VERSION_CALCULO, "estrategias": res, "faltan": faltan(exp, lang), "lectura": lectura(res, prior, lang)}
 
 
 def lectura(res, prior, lang="es"):
