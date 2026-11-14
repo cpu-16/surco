@@ -68,7 +68,26 @@
   --esc-madera: color-mix(in srgb, color-mix(in srgb, var(--rastrojo) 72%, var(--humus)) 80%, black);
 }
 
-.esc-fig svg { display: block; width: 100%; height: auto; overflow: hidden; }
+.esc-fig { --esc-curva: cubic-bezier(0.25, 1, 0.5, 1); }
+
+/* ---- capas: un <svg> por capa, todas en el mismo sistema de 320×220 (escena.tsx explica por qué) ---- */
+.esc-lienzo { position: relative; width: 100%; aspect-ratio: 320 / 220; }
+/* en la bienvenida el dibujo cede alto para que el botón siempre se vea: se achica entero y queda centrado */
+.bienvenida .esc-fig { container-type: size; }
+.bienvenida .esc-lienzo { width: min(100%, (100cqh - 1.85rem) * 320 / 220); margin-inline: auto; }
+.esc-fig .esc-lienzo .esc-capa { position: absolute; display: block; overflow: hidden; max-height: none; }
+.esc-cuadro { position: absolute; }
+.esc-recorta { overflow: hidden; }
+.esc-fija, .esc-bucle { will-change: transform; } /* capa propia: lo quieto se pinta una vez, y lo que se mueve por dentro no repinta lo demás */
+.esc-fundido { transition: opacity 0.9s var(--esc-curva), visibility 0.9s; }
+.esc-crece { transform-origin: 50% 100%; transition: transform 1.4s var(--esc-curva); }
+.esc-fig[data-estacion='lluvia'] .esc-solo-seco, .esc-fig[data-estacion='seco'] .esc-solo-lluvia { opacity: 0; visibility: hidden; }
+.esc-nubes { transition: opacity 0.9s var(--esc-curva), transform 0.9s var(--esc-curva), visibility 0.9s; }
+.esc-fig[data-estacion='seco'] .esc-nubes { transform: translateY(-13.04%); } /* 6 de 46 */
+.esc-humedo { transform: translateZ(0) skewY(var(--esc-pendiente)) scaleY(1); transition: transform 1.4s var(--esc-curva), opacity 1.4s var(--esc-curva); }
+.esc-fig[data-estacion='seco'] .esc-humedo { transform: translateZ(0) skewY(var(--esc-pendiente)) scaleY(0.3); opacity: 0.92; }
+.esc-grietas { transform: translateZ(0); transition: transform 0.9s var(--esc-curva), opacity 0.9s var(--esc-curva); }
+.esc-fig[data-estacion='lluvia'] .esc-grietas { transform: translateZ(0) scaleY(0.4); opacity: 0; }
 
 /* ---- cielo, sol, lomas ---- */
 .esc-cielo-lluvia { fill: var(--cielo-lluvia); }
@@ -86,7 +105,7 @@
 .esc-nube-sombra { fill: color-mix(in srgb, var(--nube) 80%, black); }
 .esc-nube { fill: var(--nube); }
 .esc-nube-luz { fill: color-mix(in srgb, var(--nube) 62%, white); }
-.esc-deriva { animation: esc-deriva 16s ease-in-out infinite alternate; }
+.esc-deriva { animation: esc-deriva 16s ease-in-out infinite alternate; } /* ±3 de 242 */
 
 /* ---- satélite ---- */
 .esc-panel { fill: color-mix(in srgb, var(--lluvia) 55%, black); }
@@ -97,8 +116,10 @@
 .esc-sat-oro-sombra { fill: color-mix(in srgb, var(--seco) 70%, black); }
 .esc-antena { fill: color-mix(in srgb, var(--superficie) 80%, white); stroke: var(--tinta-2); stroke-width: 0.4; }
 .esc-sensor { fill: color-mix(in srgb, var(--tinta) 85%, black); }
-.esc-orbita { animation: esc-orbita 17s linear infinite; animation-delay: -15.6s; }
-.esc-haz { animation: esc-haz 17s linear infinite; animation-delay: -15.6s; }
+.esc-orbita-sat, .esc-orbita-haz, .esc-orbita-huella { animation: 17s linear -15.6s infinite; }
+.esc-orbita-sat { animation-name: esc-orbita-sat; }
+.esc-orbita-haz { animation-name: esc-orbita-haz; }
+.esc-orbita-huella { animation-name: esc-orbita-huella; }
 .esc-huella { fill: var(--esc-haz); }
 
 /* ---- el terreno de atrás ---- */
@@ -116,7 +137,8 @@
 .esc-hojarasca-3 { fill: color-mix(in srgb, var(--rastrojo) 72%, white); }
 .esc-hojarasca-4 { fill: color-mix(in srgb, var(--rastrojo) 70%, var(--laterita)); }
 .esc-hojarasca-nervio { stroke: color-mix(in srgb, var(--rastrojo) 55%, black); stroke-width: 0.35; }
-.esc-vaho { fill: none; stroke-width: 0.9; stroke-linecap: round; animation: esc-vaho 4.2s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+.esc-vapor { fill: none; stroke-width: 0.9; stroke-linecap: round; }
+.esc-vaho { animation: esc-vaho 4.2s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
 
 /* ---- matas ---- */
 .esc-tallo { fill: color-mix(in srgb, var(--hoja) 78%, black); }
@@ -168,7 +190,9 @@
 .esc-arrastra { fill: var(--esc-b-sombra); animation: esc-arrastra 2.4s linear infinite; }
 .esc-anillo { fill: none; stroke: var(--esc-agua-luz); stroke-width: 0.45; transform-box: fill-box; transform-origin: center; animation: esc-anillo 1.1s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
 .esc-salpica { fill: var(--esc-lodo-claro); animation: esc-salpica 1.1s linear infinite; }
-.esc-cae { fill: none; stroke: var(--lluvia); stroke-width: 0.95; stroke-linecap: round; opacity: 0.85; animation: esc-cae 0.95s linear infinite; }
+.esc-cae { fill: none; stroke: var(--lluvia); stroke-width: 0.95; stroke-linecap: round; opacity: 0.85; }
+.esc-lluvia { mask-image: linear-gradient(transparent, black 14%); }
+.esc-llueve { animation: esc-llueve 1.9s linear infinite; }
 
 /* ---- pluviómetro ---- */
 .esc-vidrio { fill: color-mix(in srgb, var(--superficie) 72%, var(--lluvia)); }
@@ -209,15 +233,16 @@
 
 /* ---- movimiento: solo transform y opacity ---- */
 @keyframes esc-respira { from { opacity: 0.72; } to { opacity: 1; } }
-@keyframes esc-deriva { from { transform: translateX(-3px); } to { transform: translateX(3px); } }
-@keyframes esc-orbita {
-  0% { transform: translateX(-262px); opacity: 0; }
-  0.6% { opacity: 1; }
-  40% { transform: translateX(110px); opacity: 1; }
-  40.6%, 100% { transform: translateX(110px); opacity: 0; }
-}
-@keyframes esc-haz { 0%, 8% { opacity: 0; } 14%, 28% { opacity: 1; } 34%, 100% { opacity: 0; } }
-@keyframes esc-vaho { 0% { transform: translateY(3px); opacity: 0; } 35% { opacity: 0.85; } 100% { transform: translateY(-10px); opacity: 0; } }
+/* lo que anima un <svg> entero va en % de su propia caja, para que sirva a cualquier tamaño */
+@keyframes esc-deriva { from { transform: translateX(-1.24%); } to { transform: translateX(1.24%); } }
+/* satélite (caja de 54), haz (34) y huella (36): de x−262 a x+110 en el 40 % del ciclo; el haz y la huella se encienden a medio camino */
+@keyframes esc-orbita-sat { 0% { transform: translateX(-485.19%); opacity: 0; } 0.6% { opacity: 1; } 40% { transform: translateX(203.7%); opacity: 1; } 40.6%, 100% { transform: translateX(203.7%); opacity: 0; } }
+@keyframes esc-orbita-haz { 0% { transform: translateX(-770.59%); opacity: 0; } 8% { opacity: 0; } 14%, 28% { opacity: 1; } 34% { opacity: 0; } 40%, 100% { transform: translateX(323.53%); opacity: 0; } }
+@keyframes esc-orbita-huella { 0% { transform: translateX(-727.78%); opacity: 0; } 8% { opacity: 0; } 14%, 28% { opacity: 1; } 34% { opacity: 0; } 40%, 100% { transform: translateX(305.56%); opacity: 0; } }
+/* vaho (caja de 16 de alto): de +3 a −10 */
+@keyframes esc-vaho { 0% { transform: translateY(18.75%); opacity: 0; } 35% { opacity: 0.85; } 100% { transform: translateY(-62.5%); opacity: 0; } }
+/* lluvia (caja de 328×168): un periodo, 20 a la izquierda y 96 abajo */
+@keyframes esc-llueve { from { transform: translate(0, 0); } to { transform: translate(-6.1%, 57.14%); } }
 @keyframes esc-entra { 0% { transform: translateY(-8px); opacity: 0; } 20%, 72% { opacity: 0.95; } 100% { transform: translateY(12px); opacity: 0; } }
 @keyframes esc-frena { 0% { transform: translateY(-5px); opacity: 0; } 25% { opacity: 1; } 55% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(0); opacity: 0; } }
 @keyframes esc-corre { 0% { transform: translateX(4px); opacity: 0; } 20%, 70% { opacity: 0.9; } 100% { transform: translateX(-18px); opacity: 0; } }
@@ -229,9 +254,8 @@
   42% { transform: translate(0, 0); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
   100% { transform: translate(var(--dx), calc(var(--dy) + 0.5px)); opacity: 0; }
 }
-@keyframes esc-cae { 0% { transform: translate(5px, -24px); opacity: 0; } 15%, 85% { opacity: 0.85; } 100% { transform: translate(-5px, 24px); opacity: 0.6; } }
 
 @media (prefers-reduced-motion: reduce) {
   .esc-fig .esc-anim { animation: none !important; }
-  .esc-anio i { transition: none; }
+  .esc-fig .esc-fundido, .esc-fig .esc-crece, .esc-fig .esc-nubes, .esc-anio i { transition: none; }
 }
