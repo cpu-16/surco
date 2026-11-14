@@ -19,7 +19,8 @@ import nasa
 AQUI = Path(__file__).parent
 app = FastAPI(title="Patio API")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
-_pool = ThreadPoolExecutor(3)
+_pool = ThreadPoolExecutor(3)  # ORNL: lento, minutos por serie
+_rapido = ThreadPoolExecutor(2)  # Earthdata (IMERG, AppEEARS): segundos; no hace cola detrás de ORNL
 _trabajos: dict = {}
 
 
@@ -30,12 +31,21 @@ def redondear(lat: float, lon: float) -> tuple[float, float]:
     return round(lat, 2), round(lon, 2)
 
 
-def _en_fondo(clave, fn, *args):
-    """Devuelve el resultado si ya está; si no, lo deja corriendo y responde None."""
+_ultimo: dict = {}
+
+
+def _en_fondo(clave, fn, *args, base=None, pool=None):
+    """Devuelve el resultado si ya está; si no, lo deja corriendo y responde None.
+    Con `base`, mientras se calcula la versión nueva responde la última buena (la lluvia de hace 3 h vale más que nada)."""
     f = _trabajos.get(clave)
     if f is None or (f.done() and f.exception()):
-        f = _trabajos[clave] = _pool.submit(fn, *args)
-    return f.result() if f.done() and not f.exception() else None
+        f = _trabajos[clave] = (pool or _pool).submit(fn, *args)
+    r = f.result() if f.done() and not f.exception() else None
+    if base is not None:
+        if r is not None:
+            _ultimo[base] = r
+        r = r if r is not None else _ultimo.get(base)
+    return r
 
 
 @app.get("/api/lugar")
@@ -66,13 +76,13 @@ def lugar(lat: float = Query(...), lon: float = Query(...)):
     # Con cuenta Earthdata: lluvia IMERG de los últimos días y el pedido de AppEEARS (HLS, SMAP, ECOSTRESS, NASADEM)
     if earthdata.hay_cuenta():
         hoy = dt.date.today()
-        im = _en_fondo(("imerg", lat, lon, hoy, time.time() // 10800), earthdata.imerg, lat, lon, hoy - dt.timedelta(days=60), hoy)
+        im = _en_fondo(("imerg", lat, lon, hoy, time.time() // 10800), earthdata.imerg, lat, lon, hoy - dt.timedelta(days=60), hoy, base=("imerg", lat, lon), pool=_rapido)
         if im and im["dias"]:
             out["reciente_imerg"] = motor.reciente([{"fecha": d["fecha"], "PRECTOTCORR": d["lluvia"]} for d in im["dias"]])
             out["fuentes"]["imerg"] = im["meta"]
         else:
             out["pendiente"].append("imerg")
-        ae = _en_fondo(("appeears", lat, lon, time.time() // 600), earthdata.appeears, lat, lon)
+        ae = _en_fondo(("appeears", lat, lon, time.time() // 600), earthdata.appeears, lat, lon, base=("appeears", lat, lon), pool=_rapido)
         if ae:
             out["appeears"] = motor.resumen_appeears(ae)
         else:

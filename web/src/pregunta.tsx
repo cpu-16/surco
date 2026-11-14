@@ -1,34 +1,42 @@
-import { useRef, useState } from 'react'
-import { pedir, type Expediente, type Lugar } from './api'
-import type { Comparacion } from './App'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { pedir, sinImagenes, type Expediente, type Lugar } from './api'
+import type { Comparacion } from './anio'
+import { Icono } from './ui'
 
 type Msg = { de: 'tu' | 'surco'; texto: string; fuentes?: string[] }
 type Respuesta = { respuesta: string; fuentes: string[]; propuesta?: Partial<Expediente> | null }
 
 // Web Speech API: en Chrome/Brave de Android funciona sin servidor propio
-const Reconocer = (window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR }).SpeechRecognition
-  ?? (window as unknown as { webkitSpeechRecognition?: new () => SR }).webkitSpeechRecognition
 type SR = { lang: string; interimResults: boolean; start(): void; stop(): void; onresult: (e: { results: { 0: { transcript: string } }[] }) => void; onend: () => void; onerror: () => void }
+const w = window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR }
+const Reconocer = w.SpeechRecognition ?? w.webkitSpeechRecognition
 
-export default function Pregunta({ exp, lugar, comp }: { exp: Expediente; lugar: Lugar | null; comp: Comparacion | null }) {
+const SUGERENCIAS = ['¿Qué siembro primero?', '¿Y si llueve menos este verano?', '¿Por qué no frijol?', '¿Por qué mis piñas no crecen?']
+const NOMBRES: Record<string, string> = { cultivos: 'Cultivos', siembras: 'Siembras', riego: 'Riego', prioridades: 'Lo que te importa', infiltracion_min: 'Minutos de la lata' }
+
+export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
+  exp: Expediente; lugar: Lugar | null; comp: Comparacion | null; cambiar: (p: Partial<Expediente>) => void; enLinea: boolean
+}) {
   const [msgs, setMsgs] = useState<Msg[]>([])
   const [texto, setTexto] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [oyendo, setOyendo] = useState(false)
   const [propuesta, setPropuesta] = useState<Partial<Expediente> | null>(null)
   const sr = useRef<SR | null>(null)
+  const fin = useRef<HTMLDivElement>(null)
+  useEffect(() => { fin.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }, [msgs.length, ocupado])
 
   const enviar = async (t = texto) => {
-    if (!t.trim() || ocupado) return
+    if (!t.trim() || ocupado || !enLinea) return
     const historia = [...msgs, { de: 'tu' as const, texto: t }]
     setMsgs(historia); setTexto(''); setOcupado(true)
     try {
-      const datos = { ...exp, fotos: exp.fotos.map(({ miniatura: _m, ...f }) => f) }
-      const r = await pedir<Respuesta>('/api/ia/pregunta', { method: 'POST', body: JSON.stringify({ historia, expediente: datos, comparacion: comp, lugar: resumenLugar(lugar) }) })
+      const r = await pedir<Respuesta>('/api/ia/pregunta', { method: 'POST', body: JSON.stringify({ historia, expediente: sinImagenes(exp), comparacion: comp, lugar: resumenLugar(lugar) }) })
       setMsgs([...historia, { de: 'surco', texto: r.respuesta, fuentes: r.fuentes }])
       if (r.propuesta && Object.keys(r.propuesta).length) setPropuesta(r.propuesta)
     } catch (e) {
-      setMsgs([...historia, { de: 'surco', texto: `No pude responder ahora (${(e as Error).message}). Lo que ya está calculado arriba sigue valiendo.` }])
+      setMsgs([...historia, { de: 'surco', texto: `No pude responder ahora (${(e as Error).message}). Lo que ya está calculado sigue valiendo.` }])
     } finally { setOcupado(false) }
   }
 
@@ -47,40 +55,86 @@ export default function Pregunta({ exp, lugar, comp }: { exp: Expediente; lugar:
   }
 
   return (
-    <section className="seccion" aria-labelledby="t-preg" id="pregunta">
-      <header><h2 id="t-preg">Pregunta o cuéntale</h2></header>
-      <p>Cuéntale de tu patio con tus palabras, o pregunta «¿y si llueve menos?» o «¿por qué no frijol?». Responde con los números de arriba y te dice cuándo no sabe.</p>
-      <div aria-live="polite" style={{ display: 'grid', gap: '0.8rem', margin: '1rem 0' }}>
-        {msgs.map((m, i) => (
-          <div key={i} style={{ justifySelf: m.de === 'tu' ? 'end' : 'start', maxWidth: '90%', background: m.de === 'tu' ? 'var(--papel-2)' : 'transparent', padding: '0.5rem 0.8rem', borderRadius: 8 }}>
-            <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{m.texto}</p>
-            {m.fuentes?.length ? <p className="nota" style={{ margin: '0.3rem 0 0' }}>Datos: {m.fuentes.join('; ')}</p> : null}
-            {m.de === 'surco' && 'speechSynthesis' in window && <button className="fuente" onClick={() => leer(m.texto)}>Escuchar</button>}
-          </div>
-        ))}
-        {ocupado && <p className="nota">Pensando con tus datos…</p>}
+    <>
+      <div className="chat" aria-live="polite">
+        {!msgs.length && <p className="nota">Cuéntale de tu patio con tus palabras o pregunta. Responde con los números de los pasos anteriores y te dice cuando no sabe.</p>}
+        <AnimatePresence initial={false}>
+          {msgs.map((m, i) => (
+            <motion.div key={i} className={`burbuja ${m.de}`} initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', bounce: 0, duration: 0.3 }}>
+              <p>{m.texto}</p>
+              {m.fuentes?.length ? <small className="nota">Datos: {m.fuentes.join('; ')}</small> : null}
+              {m.de === 'surco' && 'speechSynthesis' in window && <button className="enlace" onClick={() => leer(m.texto)}><Icono n="altavoz" t={16} />Escuchar</button>}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        {ocupado && <div className="burbuja surco pensando" aria-label="Pensando"><span /><span /><span /></div>}
+        <div ref={fin} />
       </div>
+
+      {!msgs.length && (
+        <div className="chips sugerencias">
+          {SUGERENCIAS.map((s) => <button key={s} className="chip" onClick={() => enviar(s)} disabled={!enLinea}>{s}</button>)}
+        </div>
+      )}
+
       {propuesta && (
-        <div style={{ background: 'var(--papel-2)', padding: '0.8rem', borderRadius: 10, marginBottom: '0.8rem' }}>
-          <p><strong>¿Guardo esto en tu expediente?</strong></p>
-          <ul>{Object.entries(propuesta).map(([k, v]) => <li key={k}>{k}: {Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v)}</li>)}</ul>
-          <div className="fila">
-            <button className="boton" onClick={() => { window.dispatchEvent(new CustomEvent('surco-propuesta', { detail: propuesta })); setPropuesta(null) }}>Guardar</button>
-            <button className="boton claro" onClick={() => setPropuesta(null)}>No, así no es</button>
+        <div className="propuesta">
+          <p><b>¿Guardo esto en tu patio?</b></p>
+          <ul>{Object.entries(propuesta).map(([k, v]) => <li key={k}>{NOMBRES[k] ?? k}: {Array.isArray(v) ? v.join(', ') : typeof v === 'object' && v ? Object.entries(v).map(([a, b]) => `${a} ${b}`).join(', ') : String(v)}</li>)}</ul>
+          <div className="acciones">
+            <button className="boton" onClick={() => {
+              cambiar({ ...propuesta, siembras: { ...exp.siembras, ...(propuesta.siembras ?? {}) } }); setPropuesta(null)
+            }}>Guardar</button>
+            <button className="boton fantasma" onClick={() => setPropuesta(null)}>No, así no es</button>
           </div>
         </div>
       )}
-      <form className="fila" onSubmit={(e) => { e.preventDefault(); enviar() }}>
-        <input value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Escribe aquí" aria-label="Tu pregunta" style={{ flex: 1, minWidth: '12em', padding: '0.6em' }} />
-        {Reconocer && <button type="button" className="boton claro" onClick={hablar} aria-pressed={oyendo}>{oyendo ? 'Te escucho…' : 'Hablar'}</button>}
-        <button className="boton" disabled={ocupado || !texto.trim()}>Enviar</button>
+
+      <form className="escribir" onSubmit={(e) => { e.preventDefault(); enviar() }}>
+        <input value={texto} onChange={(e) => setTexto(e.target.value)} placeholder={enLinea ? 'Escribe aquí' : 'Sin señal: vuelve cuando haya'} aria-label="Tu pregunta" disabled={!enLinea} />
+        {Reconocer && <button type="button" className="icono-btn" onClick={hablar} aria-pressed={oyendo} aria-label={oyendo ? 'Te escucho, toca para parar' : 'Hablar'} disabled={!enLinea}><Icono n="mic" /></button>}
+        <button className="icono-btn lleno" disabled={ocupado || !texto.trim() || !enLinea} aria-label="Enviar"><Icono n="enviar" /></button>
       </form>
-    </section>
+
+      <Compartir exp={exp} cambiar={cambiar} enLinea={enLinea} />
+    </>
+  )
+}
+
+function Compartir({ exp, cambiar, enLinea }: { exp: Expediente; cambiar: (p: Partial<Expediente>) => void; enLinea: boolean }) {
+  const [enlace, setEnlace] = useState('')
+  const [error, setError] = useState('')
+  const compartir = async () => {
+    setError('')
+    try {
+      const datos = { datos: sinImagenes(exp) }
+      const r = exp.id
+        ? (await pedir(`/api/expediente/${exp.id}`, { method: 'PUT', body: JSON.stringify(datos) }), { id: exp.id })
+        : await pedir<{ id: string }>('/api/expediente', { method: 'POST', body: JSON.stringify(datos) })
+      cambiar({ id: r.id })
+      const url = `${location.origin}/?e=${r.id}`
+      setEnlace(url)
+      navigator.share?.({ title: exp.nombre, url }).catch(() => { /* cancelado */ })
+    } catch (e) { setError((e as Error).message) }
+  }
+  return (
+    <div className="compartir">
+      <h2 className="sub">Revisarlo con un técnico</h2>
+      <p className="nota">El técnico abre lo mismo que ves tú. Las fotos se quedan en tu celular; solo va su medición.</p>
+      <button className="boton" onClick={compartir} disabled={!enLinea}><Icono n="compartir" />Compartir mi patio</button>
+      {enlace && <p className="enlace-listo"><a href={enlace}>{enlace}</a></p>}
+      {error && <p className="nota alerta" role="alert">No se pudo compartir: {error}</p>}
+    </div>
   )
 }
 
 function resumenLugar(l: Lugar | null) {
   if (!l) return null
-  return { punto: l.punto, normales: l.normales, ninos: l.ninos.promedio, reciente: l.reciente_imerg ?? { hasta: l.reciente_power.hasta, lluvia_30d: l.reciente_power.lluvia_30d, normal_30d: l.reciente_power.normal_30d },
-    ndvi: l.ndvi && { meses: l.ndvi.meses, ultimo: l.ndvi.ultimo }, fuentes: Object.fromEntries(Object.entries(l.fuentes).map(([k, f]) => [k, `${f.producto}, ${f.celda}, consultado ${f.consultado}`])) }
+  return {
+    punto: l.punto, normales: l.normales, ninos: l.ninos.promedio,
+    reciente: l.reciente_imerg ? { ...l.reciente_imerg, dias: l.reciente_imerg.dias.slice(-14) } : { hasta: l.reciente_power.hasta, lluvia_30d: l.reciente_power.lluvia_30d, normal_30d: l.reciente_power.normal_30d },
+    ndvi: l.ndvi && { meses: l.ndvi.meses, ultimo: l.ndvi.ultimo },
+    fuentes: Object.fromEntries(Object.entries(l.fuentes).map(([k, f]) => [k, `${f.producto}, ${f.celda}, consultado ${f.consultado}`])),
+  }
 }

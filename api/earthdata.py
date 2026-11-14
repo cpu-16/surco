@@ -48,7 +48,7 @@ def imerg(lat: float, lon: float, desde: dt.date, hasta: dt.date, corrida="E") -
     """Lluvia diaria GPM IMERG V07 en un punto por Giovanni. Early (E) sale ~4 h después del día UTC;
     Final (F) llega hasta sep-2025."""
     var = {"E": "GPM_3IMERGDE_07_precipitation", "L": "GPM_3IMERGDL_07_precipitation", "F": "GPM_3IMERGDF_07_precipitation"}[corrida]
-    params = {"data": var, "location": f"[{lat},{lon}]", "time": f"{desde}T00:00:00Z/{hasta}T23:59:59Z"}
+    params = {"data": var, "location": f"[{lat},{lon}]", "time": f"{desde}T00:00:00/{hasta}T23:59:59"}  # sin «Z»: con ella Giovanni da 500
     url = str(httpx.URL(GIOVANNI, params=params))
     with _db() as c:
         row = c.execute("select cuerpo, consultado from cache where url=?", (url,)).fetchone()

@@ -10,7 +10,7 @@ export type Lugar = {
   normales: Normal[]
   ninos: Ninos
   reciente_power: { hasta: string; dias: { fecha: string; lluvia: number }[]; lluvia_30d: number; normal_30d: number | null }
-  reciente_imerg?: { hasta: string; dias: { fecha: string; lluvia: number }[]; racha_seca_dias: number; lluvia_30d: number }
+  reciente_imerg?: { hasta: string; dias: { fecha: string; lluvia: number }[]; racha_seca_dias: number; ultima_racha: { desde: string; hasta: string; dias: number } | null; lluvia_30d: number }
   lluvia_mensual: Record<string, number>
   ndvi?: { meses: { mes: number; ndvi: number | null; n: number }[]; ultimo: { fecha: string; valor: number } | null; n_validos: number; n_total: number; serie: { fecha: string; valor: number | null }[] }
   et?: { fecha: string; valor: number | null }[]
@@ -19,7 +19,7 @@ export type Lugar = {
   pendiente: string[]
 }
 
-export type Foto = { id: string; tipo: TipoFoto; fecha: string; cobertura: number; descripcion?: string; hojarasca?: 'mucha' | 'poca' | 'nada' | null; miniatura: string }
+export type Foto = { id: string; tipo: TipoFoto; fecha: string; cobertura: number; descripcion?: string; hojarasca?: 'mucha' | 'poca' | 'nada' | null; miniatura: string; mascara?: string }
 export type TipoFoto = 'cama' | 'perennes' | 'pina' | 'general'
 export type Expediente = {
   id?: string
@@ -52,4 +52,14 @@ export async function pedir<T>(ruta: string, init?: RequestInit): Promise<T> {
   const r = await fetch(ruta, { ...init, headers: { 'Content-Type': 'application/json', ...init?.headers } })
   if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? `El servidor respondió ${r.status}`)
   return r.json()
+}
+
+/** El expediente sin imágenes: lo que se manda al servidor. Las fotos se quedan en el celular. */
+export const sinImagenes = (e: Expediente) => ({ ...e, fotos: e.fotos.map(({ miniatura: _m, mascara: _k, ...f }) => ({ ...f, miniatura: '' })) })
+
+/** Guardado local que nunca rompe la app (modo privado, almacenamiento lleno). */
+export const local = {
+  leer<T>(k: string): T | null { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) as T : null } catch { return null } },
+  poner(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* lleno o bloqueado */ } },
+  quitar(k: string) { try { localStorage.removeItem(k) } catch { /* bloqueado */ } },
 }

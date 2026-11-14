@@ -37,17 +37,20 @@ export function BarrasLluvia({ normales, ninos, desde }: { normales: Normal[]; n
   )
 }
 
-/** Lluvia diaria reciente. */
-export function Reciente({ dias }: { dias: { fecha: string; lluvia: number }[] }) {
-  const W = 360, H = 70, max = Math.max(...dias.map((d) => d.lluvia), 10), a = W / dias.length
+/** Lluvia diaria reciente. Los días secos (menos de 1 mm) quedan marcados con un terrón al pie. */
+export function Reciente({ dias }: { dias: { fecha: string; lluvia: number | null }[] }) {
+  const W = 360, H = 96, base = H - 22, max = Math.max(...dias.map((d) => d.lluvia ?? 0), 10), a = W / dias.length
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Lluvia diaria de los últimos días">
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Lluvia diaria: ${dias.filter((d) => (d.lluvia ?? 0) < 1).length} de ${dias.length} días sin lluvia`}>
       {dias.map((d, i) => {
-        const h = (Math.sqrt(d.lluvia) / Math.sqrt(max)) * (H - 16)
-        return <rect key={d.fecha} x={i * a + 0.5} y={H - 14 - h} width={Math.max(a - 1, 1)} height={h} fill="var(--lluvia)" />
+        const v = d.lluvia ?? 0, h = (Math.sqrt(v) / Math.sqrt(max)) * (base - 6)
+        return v < 1
+          ? <rect key={d.fecha} x={i * a + a * 0.2} y={base - 3} width={a * 0.6} height={3} rx="1" fill="var(--laterita)" />
+          : <rect key={d.fecha} x={i * a + a * 0.12} y={base - h} width={a * 0.76} height={h} rx="1.5" fill="var(--lluvia)" />
       })}
-      <text x="0" y={H - 2} fontSize="11">{dias[0]?.fecha.slice(5).split('-').reverse().join('/')}</text>
-      <text x={W} y={H - 2} fontSize="11" textAnchor="end">{dias.at(-1)?.fecha.slice(5).split('-').reverse().join('/')}</text>
+      <line x1="0" x2={W} y1={base + 0.5} y2={base + 0.5} stroke="var(--linea)" />
+      <text x="0" y={H - 4} fontSize="12">{dias[0]?.fecha.slice(5).split('-').reverse().join('/')}</text>
+      <text x={W} y={H - 4} fontSize="12" textAnchor="end">{dias.at(-1)?.fecha.slice(5).split('-').reverse().join('/')}</text>
     </svg>
   )
 }

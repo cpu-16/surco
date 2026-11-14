@@ -1,381 +1,298 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { EJEMPLO, pedir, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
-import { medir } from './canopeo'
-import { BarrasLluvia, MESES, MESES_LARGOS, NdviMeses, ordenMeses, Reciente } from './graficos'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
+import { flushSync } from 'react-dom'
+import { AnimatePresence, MotionConfig, motion } from 'motion/react'
+import { EJEMPLO, local, pedir, sinImagenes, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
+import { Agua, FOTOS, Fotos, Importa, Patio } from './pasos'
+import Cielo from './cielo'
+import Anio, { type Comparacion } from './anio'
+import { Cargando, Hoja, Icono } from './ui'
 
-const Mapa = lazy(() => import('./mapa'))
-const Pregunta = lazy(() => import('./pregunta'))
+const Conversa = lazy(() => import('./pregunta'))
 
-export type Muestra = { mes: number; cultivo: string | null; nombre: string | null; cobertura: 'alta' | 'media' | 'baja' | 'desnudo'; medido?: boolean }
-export type Estrategia = {
-  id: string; nombre: string; aplica_a: string; tira: Muestra[]; arboles: Muestra[]; meses_desnudo: number; desnudo_cama: number; desnudo_arboles: number
-  n_kg_ha: [number, number] | null
-  agua: { demanda_seca_mm: number; deficit_normal_mm: number; deficit_nino_mm: number }
-  razon: string; evidencia: { id: string; titulo: string; url: string }[]
-  beneficios: string[]; vacios: string[]; riesgos: string[]; ajustes: string[]
+export const NOMBRE = 'Surco'
+
+type Paso = { id: string; corto: string; titulo: string; listo: (e: Expediente) => boolean }
+const PASOS: Paso[] = [
+  { id: 'patio', corto: 'Tu patio', titulo: '¿Dónde está y qué siembras?', listo: (e) => e.cultivos.length > 0 },
+  { id: 'cielo', corto: 'El cielo', titulo: 'Lo que ve la NASA sobre tu patio', listo: () => true },
+  { id: 'fotos', corto: 'Tus fotos', titulo: 'El suelo que ves tú', listo: (e) => e.fotos.length >= 2 },
+  { id: 'agua', corto: 'El agua', titulo: 'La prueba de la lata', listo: (e) => e.infiltracion_min != null },
+  { id: 'importa', corto: 'Lo tuyo', titulo: '¿Qué te importa más?', listo: (e) => e.prioridades.length > 0 },
+  { id: 'anio', corto: 'Tu año', titulo: 'Así le iría a tu suelo', listo: () => true },
+  { id: 'conversa', corto: 'Conversa', titulo: 'Pregunta o compártelo', listo: () => true },
+]
+const IDS = PASOS.map((p) => p.id)
+// lo que el motor pide → el paso donde se resuelve
+const DONDE: Record<string, [number, TipoFoto?]> = { foto_cama: [2, 'cama'], foto_perennes: [2, 'perennes'], infiltracion: [3], parcela: [0], prioridades: [4] }
+
+const L = { exp: 'surco-expediente', lugar: 'surco-lugar', comp: 'surco-comp', vistos: 'surco-vistos', visto: 'surco-bienvenida' }
+type CacheLugar = { lat: number; lon: number; datos: Lugar }
+const cerca = (c: CacheLugar | null, e: Expediente) => !!c && Math.abs(c.lat - e.lat) < 0.005 && Math.abs(c.lon - e.lon) < 0.005
+
+function useEnLinea() {
+  const [v, setV] = useState(navigator.onLine)
+  useEffect(() => {
+    const si = () => setV(true), no = () => setV(false)
+    addEventListener('online', si); addEventListener('offline', no)
+    return () => { removeEventListener('online', si); removeEventListener('offline', no) }
+  }, [])
+  return v
 }
-export type Comparacion = { estrategias: Estrategia[]; faltan: { clave: string; texto: string; cambia: string }[]; lectura: string[] }
 
-const CULTIVOS: [string, string][] = [
-  ['yuca', 'Yuca'], ['pina', 'Piña'], ['platano', 'Plátano'], ['cacao', 'Cacao'], ['naranja', 'Naranja'], ['toronja', 'Toronja'],
-  ['maiz', 'Maíz'], ['frijol', 'Frijol'], ['guandu', 'Guandú'], ['otoe', 'Otoe'], ['name', 'Ñame'], ['zapallo', 'Zapallo'],
-]
-const PRIORIDADES: [string, string][] = [
-  ['agua', 'Gastar menos agua'], ['suelo', 'Mejorar el suelo'], ['comida', 'Comida para la casa'], ['venta', 'Algo para vender'], ['trabajo', 'Menos trabajo'],
-]
-const FOTOS: { tipo: TipoFoto; titulo: string; como: string }[] = [
-  { tipo: 'cama', titulo: 'Suelo de la cama de yuca y piña', como: 'De pie, el celular a la altura del pecho, mirando hacia abajo.' },
-  { tipo: 'perennes', titulo: 'Suelo debajo del cacao o los cítricos', como: 'Igual, pero bajo la copa del árbol. El satélite no ve esto.' },
-  { tipo: 'pina', titulo: 'Una piña completa', como: 'La planta entera con su base.' },
-  { tipo: 'general', titulo: 'El patio entero', como: 'Desde una esquina, para ver si hay pendiente.' },
-]
-const COLOR = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)', desnudo: 'var(--laterita)' }
-const LLAVE = 'surco-expediente'
-
-function cargarLocal(): Expediente {
-  try {
-    const s = localStorage.getItem(LLAVE)
-    if (s) return { ...EJEMPLO, ...JSON.parse(s) }
-  } catch { /* sin almacenamiento: se usa el ejemplo */ }
-  return EJEMPLO
-}
+const pasoDeHash = () => IDS.indexOf(location.hash.slice(1))
 
 export default function App() {
-  const [exp, setExp] = useState<Expediente>(cargarLocal)
-  const [lugar, setLugar] = useState<Lugar | null>(null)
-  const [comp, setComp] = useState<Comparacion | null>(null)
+  const [exp, setExp] = useState<Expediente>(() => ({ ...EJEMPLO, ...local.leer<Expediente>(L.exp) }))
+  const enLinea = useEnLinea()
   const [error, setError] = useState('')
-  const mesActual = new Date().getMonth() + 1
 
-  useEffect(() => {
-    try { localStorage.setItem(LLAVE, JSON.stringify(exp)) } catch { /* lleno o bloqueado */ }
-  }, [exp])
+  /* ---------- navegación: cada paso es una entrada del historial, así el botón Atrás del celular funciona ---------- */
+  const [paso, setPaso] = useState(() => { const n = pasoDeHash(); return n >= 0 ? n : local.leer(L.visto) ? 0 : -1 })
+  const [dir, setDir] = useState(1)
+  const actual = useRef(paso)
+  const [subFoto, setSubFoto] = useState(0)
+  const [vistos, setVistos] = useState<string[]>(() => local.leer<string[]>(L.vistos) ?? [])
+  const titulo = useRef<HTMLHeadingElement>(null)
 
-  // el satélite: se vuelve a pedir mientras falten series que ORNL todavía está bajando
-  useEffect(() => {
-    let vivo = true, t = 0
-    const traer = () => pedir<Lugar>(`/api/lugar?lat=${exp.lat}&lon=${exp.lon}`)
-      .then((l) => { if (!vivo) return; setLugar(l); setError(''); if (l.pendiente.length) t = window.setTimeout(traer, 15000) })
-      .catch((e) => vivo && setError(e.message))
-    traer()
-    return () => { vivo = false; clearTimeout(t) }
-  }, [exp.lat, exp.lon])
-
-  // la comparación se recalcula con cada dato de campo
-  const claveComp = JSON.stringify({ ...exp, fotos: exp.fotos.map((f) => [f.tipo, f.cobertura, f.hojarasca]) })
-  useEffect(() => {
-    if (!lugar) return
-    const datos = { ...exp, fotos: exp.fotos.map(({ miniatura: _m, ...f }) => f) }
-    pedir<Comparacion>('/api/comparar', { method: 'POST', body: JSON.stringify({ expediente: datos }) })
-      .then(setComp).catch(() => setComp(null))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [claveComp, lugar?.punto.lat, lugar?.punto.lon])
-
-  const cambiar = (p: Partial<Expediente>) => setExp((e) => ({ ...e, ...p }))
-
-  // lo que el productor contó en la conversación, ya confirmado por él
-  useEffect(() => {
-    const f = (ev: Event) => {
-      const p = (ev as CustomEvent<Partial<Expediente>>).detail
-      setExp((e) => ({ ...e, ...p, siembras: { ...e.siembras, ...(p.siembras ?? {}) } }))
-    }
-    window.addEventListener('surco-propuesta', f)
-    return () => window.removeEventListener('surco-propuesta', f)
+  const mover = useCallback((n: number) => {
+    setDir(n >= actual.current ? 1 : -1)
+    actual.current = n
+    setPaso(n)
+    window.scrollTo({ top: 0 })
   }, [])
+  const ir = useCallback((n: number, sub?: number) => {
+    if (sub != null) setSubFoto(sub)
+    if (n === actual.current) return
+    history.pushState(null, '', n < 0 ? location.pathname + location.search : `#${IDS[n]}`)
+    mover(n)
+  }, [mover])
+  useEffect(() => {
+    if (paso === 0 && !location.hash) history.replaceState(null, '', '#patio')
+    const f = () => mover(pasoDeHash())
+    addEventListener('popstate', f)
+    return () => removeEventListener('popstate', f)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mover])
+  useEffect(() => {
+    if (paso < 0) return
+    setVistos((v) => v.includes(IDS[paso]) ? v : [...v, IDS[paso]])
+    titulo.current?.focus({ preventScroll: true })
+  }, [paso])
+  useEffect(() => local.poner(L.vistos, vistos), [vistos])
+  const irA = (clave: string) => { const d = DONDE[clave]; if (d) ir(d[0], d[1] ? FOTOS.findIndex((f) => f.tipo === d[1]) : undefined) }
+
+  /* ---------- el expediente vive en el celular ---------- */
+  useEffect(() => local.poner(L.exp, exp), [exp])
+  const cambiar = useCallback((p: Partial<Expediente>) => setExp((e) => ({ ...e, ...p })), [])
 
   useEffect(() => {
     const f = (ev: Event) => {
       const { tipo, extra } = (ev as CustomEvent<{ tipo: TipoFoto; extra: Partial<Foto> }>).detail
       setExp((e) => ({ ...e, fotos: e.fotos.map((x) => x.tipo === tipo ? { ...x, ...extra, hojarasca: x.hojarasca ?? extra.hojarasca } : x) }))
     }
-    window.addEventListener('surco-foto', f)
-    return () => window.removeEventListener('surco-foto', f)
+    addEventListener('surco-foto', f)
+    return () => removeEventListener('surco-foto', f)
   }, [])
 
-  // enlace compartido: el técnico abre el mismo expediente
+  // enlace compartido: el técnico abre el mismo patio
   useEffect(() => {
     const id = new URLSearchParams(location.search).get('e')
     if (id && id !== exp.id) pedir<{ datos: Expediente }>(`/api/expediente/${encodeURIComponent(id)}`).then((r) => setExp({ ...EJEMPLO, ...r.datos, id })).catch((e) => setError(e.message))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /* ---------- satélite: lo último que llegó se guarda y se muestra sin señal ---------- */
+  const [lugar, setLugar] = useState<Lugar | null>(() => { const c = local.leer<CacheLugar>(L.lugar); return cerca(c, exp) ? c!.datos : null })
+  const [lugarViejo, setLugarViejo] = useState(false)
+  useEffect(() => {
+    let vivo = true, t = 0
+    const traer = () => pedir<Lugar>(`/api/lugar?lat=${exp.lat}&lon=${exp.lon}`)
+      .then((l) => {
+        if (!vivo) return
+        setLugar(l); setLugarViejo(false); setError('')
+        local.poner(L.lugar, { lat: exp.lat, lon: exp.lon, datos: l })
+        // AppEEARS tarda horas: no se pregunta cada 15 s por él
+        if (l.pendiente.length) t = window.setTimeout(traer, l.pendiente.every((p) => p === 'appeears') ? 120000 : 15000)
+      })
+      .catch((e) => {
+        if (!vivo) return
+        const c = local.leer<CacheLugar>(L.lugar)
+        if (cerca(c, exp)) { setLugar(c!.datos); setLugarViejo(true) } else setError(e.message)
+      })
+    traer()
+    return () => { vivo = false; clearTimeout(t) }
+  }, [exp.lat, exp.lon, enLinea]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ---------- la comparación se recalcula con cada dato de campo; sin señal queda la última ---------- */
+  const claveComp = JSON.stringify({ ...sinImagenes(exp), nombre: '', id: '' })
+  const [comp, setComp] = useState<Comparacion | null>(() => local.leer<{ clave: string; datos: Comparacion }>(L.comp)?.datos ?? null)
+  const [compViejo, setCompViejo] = useState(false)
+  useEffect(() => {
+    if (!lugar) return
+    let vivo = true
+    pedir<Comparacion>('/api/comparar', { method: 'POST', body: JSON.stringify({ expediente: sinImagenes(exp) }) })
+      .then((c) => { if (!vivo) return; setComp(c); setCompViejo(false); local.poner(L.comp, { clave: claveComp, datos: c }) })
+      .catch(() => vivo && setCompViejo(local.leer<{ clave: string }>(L.comp)?.clave !== claveComp))
+    return () => { vivo = false }
+  }, [claveComp, lugar?.punto.lat, lugar?.punto.lon, enLinea]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const mesActual = new Date().getMonth() + 1
+  const listo = (i: number) => vistos.includes(IDS[i]) && PASOS[i].listo(exp)
+
+  if (paso < 0) return <MotionConfig reducedMotion="user"><Bienvenida empezar={() => { local.poner(L.visto, true); ir(0) }} /></MotionConfig>
+
+  const p = PASOS[paso]
   return (
-    <main className="app">
-      <header>
-        <p className="nota">Expediente del suelo</p>
-        <h1>{exp.nombre}</h1>
-        <p className="nota">
-          {exp.cultivos.length} cultivos, {exp.fotos.length} {exp.fotos.length === 1 ? 'foto' : 'fotos'}
-          {lugar && <>, a {Math.round(lugar.punto.elevacion_m)} m sobre el mar</>}
-        </p>
+    <MotionConfig reducedMotion="user">
+      <header className="cabecera">
+        <div className="cabecera-fila">
+          <button className="marca" onClick={() => ir(-1)} aria-label={`${NOMBRE}, volver al inicio`}><Marca />{NOMBRE}</button>
+          <AnimatePresence>
+            {!enLinea && <motion.span className="sin-senal" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>Sin señal</motion.span>}
+          </AnimatePresence>
+          <span className="espacio" />
+          <Instalar />
+          <BotonTema />
+        </div>
+        <nav className="surco" aria-label="Pasos">
+          {PASOS.map((x, i) => (
+            <button key={x.id} className="terron" data-listo={listo(i)} aria-current={i === paso ? 'step' : undefined} onClick={() => ir(i)}
+              aria-label={`Paso ${i + 1}: ${x.corto}${listo(i) ? ', listo' : ''}`}>
+              <motion.span className="tapa" initial={false} animate={{ scaleY: listo(i) ? 1 : 0 }} transition={{ type: 'spring', bounce: 0.3, duration: 0.5 }} />
+              <span className="num">{listo(i) ? <Icono n="brote" t={14} /> : i + 1}</span>
+            </button>
+          ))}
+        </nav>
       </header>
 
-      {error && <p role="alert" className="estado falta">No se pudo leer el satélite: {error}</p>}
+      <main className="escena">
+        <AnimatePresence mode="popLayout" initial={false} custom={dir}>
+          <motion.section key={p.id} className="paso" custom={dir} aria-labelledby={`t-${p.id}`}
+            variants={{ entra: (d: number) => ({ x: d * 56, opacity: 0 }), centro: { x: 0, opacity: 1 }, sale: (d: number) => ({ x: d * -56, opacity: 0 }) }}
+            initial="entra" animate="centro" exit="sale" transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
+            <header className="paso-cab">
+              <p className="paso-n">Paso {paso + 1} de {PASOS.length}</p>
+              <h1 id={`t-${p.id}`} ref={titulo} tabIndex={-1}>{p.titulo}</h1>
+            </header>
+            {error && !lugar && <p className="aviso" role="alert">No se pudo leer el satélite: {error}</p>}
+            {lugarViejo && p.id === 'cielo' && <p className="aviso">Sin señal: son los datos de la última vez.</p>}
+            {p.id === 'patio' && <Patio exp={exp} cambiar={cambiar} lugar={lugar} />}
+            {p.id === 'cielo' && <Cielo lugar={lugar} desde={mesActual} />}
+            {p.id === 'fotos' && <Fotos exp={exp} cambiar={cambiar} sub={subFoto} setSub={setSubFoto} />}
+            {p.id === 'agua' && <Agua exp={exp} cambiar={cambiar} />}
+            {p.id === 'importa' && <Importa exp={exp} cambiar={cambiar} />}
+            {p.id === 'anio' && <Anio comp={comp} desde={mesActual} viejo={compViejo} irA={irA} />}
+            {p.id === 'conversa' && <Suspense fallback={<Cargando texto="Abriendo…" />}><Conversa exp={exp} lugar={lugar} comp={comp} cambiar={cambiar} enLinea={enLinea} /></Suspense>}
+          </motion.section>
+        </AnimatePresence>
+      </main>
 
-      <Faltan comp={comp} />
-      <Comparar comp={comp} desde={mesActual} />
-      <LoQueVes exp={exp} cambiar={cambiar} />
-      {lugar ? <Satelite lugar={lugar} desde={mesActual} exp={exp} /> : <p className="nota">Leyendo 45 años de clima de la NASA para tu punto…</p>}
-      <TuParcela exp={exp} cambiar={cambiar} />
-      <Suspense fallback={null}>
-        <Pregunta exp={exp} lugar={lugar} comp={comp} />
-      </Suspense>
-      <Compartir exp={exp} cambiar={cambiar} />
+      <nav className="barra" aria-label="Avanzar">
+        <button className="boton fantasma" onClick={() => ir(paso - 1)} disabled={paso === 0}><Icono n="atras" />Atrás</button>
+        {paso < PASOS.length - 1 && <button className="boton" onClick={() => ir(paso + 1)}>Seguir: {PASOS[paso + 1].corto}</button>}
+      </nav>
+    </MotionConfig>
+  )
+}
+
+/** La marca: la tabla de colores del suelo, de laterita a hoja. */
+function Marca({ t = 22 }: { t?: number }) {
+  const c = ['#a04b2c', '#c4a46a', '#8fae55', '#c4a46a', '#8fae55', '#3d7638', '#8fae55', '#3d7638', '#3d7638']
+  return (
+    <svg width={t} height={t} viewBox="0 0 30 30" aria-hidden="true">
+      {c.map((f, i) => <rect key={i} x={1 + (i % 3) * 9.7} y={1 + Math.floor(i / 3) * 9.7} width="8.6" height="8.6" rx="1.4" fill={f} />)}
+    </svg>
+  )
+}
+
+/** Primera vez: un año de suelo que se va cubriendo, mes por mes. Es toda la idea en un segundo. */
+const AÑO = ['alta', 'alta', 'media', 'baja', 'alta', 'alta', 'alta', 'media', 'media', 'alta', 'alta', 'media'] as const
+function Bienvenida({ empezar }: { empezar: () => void }) {
+  const color = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)' }
+  return (
+    <main className="bienvenida">
+      <div className="bienvenida-marca"><Marca t={30} /><span>{NOMBRE}</span></div>
+      <div className="bienvenida-tira" aria-hidden="true">
+        {AÑO.map((c, i) => (
+          <span key={i} className="muestra">
+            <motion.span className="tapa" style={{ background: color[c] }} initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
+              transition={{ type: 'spring', bounce: 0.2, duration: 0.6, delay: 0.5 + i * 0.07 }} />
+          </span>
+        ))}
+      </div>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', bounce: 0, duration: 0.6, delay: 0.15 }}>
+        <h1>El año de tu suelo, mes por mes</h1>
+        <p>Compara maneras de sembrar tu patio según cuánto tiempo dejan el suelo desnudo. Con datos de la NASA y lo que ves tú.</p>
+        <button className="boton grande" onClick={empezar}>Empezar</button>
+        <p className="nota">Siete pasos cortos. Funciona sin señal y tus fotos no salen del celular.</p>
+      </motion.div>
     </main>
   )
 }
 
-function Faltan({ comp }: { comp: Comparacion | null }) {
-  if (!comp?.faltan.length) return null
-  return (
-    <section aria-labelledby="t-falta" style={{ marginTop: '1.2rem' }}>
-      <h3 id="t-falta">Para decidir falta</h3>
-      <ul className="falta-lista">
-        {comp.faltan.map((f) => (
-          <li key={f.clave}>
-            <strong>{f.texto}</strong>
-            <a href={`#${f.clave}`}>Hacerlo</a>
-            <span className="nota" style={{ gridColumn: '1 / -1' }}>{f.cambia}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
-}
-
-function Comparar({ comp, desde }: { comp: Comparacion | null; desde: number }) {
-  const [mesSel, setMesSel] = useState<number | null>(null)
-  const orden = ordenMeses(desde)
-  return (
-    <section className="seccion" aria-labelledby="t-comp">
-      <header><h2 id="t-comp">El año de tu suelo</h2><span className="estado">{comp ? `${comp.estrategias.length} maneras` : 'calculando'}</span></header>
-      <p>Cada cuadro es un mes. Rojo es suelo desnudo, que el sol y el aguacero se llevan. Verde es suelo tapado.</p>
-      {comp?.lectura.map((l, i) => <p key={i}><strong>{l}</strong></p>)}
-      <Leyenda />
-      {comp?.estrategias.map((e) => (
-        <details key={e.id} className="estrategia">
-          <summary>
-            <h3>{e.nombre}</h3>
-            <p className="nota">
-              Suelo desnudo: {e.desnudo_cama} {e.desnudo_cama === 1 ? 'mes' : 'meses'} en la cama y {e.desnudo_arboles} debajo de los árboles
-              {e.n_kg_ha && `. Las leguminosas pueden dejar ${e.n_kg_ha[0]} a ${e.n_kg_ha[1]} kg de nitrógeno por hectárea`}.
-            </p>
-            {[['Cama', e.tira], ['Árboles', e.arboles]].map(([etq, fila]) => (
-              <div key={etq as string} className="fila-tira">
-                <span className="etq">{etq as string}</span>
-                <div className="tira" role="img" aria-label={`${e.nombre}, ${etq}: ${(fila as Muestra[]).map((m) => `${MESES_LARGOS[m.mes - 1]} ${m.nombre ?? 'desnudo'}`).join(', ')}`}>
-                  {orden.map((mes) => {
-                    const m = (fila as Muestra[]).find((x) => x.mes === mes)!
-                    return (
-                      <button key={mes} className="muestra" data-sel={mesSel === mes ? 1 : 0} data-medido={m.medido ? 1 : 0} style={{ background: COLOR[m.cobertura] }}
-                        onClick={(ev) => { ev.preventDefault(); setMesSel(mesSel === mes ? null : mes) }}
-                        aria-label={`${MESES_LARGOS[mes - 1]}: ${m.nombre ?? 'suelo desnudo'}`}>
-                        {m.nombre?.slice(0, 3) ?? ''}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-            <div className="fila-tira"><span className="etq" /><div className="meses" aria-hidden="true">{orden.map((m) => <span key={m}>{MESES[m - 1]}</span>)}</div></div>
-            {mesSel && <p className="nota">En {MESES_LARGOS[mesSel - 1]}: la cama con {e.tira.find((x) => x.mes === mesSel)?.nombre?.toLowerCase() ?? 'suelo desnudo'}, debajo de los árboles {e.arboles.find((x) => x.mes === mesSel)?.nombre?.toLowerCase() ?? 'suelo desnudo'}.</p>}
-            <p className="abrir">Ver por qué, qué le da al suelo y sus riesgos</p>
-          </summary>
-          <div className="campos">
-            <div><h4>Por qué se sugiere</h4><p>{e.razon}</p></div>
-            {!!e.ajustes.length && <div><h4>Lo que cambió con tus datos</h4><ul>{e.ajustes.map((a) => <li key={a}>{a}</li>)}</ul></div>}
-            <div><h4>Qué le da al suelo</h4><ul>{e.beneficios.map((b) => <li key={b}>{b}</li>)}</ul></div>
-            <div><h4>Lo que todavía no se sabe</h4><ul>{e.vacios.map((b) => <li key={b}>{b}</li>)}</ul></div>
-            <div><h4>Para revisar con un técnico</h4><ul>{e.riesgos.map((b) => <li key={b}>{b}</li>)}</ul></div>
-            <div><h4>De dónde sale</h4><ul>{e.evidencia.map((f) => <li key={f.id}><a href={f.url} target="_blank" rel="noreferrer">{f.titulo}</a></li>)}</ul></div>
-          </div>
-        </details>
-      ))}
-      <p className="nota">La herramienta muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico del MIDA o del IDIAP.</p>
-    </section>
-  )
-}
-
-const claseInfil = (m: number) =>
-  ([[3, 'muy rápida'], [10, 'rápida'], [30, 'moderadamente rápida'], [100, 'moderada'], [300, 'moderadamente lenta'], [1000, 'lenta'], [40000, 'muy lenta']] as const)
-    .find(([lim]) => m < lim)?.[1] ?? 'casi nula'
-
-function Leyenda() {
-  const items: [keyof typeof COLOR, string][] = [['desnudo', 'Desnudo'], ['baja', 'Poco tapado o acolchado'], ['media', 'Medio tapado'], ['alta', 'Bien tapado']]
-  return (
-    <div className="leyenda">
-      {items.map(([k, t]) => <span key={k}><i style={{ background: COLOR[k] }} />{t}</span>)}
-      <span><i className="medido" />Medido con tu foto</span>
-    </div>
-  )
-}
-
-function LoQueVes({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }) {
-  const [midiendo, setMidiendo] = useState<TipoFoto | null>(null)
-  const [mascara, setMascara] = useState<Record<string, string>>({})
-  // ponytail: la respuesta de la IA llega después; se pega a la foto vigente de ese tipo, sin pisar otras
-  const setFotoIA = (tipo: TipoFoto, extra: Partial<Foto>) => window.dispatchEvent(new CustomEvent('surco-foto', { detail: { tipo, extra } }))
-  const tomar = async (tipo: TipoFoto, archivo?: File) => {
-    if (!archivo) return
-    setMidiendo(tipo)
-    try {
-      const r = await medir(archivo)
-      const foto: Foto = { id: crypto.randomUUID(), tipo, fecha: new Date().toISOString().slice(0, 10), cobertura: r.cobertura, miniatura: r.miniatura }
-      setMascara((m) => ({ ...m, [tipo]: r.mascara }))
-      cambiar({ fotos: [...exp.fotos.filter((f) => f.tipo !== tipo), foto] })
-      // la IA describe la foto; la cobertura ya está medida y no la toca
-      const fd = new FormData(); fd.append('foto', r.jpeg, 'foto.jpg'); fd.append('tipo', tipo)
-      fetch('/api/ia/foto', { method: 'POST', body: fd }).then((x) => x.ok ? x.json() : null).then((j) => {
-        if (j?.descripcion) setFotoIA(tipo, { descripcion: j.descripcion, hojarasca: j.hojarasca })
-      }).catch(() => { /* sin IA queda la medición */ })
-    } finally { setMidiendo(null) }
-  }
-  const listos = FOTOS.filter((f) => exp.fotos.some((x) => x.tipo === f.tipo)).length + (exp.infiltracion_min != null ? 1 : 0)
-  return (
-    <section className="seccion" aria-labelledby="t-ves">
-      <header><h2 id="t-ves">Lo que ves tú</h2><span className={`estado ${listos === 5 ? 'listo' : 'falta'}`}>{listos} de 5</span></header>
-      <p>El satélite ve tu zona desde arriba. Tus fotos ven el suelo. La parte verde se mide en tu celular y la foto no se guarda en ningún lado.</p>
-      {FOTOS.map((f) => {
-        const foto = exp.fotos.find((x) => x.tipo === f.tipo)
-        return (
-          <div key={f.tipo} id={`foto_${f.tipo}`} style={{ margin: '1.2rem 0' }}>
-            <h3>{f.titulo}</h3>
-            <p className="nota">{f.como}</p>
-            {foto && (
-              <div className="dos" style={{ margin: '0.6rem 0' }}>
-                <img src={foto.miniatura} alt={f.titulo} style={{ width: '100%', borderRadius: 8 }} />
-                {mascara[f.tipo] ? <img src={mascara[f.tipo]} alt="Parte verde detectada" style={{ width: '100%', borderRadius: 8 }} /> : null}
-              </div>
-            )}
-            {foto && <p><span className="cifra">{foto.cobertura}%</span> del suelo tapado por planta verde <span className="fuente">método Canopeo</span></p>}
-            {foto?.descripcion && <p className="nota">Lo que se ve: {foto.descripcion}</p>}
-            {foto && (f.tipo === 'perennes' || f.tipo === 'cama') && (
-              <div style={{ margin: '0.6rem 0' }}>
-                <p style={{ marginBottom: '0.3rem' }}>¿Hay hojarasca o rastrojo seco tapando el suelo?{foto.hojarasca && foto.descripcion ? ' (sugerido por la foto, corrígelo si no es así)' : ''}</p>
-                <div className="chips">
-                  {(['mucha', 'poca', 'nada'] as const).map((h) => (
-                    <button key={h} className="chip" aria-pressed={foto.hojarasca === h}
-                      onClick={() => cambiar({ fotos: exp.fotos.map((x) => x.tipo === f.tipo ? { ...x, hojarasca: h } : x) })}>{h[0].toUpperCase() + h.slice(1)}</button>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="fila">
-              <label className="boton claro">
-                {midiendo === f.tipo ? 'Midiendo…' : foto ? 'Cambiar foto' : 'Tomar foto'}
-                <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => tomar(f.tipo, e.target.files?.[0])} />
-              </label>
-              {foto && <button className="boton claro" onClick={() => cambiar({ fotos: exp.fotos.filter((x) => x.tipo !== f.tipo) })}>Quitar</button>}
-            </div>
-          </div>
-        )
-      })}
-      <div id="infiltracion" style={{ margin: '1.2rem 0' }}>
-        <h3>La prueba de la lata con agua</h3>
-        <p className="nota">Es la prueba de infiltración del USDA, hecha con una lata. Quítale el fondo y la tapa a una lata de unos 15 cm de ancho y entiérrala 7 a 8 cm en la cama de yuca. Echa casi dos tazas de agua (450 mL) y espera a que se vaya. Después echa otras dos tazas y mide con el cronómetro cuántos minutos tarda esta segunda vez.</p>
-        <label>Minutos de la segunda vez:{' '}
-          <input type="number" inputMode="decimal" min="0" max="2000" step="0.5" style={{ width: '6em', padding: '0.4em' }}
-            value={exp.infiltracion_min ?? ''} onChange={(e) => cambiar({ infiltracion_min: e.target.value === '' ? null : Number(e.target.value) })} />
-        </label>
-        {exp.infiltracion_min != null && <p>Según la tabla del USDA, el agua entra de forma <strong>{claseInfil(exp.infiltracion_min)}</strong>.</p>}
-      </div>
-      <div id="riego">
-        <h3>¿Riegas en verano?</h3>
-        <div className="chips">
-          {(['no', 'a veces', 'si'] as const).map((r) => (
-            <button key={r} className="chip" aria-pressed={exp.riego === r} onClick={() => cambiar({ riego: exp.riego === r ? '' : r })}>{r === 'si' ? 'Sí' : r[0].toUpperCase() + r.slice(1)}</button>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Satelite({ lugar, desde, exp }: { lugar: Lugar; desde: number; exp: Expediente }) {
-  const prom = lugar.ninos.promedio
-  const seco = prom.filter((p) => [1, 2, 3].includes(p.mes)).map((p) => p.pct_normal ?? 100)
-  const pctSeco = Math.round(seco.reduce((a, b) => a + b, 0) / (seco.length || 1))
-  const rec = lugar.reciente_imerg ?? lugar.reciente_power
-  const esImerg = !!lugar.reciente_imerg
-  const f = (k: string) => lugar.fuentes[k]
-  const ultimoNdvi = lugar.ndvi?.ultimo
-  return (
-    <section className="seccion" aria-labelledby="t-sat">
-      <header><h2 id="t-sat">Lo que dice el satélite</h2><span className="estado">{lugar.pendiente.length ? 'bajando datos' : 'al día'}</span></header>
-
-      <h3>La lluvia de tu zona y El Niño</h3>
-      <p>Barras azules: lo que llueve normalmente cada mes. Raya ocre: lo que el sol y el calor le sacan al suelo (ET₀). Rayado: cómo llovió en los Niños fuertes de 1982, 1997, 2015 y 2023.</p>
-      <BarrasLluvia normales={lugar.normales} ninos={lugar.ninos} desde={desde} />
-      <p>En esos cuatro Niños, de enero a marzo llovió en promedio el <strong>{pctSeco}%</strong> de lo normal. Es la memoria de tu zona, no un pronóstico.</p>
-      <p><button className="fuente" title={f('power')?.consultado}>{f('power')?.producto}, celda {f('power')?.celda}</button></p>
-
-      <h3 style={{ marginTop: '1.4rem' }}>Los últimos días</h3>
-      <Reciente dias={rec.dias.slice(-45)} />
-      {esImerg && lugar.reciente_imerg ? (
-        <p><span className="cifra">{lugar.reciente_imerg.racha_seca_dias}</span> días seguidos sin lluvia hasta el {lugar.reciente_imerg.hasta.split('-').reverse().join('/')}</p>
-      ) : (
-        <p className="nota">NASA POWER llega hasta el {rec.hasta.split('-').reverse().join('/')} y reparte la lluvia en una celda de 55 km, así que casi nunca marca cero. La lluvia de satélite (IMERG) está en camino.</p>
-      )}
-
-      <h3 style={{ marginTop: '1.4rem' }}>Qué tan verde está tu zona</h3>
-      {lugar.ndvi ? (
-        <>
-          <NdviMeses meses={lugar.ndvi.meses} desde={desde} />
-          <p>Verdor (NDVI) medio por mes desde el año 2000, con {lugar.ndvi.n_validos} imágenes sin nubes de {lugar.ndvi.n_total}.
-            {ultimoNdvi && <> La última, del {ultimoNdvi.fecha.split('-').reverse().join('/')}, dio {ultimoNdvi.valor.toFixed(2)}.</>}</p>
-          <p className="nota">Ese píxel de 250 m incluye techos, calles y árboles. Si tu foto debajo del cacao sale con suelo desnudo, el satélite está viendo la copa, no el suelo.</p>
-          <p><button className="fuente">{f('ndvi')?.producto}</button></p>
-        </>
-      ) : <p className="nota">Bajando 26 años de imágenes MODIS de tu punto. Tarda unos minutos la primera vez.</p>}
-
-      <h3 style={{ marginTop: '1.4rem' }}>Lo que ve cada satélite</h3>
-      <Suspense fallback={<div className="mapa" />}><Mapa lat={lugar.punto.lat} lon={lugar.punto.lon} /></Suspense>
-      <p className="nota">Punto redondeado a ~1 km ({exp.lat.toFixed(2)}, {exp.lon.toFixed(2)}): tu casa exacta no se manda a ningún lado.</p>
-    </section>
-  )
-}
-
-function TuParcela({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }) {
-  const alternar = (k: 'cultivos' | 'prioridades', v: string) =>
-    cambiar({ [k]: exp[k].includes(v) ? exp[k].filter((x) => x !== v) : [...exp[k], v] })
-  const ubicar = () => navigator.geolocation?.getCurrentPosition(
-    (p) => cambiar({ lat: Math.round(p.coords.latitude * 100) / 100, lon: Math.round(p.coords.longitude * 100) / 100 }),
-    () => alert('No se pudo leer la ubicación. Revisa el permiso del navegador.'),
-  )
-  return (
-    <section className="seccion" aria-labelledby="t-parcela" id="parcela">
-      <header><h2 id="t-parcela">Tu parcela</h2><span className={`estado ${exp.prioridades.length ? 'listo' : 'falta'}`}>{exp.prioridades.length ? 'lista' : 'falta lo que te importa'}</span></header>
-      <label className="nota" htmlFor="nombre">Nombre</label>
-      <input id="nombre" value={exp.nombre} onChange={(e) => cambiar({ nombre: e.target.value })} style={{ width: '100%', padding: '0.5em', marginBottom: '1rem' }} />
-      <h3>Qué tienes sembrado</h3>
-      <div className="chips">{CULTIVOS.map(([k, n]) => <button key={k} className="chip" aria-pressed={exp.cultivos.includes(k)} onClick={() => alternar('cultivos', k)}>{n}</button>)}</div>
-      <h3 style={{ marginTop: '1.2rem' }} id="prioridades">Qué te importa más</h3>
-      <div className="chips">{PRIORIDADES.map(([k, n]) => <button key={k} className="chip" aria-pressed={exp.prioridades.includes(k)} onClick={() => alternar('prioridades', k)}>{n}</button>)}</div>
-      <h3 style={{ marginTop: '1.2rem' }}>Dónde está</h3>
-      <p className="nota">Se guarda redondeado a ~1 km.</p>
-      <button className="boton claro" onClick={ubicar}>Usar mi ubicación</button>
-    </section>
-  )
-}
-
-function Compartir({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }) {
-  const [enlace, setEnlace] = useState('')
-  const sinFotos = useMemo(() => ({ ...exp, fotos: exp.fotos.map(({ miniatura: _m, ...f }) => ({ ...f, miniatura: '' })) }), [exp])
-  const compartir = async () => {
-    const r = exp.id
-      ? (await pedir(`/api/expediente/${exp.id}`, { method: 'PUT', body: JSON.stringify({ datos: sinFotos }) }), { id: exp.id })
-      : await pedir<{ id: string }>('/api/expediente', { method: 'POST', body: JSON.stringify({ datos: sinFotos }) })
-    cambiar({ id: r.id })
-    const url = `${location.origin}/?e=${r.id}`
-    setEnlace(url)
-    navigator.share?.({ title: exp.nombre, url }).catch(() => { /* cancelado */ })
+/* ---------- tema claro y oscuro; el cambio se abre en círculo desde el botón ---------- */
+const FONDO = { light: '#eef0e7', dark: '#151812' }
+function BotonTema() {
+  const [tema, setTema] = useState<'light' | 'dark' | null>(() => { const t = local.leer<string>('surco-tema'); return t === 'light' || t === 'dark' ? t : null })
+  const efectivo = tema ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  const cambiar = (ev: MouseEvent) => {
+    const nuevo = efectivo === 'dark' ? 'light' : 'dark'
+    const aplicar = () => {
+      document.documentElement.dataset.theme = nuevo
+      document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', FONDO[nuevo]))
+      local.poner('surco-tema', nuevo); setTema(nuevo)
+    }
+    const d = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } }
+    if (!d.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return aplicar()
+    const x = ev.clientX, y = ev.clientY, r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+    d.startViewTransition(() => flushSync(aplicar)).ready.then(() => document.documentElement.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+      { duration: 520, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', pseudoElement: '::view-transition-new(root)' },
+    )).catch(() => { /* la transición se saltó */ })
   }
   return (
-    <section className="seccion" aria-labelledby="t-comp2">
-      <header><h2 id="t-comp2">Revisarlo con un técnico</h2></header>
-      <p>Comparte este expediente. El técnico ve lo mismo que tú y puede dejar notas. Las fotos se quedan en tu celular; solo se manda su medición.</p>
-      <button className="boton" onClick={compartir}>Compartir expediente</button>
-      {enlace && <p><a href={enlace}>{enlace}</a></p>}
-    </section>
+    <button className="icono-btn" onClick={cambiar} aria-label={efectivo === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
+      <Icono n={efectivo === 'dark' ? 'sol' : 'luna'} />
+    </button>
+  )
+}
+
+/* ---------- instalar: el aviso del navegador si existe; si no, cómo hacerlo en cada uno ---------- */
+type AvisoInstalar = Event & { prompt(): Promise<void>; userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }> }
+function Instalar() {
+  const [aviso, setAviso] = useState<AvisoInstalar | null>(null)
+  const [ayuda, setAyuda] = useState(false)
+  const [instalada, setInstalada] = useState(() => matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone === true)
+  const cerrar = useCallback(() => setAyuda(false), [])
+  useEffect(() => {
+    const f = (e: Event) => { e.preventDefault(); setAviso(e as AvisoInstalar) }
+    const g = () => setInstalada(true)
+    addEventListener('beforeinstallprompt', f); addEventListener('appinstalled', g)
+    return () => { removeEventListener('beforeinstallprompt', f); removeEventListener('appinstalled', g) }
+  }, [])
+  if (instalada) return null
+  const ua = navigator.userAgent
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+  const tocar = async () => {
+    if (!aviso) return setAyuda(true)
+    await aviso.prompt()
+    if ((await aviso.userChoice).outcome === 'accepted') setInstalada(true)
+    setAviso(null)
+  }
+  return (
+    <>
+      <button className="boton pildora" onClick={tocar}><Icono n="bajar" t={18} />Instalar</button>
+      <Hoja abierta={ayuda} cerrar={cerrar} titulo={`Instala ${NOMBRE} en tu celular`}>
+        <p>Queda como una app: abre sin la barra del navegador y funciona sin señal.</p>
+        <ol className="receta larga">
+          {ios
+            ? <li><b>iPhone o iPad:</b> toca el botón Compartir (el cuadro con la flecha hacia arriba) y luego «Agregar a inicio».</li>
+            : <li><b>Android (Chrome, Brave, Edge):</b> toca el menú ⋮ y luego «Instalar app» o «Agregar a la pantalla principal».</li>}
+          <li><b>Samsung Internet:</b> menú ☰, «Agregar página a» y «Pantalla de inicio».</li>
+          <li><b>Firefox en Android:</b> menú ⋮ y «Instalar».</li>
+          <li><b>Computadora:</b> en Chrome, Edge o Brave, el ícono de instalar a la derecha de la dirección.</li>
+        </ol>
+      </Hoja>
+    </>
   )
 }

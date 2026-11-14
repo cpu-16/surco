@@ -78,8 +78,22 @@ def reciente(dias: list[dict], umbral_mm=1.0) -> dict:
             hist[y] = hist.get(y, 0) + f["PRECTOTCORR"]
     normal30 = mean(hist.values()) if hist else None
     ult30 = sum(f["PRECTOTCORR"] for f in ult[-30:])
+    # la última racha de 2+ días secos en las últimas dos semanas (lo que el productor recuerda: «hace días que no llueve»)
+    ultima = None
+    dias14 = ult[-14:]
+    i = len(dias14) - 1
+    while i >= 0:
+        if dias14[i]["PRECTOTCORR"] < umbral_mm:
+            j = i
+            while j >= 0 and dias14[j]["PRECTOTCORR"] < umbral_mm:
+                j -= 1
+            if i - j >= 2:
+                ultima = {"desde": dias14[j + 1]["fecha"], "hasta": dias14[i]["fecha"], "dias": i - j}
+                break
+            i = j
+        i -= 1
     return {"hasta": ult[-1]["fecha"], "dias": [{"fecha": f["fecha"], "lluvia": round(f["PRECTOTCORR"], 1)} for f in ult],
-            "racha_seca_dias": racha, "umbral_mm": umbral_mm, "lluvia_30d": round(ult30),
+            "racha_seca_dias": racha, "ultima_racha": ultima, "umbral_mm": umbral_mm, "lluvia_30d": round(ult30),
             "normal_30d": round(normal30) if normal30 else None}
 
 
@@ -254,7 +268,7 @@ def lectura(res, prior):
                   f"unos {res[0]['agua']['deficit_normal_mm']} mm en un verano normal y {res[0]['agua']['deficit_nino_mm']} mm en uno como los Niños anteriores."]
                  if len(agua) == 1 else [])
     if not prior:
-        return ["Escoge qué te importa más (abajo, en Tu parcela) y te digo cuál sale mejor para ti."] + nota_agua
+        return ["Escoge qué te importa más (paso 5) y te digo cuál sale mejor para ti."] + nota_agua
     crit = {"suelo": lambda r: (r["meses_desnudo"], -(r["n_kg_ha"] or [0, 0])[0], -r["familias"]),
             "agua": lambda r: (r["agua"]["deficit_nino_mm"],),
             "trabajo": lambda r: (len([1 for a, b in zip(r["tira"], r["tira"][1:]) if a.get("cultivo") != b.get("cultivo") and b.get("cultivo")]),),
@@ -268,7 +282,7 @@ def lectura(res, prior):
     mejor = min(puntos.values())
     ganadoras = [r["nombre"] for r in res if puntos[r["id"]] == mejor]
     if len(ganadoras) > 1:
-        return [f"Con lo que escogiste quedan empatadas: {' y '.join(ganadoras)}. Mira abajo en qué se diferencian."] + nota_agua
+        return [f"Con lo que escogiste quedan empatadas: {' y '.join(ganadoras)}. Toca cada una para ver en qué se diferencian."] + nota_agua
     return [f"Con lo que escogiste, la que mejor sale es: {ganadoras[0]}."] + nota_agua
 
 

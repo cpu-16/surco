@@ -145,7 +145,8 @@ def ornl(var: str, lat: float, lon: float, desde: str = "2000-01-01") -> dict:
     for j, _, _ in res:
         for s in j.get("subset", []):
             x = s["data"][0]
-            filas.append({"fecha": s["calendar_date"], "valor": None if x == relleno else round(x * escala, 4)})
+            # MOD16 usa 32761–32767 para casos sin cálculo (urbano, agua, sin vegetación): todos son «sin dato»
+            filas.append({"fecha": s["calendar_date"], "valor": None if x == relleno or (relleno > 30000 and x >= relleno) else round(x * escala, 4)})
     t = max((r[2] for r in res), default=time.time())
     return {"meta": _meta(f"{prod} ({banda}) vía ORNL DAAC", celda, f"{ORNL_URL}/{prod}/subset", t, unidad), "datos": filas}
 
