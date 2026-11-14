@@ -11,7 +11,7 @@ export type Estrategia = {
   comida_meses?: number | null; labores?: { siembras: number; tapar_hojas: number; cortes: number }
   n_por_planta?: { nombre: string; kg_ha: [number, number] }[]
   agua: { demanda_seca_mm: number | null; deficit_normal_mm: number | null; deficit_nino_mm: number | null }
-  razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string }[]
+  razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string | null }[]
   beneficios: string[]; vacios: string[]; riesgos: string[]; ajustes: string[]
 }
 export type Comparacion = { estrategias: Estrategia[]; faltan: { clave: string; texto: string; cambia: string }[]; lectura: string[]; temporada?: { meses_secos: number[] } }
@@ -46,7 +46,7 @@ export default function Anio({ comp, desde, viejo, irA, enLinea }: { comp: Compa
               {e.tira.length > 0 && <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />}
               {e.arboles.length > 0 && <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />}
               <span className="e-pie">
-                <span>{L(<>Desnudo: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> bajo los árboles</>}</>,
+                <span>{e.desnudo_cama === null && !e.arboles.length ? L('Sin cálculo para estos cultivos', 'No calculation for these crops') : L(<>Desnudo: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> bajo los árboles</>}</>,
                   <>Bare: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> under the trees</>}</>)}</span>
                 <span className="ver">{L('Ver por qué', 'See why')}</span>
               </span>
@@ -128,7 +128,7 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
 
       <p className="razon">{e.razon}</p>
       {!!e.plantas?.length && (
-        <p className="nota plantas">{e.plantas.map((p, i) => <span key={p.cientifico}>{i ? ' · ' : ''}{p.nombre} <i>({p.cientifico})</i></span>)}{L('. Con el nombre científico la encuentras aunque en tu país le digan distinto.', '. With the scientific name you can find it even if people where you live call it something else.')}</p>
+        <p className="nota plantas">{e.plantas.map((p, i) => <span key={p.cientifico ?? p.nombre}>{i ? ' · ' : ''}{p.nombre}{p.cientifico && <> <i>({p.cientifico})</i></>}</span>)}{L('. Con el nombre científico la encuentras aunque en tu país le digan distinto.', '. With the scientific name you can find it even if people where you live call it something else.')}</p>
       )}
 
       <div className="numeros">

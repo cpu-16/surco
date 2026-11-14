@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { Comparacion } from './anio'
-import { local, pedir, sinImagenes, type Expediente, type Ficha, type Lugar, type Resultado } from './api'
+import { enPanama, local, pedir, sinImagenes, type Expediente, type Ficha, type Lugar, type Resultado } from './api'
 import { cambiarIdioma, idioma, L } from './i18n'
 import { Cargando, fecha, Icono } from './ui'
 
@@ -135,7 +135,7 @@ export function Registro({ exp, cambiar, comp, lugar, enLinea, nombreCultivo }: 
       <Linea exp={exp} nombreCultivo={nombreCultivo} />
 
       <h2 className="sub">{L('Guárdalo y compártelo', 'Save and share it')}</h2>
-      <p className="nota">{L('Con el enlace, tu técnico, la cooperativa o el MIDA ven tu registro y te pueden dejar notas. Solo tú lo cambias, desde este celular. Las fotos no se suben: solo va su medición.',
+      <p className="nota">{L(`Con el enlace, tu técnico, la cooperativa ${enPanama(exp) ? 'o el MIDA' : 'o la oficina agrícola de tu zona'} ven tu registro y te pueden dejar notas. Solo tú lo cambias, desde este celular. Las fotos no se suben: solo va su medición.`,
         'With the link, your advisor, co-op or agriculture office can see your record and leave you notes. Only you can change it, from this phone. Photos are not uploaded: only their measurement.')}</p>
       <div className="acciones">
         <button className="boton grande" onClick={guardar} disabled={!enLinea || estado === 'guardando'}><Icono n="compartir" />{estado === 'guardando' ? L('Guardando…', 'Saving…') : exp.id ? L('Guardar los cambios', 'Save changes') : L('Guardar y crear mi enlace', 'Save and get my link')}</button>

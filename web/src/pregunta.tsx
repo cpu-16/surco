@@ -13,7 +13,7 @@ type SR = { lang: string; interimResults: boolean; start(): void; stop(): void; 
 const w = window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR }
 const Reconocer = w.SpeechRecognition ?? w.webkitSpeechRecognition
 
-const SUGERENCIAS = L(['¿Qué siembro primero?', '¿Y si llueve menos este verano?', '¿Con qué tapo el suelo?', '¿Por qué mis plantas no crecen?'],
+const SUGERENCIAS = L(['¿Qué siembro primero?', '¿Y si este año llueve menos?', '¿Con qué tapo el suelo?', '¿Por qué mis plantas no crecen?'],
   ['What do I plant first?', 'What if it rains less this dry season?', 'What can I cover the soil with?', 'Why aren’t my plants growing?'])
 /** País del celular (es-PA → PA) para que la conversación use las palabras de allá. */
 const region = () => { try { return new Intl.Locale(navigator.language).region ?? 'PA' } catch { return 'PA' } }

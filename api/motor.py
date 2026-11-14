@@ -415,6 +415,9 @@ def _generar(exp, normales, i0, lang):
                 vac.append(f'{nombre_cultivo(c, lang)}: ' + '; '.join(faltas) + '.')
         nombre, razon, beneficios = _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang)
         if id == 'viva' and cortos and not any(p.get('abono_verde') for p in pasos):
+            # el nombre no promete una planta que no entra en el calendario
+            nombre = (t('Maní forrajero bajo los árboles; en el huerto no cabe cobertura viva este año', 'Forage peanut beneath the trees; living cover does not fit in the garden this year') if arboles
+                      else t('Cobertura viva: no cabe este año en el huerto', 'Living cover: it does not fit in the garden this year'))
             razon += t(' No cabe cobertura viva en los meses libres antes de la próxima siembra.',
                        ' Living cover does not fit in the free months before the next planting.')
         riesgos = [t('Revisa las plagas compartidas, el drenaje y la adaptación local antes de cambiar de cultivo.',

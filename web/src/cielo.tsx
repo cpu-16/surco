@@ -127,7 +127,7 @@ function Verdor({ lugar, desde }: { lugar: Lugar; desde: number }) {
       {lugar.ndvi.progreso
         ? <p className="nota" role="status">{L(<>Ya llegaron {lugar.ndvi.n_total} imágenes, las más nuevas primero ({Math.round(100 * lugar.ndvi.progreso[0] / lugar.ndvi.progreso[1])} % de 26 años). El promedio se completa solo.</>,
           <>{lugar.ndvi.n_total} images are in, newest first ({Math.round(100 * lugar.ndvi.progreso[0] / lugar.ndvi.progreso[1])} % of 26 years). The average fills in by itself.</>)}</p>
-        : <p className="nota">{L(<>Así cambia el verdor de tu zona en el año: baja en el verano y sube con las lluvias. Es el promedio de {lugar.ndvi.n_validos} fotos del satélite sin nubes, desde el año 2000. El satélite ve un cuadro de 250 m con techos, calles y árboles; el suelo debajo de tus plantas lo ve tu foto.</>,
+        : <p className="nota">{L(<>Así cambia el verdor de tu zona en el año: baja en la época seca y sube con las lluvias. Es el promedio de {lugar.ndvi.n_validos} fotos del satélite sin nubes, desde el año 2000. El satélite ve un cuadro de 250 m con techos, calles y árboles; el suelo debajo de tus plantas lo ve tu foto.</>,
           <>This is how your area’s greenness changes through the year: it drops in the dry season and comes back with the rainy season. It is the average of {lugar.ndvi.n_validos} cloud-free satellite photos since 2000. The satellite sees a 250 m square with roofs, streets and trees; the soil under your plants is seen by your photo.</>)}</p>}
       {f && <Fuente titulo={L(`${f.producto}, consultado ${f.consultado}`, `${f.producto}, checked ${f.consultado}`)}>{FUENTE.ndvi}</Fuente>}
     </>

@@ -147,7 +147,11 @@ def main():
     santiago = motor.comparar(SANTIAGO,n,ni,HOY)['estrategias']
     assert santiago[0]['nombre'] == 'Lo que haces hoy: yuca tras yuca'
     assert santiago[2]['nombre'] == 'Rotar: frijol de bejuco, luego camote'
-    assert santiago[3]['nombre'] == 'Guandú en el huerto y maní forrajero bajo los árboles'
+    # sin fecha de siembra el guandú no cabe antes de la próxima yuca: el nombre no lo promete
+    assert santiago[3]['nombre'] == 'Maní forrajero bajo los árboles; en el huerto no cabe cobertura viva este año'
+    assert not any(m.get('cultivo') == 'guandu' for m in santiago[3]['tira'])
+    con_fecha = motor.comparar({**SANTIAGO, 'siembras': {'yuca': '2026-06'}}, n, ni, HOY)['estrategias'][3]
+    assert con_fecha['nombre'].startswith('Guandú') and any(m.get('cultivo') == 'guandu' for m in con_fecha['tira'])
     for e in santiago:
         assert all(c not in e['nombre'].lower() + e['razon'].lower() for c in ('piña','plátano','cacao','naranja','toronja'))
     assert motor.nombre_cultivo('frijol_comun') == 'Frijol común'

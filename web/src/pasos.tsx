@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { animate, AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { local, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
+import { enPanama, local, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
 import { medir } from './canopeo'
 import { GuiaLata } from './guia'
 import { idioma, L } from './i18n'
@@ -66,7 +66,7 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
     if (!navigator.geolocation) return setAviso(L('Este navegador no da la ubicación.', "This browser can't share your location."))
     setBuscando(true); setAviso('')
     navigator.geolocation.getCurrentPosition(
-      (p) => { setBuscando(false); cambiar({ lat: Math.round(p.coords.latitude * 100) / 100, lon: Math.round(p.coords.longitude * 100) / 100 }) },
+      (p) => { setBuscando(false); cambiar({ lat: Math.round(p.coords.latitude * 100) / 100, lon: Math.round(p.coords.longitude * 100) / 100, resultado: undefined }) },
       () => { setBuscando(false); setAviso(L('No se pudo leer la ubicación. Revisa el permiso del navegador.', "Couldn't read your location. Check the browser's permission.")) },
       { enableHighAccuracy: false, timeout: 15000 },
     )
@@ -90,7 +90,7 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
         {LUGARES.map((x) => (
           <button key={x.id} className="chip" aria-pressed={exp.lat === x.lat && exp.lon === x.lon} onClick={() => {
             if (exp.fotos.length && !confirm(L('Esto cambia tu patio por el ejemplo y quita tus fotos. ¿Sigues?', 'This replaces your yard with the example and removes your photos. Continue?'))) return
-            cambiar({ lat: x.lat, lon: x.lon, nombre: x.nombre, cultivos: x.cultivos, siembras: {}, fotos: [] })
+            cambiar({ lat: x.lat, lon: x.lon, nombre: x.nombre, cultivos: x.cultivos, siembras: {}, fotos: [], resultado: undefined })
           }}>{x.nombre}</button>
         ))}
       </div>
@@ -161,13 +161,14 @@ function Siembra({ nombre, valor, poner }: { nombre: string; valor: string; pone
 
 export const FOTOS: { tipo: TipoFoto; corto: string; titulo: string; como: string }[] = [
   { tipo: 'cama', corto: L('El huerto', 'The garden plot'), titulo: L('El suelo del huerto', 'The soil of the garden plot'), como: L('De pie, con el celular a la altura del pecho, mirando hacia abajo.', 'Standing up, with the phone at chest height, pointing down.') },
-  { tipo: 'perennes', corto: L('Bajo los árboles', 'Under the trees'), titulo: L('El suelo debajo de los árboles', 'The soil under the trees'), como: L('Igual, pero debajo de la copa. El satélite no puede ver esto.', "The same way, but under the tree crown. The satellite can't see this.") },
+  { tipo: 'perennes', corto: L('Bajo las matas', 'Under the trees'), titulo: L('El suelo debajo de los árboles o entre las matas que duran años', 'The soil under the trees or between long-lived plants'), como: L('Igual, pero debajo de la copa. El satélite no puede ver esto.', "The same way, but under the tree crown. The satellite can't see this.") },
   { tipo: 'pina', corto: L('Una planta', 'A plant'), titulo: L('Una planta que te preocupa', 'A plant you are worried about'), como: L('La planta entera con su base. No entra en el cálculo: el asistente la describe y queda en tu registro.', 'The whole plant with its base. It is not part of the calculation: the assistant describes it and it stays in your record.') },
   { tipo: 'general', corto: L('El patio', 'The plot'), titulo: L('El patio entero', 'The whole plot'), como: L('Desde una esquina, para ver si hay pendiente. No entra en el cálculo; queda en tu registro.', 'From a corner, to see if there is a slope. It is not part of the calculation; it stays in your record.') },
 ]
 
 /** Solo las fotos que aplican: la de debajo de los árboles si hay árboles o cultivos que duran años. */
-export const fotosDe = (exp: Expediente) => FOTOS.filter((f) => f.tipo !== 'perennes' || exp.cultivos.some((c) => !esCorto(c)))
+export const fotosDe = (exp: Expediente) => FOTOS.filter((f) =>
+  f.tipo === 'perennes' ? exp.cultivos.some((c) => !esCorto(c)) : f.tipo === 'cama' ? !exp.cultivos.length || exp.cultivos.some(esCorto) : true)
 
 /** Lo que dice cada botón; la clave es lo que se guarda. */
 const HOJARASCA = { mucha: L('Mucha', 'A lot'), poca: L('Poca', 'A little'), nada: L('Nada', 'None') }
@@ -180,9 +181,10 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
   const [nueva, setNueva] = useState<string | null>(null) // la foto recién medida hace el barrido una vez
   const [dir, setDir] = useState(1)
   const lista = fotosDe(exp)
-  const f = lista[Math.min(sub, lista.length - 1)]
+  const i = Math.min(sub, lista.length - 1) // al cambiar de patio la lista puede achicarse
+  const f = lista[i]
   const foto = exp.fotos.find((x) => x.tipo === f.tipo)
-  const irSub = (n: number) => { setDir(n > sub ? 1 : -1); setSub(n) }
+  const irSub = (n: number) => { setDir(n > i ? 1 : -1); setSub(n) }
 
   const tomar = async (archivo?: File) => {
     if (!archivo) return
@@ -206,11 +208,11 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
   return (
     <>
       <div className="subpasos" role="tablist" aria-label={L('Fotos', 'Photos')}>
-        {lista.map((x, i) => {
+        {lista.map((x, j) => {
           const hecha = exp.fotos.some((y) => y.tipo === x.tipo)
           return (
-            <button key={x.tipo} role="tab" aria-selected={i === sub} data-hecha={hecha} onClick={() => irSub(i)}>
-              <span className="punto">{hecha ? <Icono n="brote" t={14} /> : i + 1}</span>{x.corto}
+            <button key={x.tipo} role="tab" aria-selected={j === i} data-hecha={hecha} onClick={() => irSub(j)}>
+              <span className="punto">{hecha ? <Icono n="brote" t={14} /> : j + 1}</span>{x.corto}
             </button>
           )
         })}
@@ -259,7 +261,7 @@ export function Fotos({ exp, cambiar, sub, setSub }: Props & { sub: number; setS
               <Icono n="galeria" />{TACTIL ? L('De la galería', 'From the gallery') : midiendo ? L('Midiendo…', 'Measuring…') : L('Elegir una foto', 'Choose a photo')}
               <input type="file" accept="image/*" hidden disabled={midiendo} onChange={(e) => { tomar(e.target.files?.[0]); e.target.value = '' }} />
             </label>
-            {sub < lista.length - 1 && <button className="boton fantasma" onClick={() => irSub(sub + 1)}>{foto ? L('Siguiente foto', 'Next photo') : L('Saltar', 'Skip')}</button>}
+            {i < lista.length - 1 && <button className="boton fantasma" onClick={() => irSub(i + 1)}>{foto ? L('Siguiente foto', 'Next photo') : L('Saltar', 'Skip')}</button>}
           </div>
           {foto && <button className="enlace" onClick={() => cambiar({ fotos: exp.fotos.filter((x) => x.tipo !== f.tipo) })}>{L('Quitar esta foto', 'Remove this photo')}</button>}
         </motion.div>
@@ -457,7 +459,7 @@ export function Importa({ exp, cambiar }: Props) {
           </button>
         ))}
       </div>
-      <h2 className="sub">{L('¿Riegas en verano?', 'Do you water in the dry season?')}</h2>
+      <h2 className="sub">{L(`¿Riegas en ${enPanama(exp) ? 'verano' : 'la época seca'}?`, 'Do you water in the dry season?')}</h2>
       <div className="chips">
         {(['no', 'a veces', 'si'] as const).map((r) => (
           <button key={r} className="chip" aria-pressed={exp.riego === r} onClick={() => cambiar({ riego: exp.riego === r ? '' : r })}>{RIEGO[r]}</button>

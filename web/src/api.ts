@@ -68,6 +68,9 @@ export async function pedir<T>(ruta: string, init?: RequestInit): Promise<T> {
 export const sinImagenes = (e: Expediente) => ({ ...e, fotos: e.fotos.map(({ miniatura: _m, mascara: _k, ...f }) => ({ ...f, miniatura: '' })) })
 
 /** Guardado local que nunca rompe la app (modo privado, almacenamiento lleno). */
+/** Caja de Panamá: decide si se nombra al MIDA y se dice «verano». // ponytail: una caja, no la frontera */
+export const enPanama = (e: { lat: number; lon: number }) => e.lat >= 7 && e.lat <= 9.7 && e.lon >= -83.1 && e.lon <= -77.1
+
 export const local = {
   leer<T>(k: string): T | null { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) as T : null } catch { return null } },
   poner(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* lleno o bloqueado */ } },
