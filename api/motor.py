@@ -135,7 +135,7 @@ CLASES_INFIL = [(3, "muy rápida"), (10, "rápida"), (30, "moderadamente rápida
 def clase_infiltracion(minutos: float) -> str:
     return next((n for lim, n in CLASES_INFIL if minutos < lim), "impermeable")
 NIVEL = {"desnudo": 0, "baja": 1, "media": 2, "alta": 3}
-NOMBRES = {"yuca": "Yuca", "caupi": "Caupí", "camote": "Camote", "canavalia": "Canavalia", "maiz": "Maíz", "guandu": "Guandú",
+NOMBRES = {"yuca": "Yuca", "caupi": "Frijol de bejuco", "camote": "Camote", "canavalia": "Canavalia", "maiz": "Maíz", "guandu": "Guandú",
            "mani_forrajero": "Maní forrajero", "frijol_comun": "Frijol", "zapallo": "Zapallo", "mucuna": "Mucuna"}
 KC_LEGUMINOSA = {"ini": 0.4, "mid": 1.05, "end": 0.35}  # caupí FAO-56, para leguminosas sin Kc publicado
 
@@ -187,7 +187,7 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
         tira, arboles = [], []
         for idx in horizonte:
             mes = idx % 12 + 1
-            m = cama.get(idx) or ({"cultivo": None, "nombre": "acolchado", "cobertura": "baja", "kc": 0}
+            m = cama.get(idx) or ({"cultivo": None, "nombre": "hojas secas", "cobertura": "baja", "kc": 0}
                                   if e["huecos"] == "acolchado" else {"cultivo": None, "nombre": None, "cobertura": "desnudo", "kc": 0})
             m = {**m, "mes": mes}
             if idx == i0 and "cama" in fotos:  # el dato de campo manda sobre el supuesto en el mes de la foto
@@ -197,9 +197,9 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             a = {"mes": mes, "cultivo": None}
             if e["arboles"] == "mani_forrajero":
                 siembra = _mm("2027-05")  # con las lluvias; tarda ~3 meses en cerrar
-                a.update(nombre="acolchado" if idx < siembra else "maní forrajero", cobertura="alta" if idx >= siembra + 3 else "baja")
+                a.update(nombre="hojas secas" if idx < siembra else "maní forrajero", cobertura="alta" if idx >= siembra + 3 else "baja")
             elif e["arboles"] == "acolchado":
-                a.update(nombre="acolchado", cobertura="baja")
+                a.update(nombre="hojas secas", cobertura="baja")
             else:
                 a.update(nombre=None, cobertura="desnudo")
             arboles.append(a)
@@ -235,16 +235,17 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
         desn_cama = sum(m["cobertura"] == "desnudo" for m in tira)
         desn_arb = sum(a["cobertura"] == "desnudo" for a in arboles)
         riesgos = list(e["riesgos"])
-        if infil is not None:
-            clase = clase_infiltracion(infil)
-            if infil >= 100:
-                riesgos.append(f"Tu prueba de la lata dio infiltración {clase} ({infil:g} minutos por pulgada): el agua se queda arriba. "
-                               "Piña y camote sufren con encharcamiento; considera sembrar en camellón.")
-                if e["id"] == "guandu_mani":
-                    ajustes.append(f"El agua entró {clase} en tu suelo ({infil:g} minutos). La raíz profunda del guandú es la que más puede ayudar a abrirlo.")
-            elif infil < 10 and e["huecos"] == "acolchado":
-                ajustes.append(f"El agua entró {clase} ({infil:g} minutos): drena bien pero guarda poca humedad. "
-                               "Tapar el suelo pesa más en el verano: el acolchado reduce la evaporación ~5 % por cada 10 % de suelo cubierto (FAO-56).")
+        # la lata manda; si no hay lata, la pregunta de los charcos dice al menos si el agua se queda arriba
+        lento = infil >= 100 if infil is not None else exp.get("charcos") == "si"
+        if lento:
+            dato = (f"El agua tardó {infil:g} minutos en entrar en tu lata (infiltración {clase_infiltracion(infil)})" if infil is not None
+                    else "Dices que después de un aguacero quedan charcos")
+            riesgos.append(f"{dato}: el agua se queda arriba. Piña y camote sufren con el suelo empapado; considera sembrarlos en camellón.")
+            if e["id"] == "guandu_mani":
+                ajustes.append(f"{dato}. La raíz honda del guandú es la que más puede ayudar a abrir ese suelo.")
+        elif infil is not None and infil < 10 and e["huecos"] == "acolchado":
+            ajustes.append(f"El agua entró {clase_infiltracion(infil)} en tu lata ({infil:g} minutos): drena bien pero guarda poca humedad. "
+                           "Tapar el suelo pesa más en el verano: por cada 10 % de suelo tapado con hojas se seca ~5 % menos (FAO-56).")
         evid = e["evidencia"] + (["USDA"] if infil is not None else []) + (["F56M"] if e["huecos"] == "acolchado" else [])
         res.append({
             "id": e["id"], "nombre": e["nombre"], "aplica_a": "cama y árboles",
@@ -254,6 +255,9 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             "familias": len(familias),
             "agua": {"demanda_seca_mm": round(sum(m["kc"] * normales[m["mes"] - 1]["et0"] for m in seca)),
                      "deficit_normal_mm": deficit(None), "deficit_nino_mm": deficit(pct_nino)},
+            # nombre científico al lado: en otro país la misma planta se llama distinto
+            "plantas": [{"nombre": NOMBRES.get(c, AGRO["cultivos"][c]["nombre"]), "cientifico": AGRO["cultivos"][c]["cientifico"]}
+                        for c in dict.fromkeys([x["cultivo"] for x in e["cama"]] + (["mani_forrajero"] if e["arboles"] == "mani_forrajero" else []))],
             "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"] + ([] if exp.get("siembras", {}).get("yuca") else ["Se supuso que la yuca se sembró en mayo de 2026."]),
             "riesgos": riesgos, "ajustes": [a for a in ajustes if a],
             "evidencia": [{"id": k, "titulo": AGRO["fuentes"][k]["titulo"], "url": AGRO["fuentes"][k]["url"]} for k in dict.fromkeys(evid) if k in AGRO["fuentes"]],
@@ -294,8 +298,8 @@ def faltan(exp):
                     "cambia": "El satélite ve la copa verde de los árboles, no el suelo de abajo. Tu foto dice si ahí hay suelo desnudo."})
     if "cama" not in f:
         out.append({"clave": "foto_cama", "texto": "Foto del suelo de la cama de yuca", "cambia": "Mide cuánto suelo está tapado este mes."})
-    if exp.get("infiltracion_min") is None:
-        out.append({"clave": "infiltracion", "texto": "La prueba de la lata con agua", "cambia": "Dice si el agua entra o se queda arriba (método del USDA); eso decide entre raíz profunda y acolchado."})
+    if exp.get("infiltracion_min") is None and not exp.get("charcos"):
+        out.append({"clave": "infiltracion", "texto": "Si quedan charcos después de un aguacero", "cambia": "Dice si el agua entra o se queda arriba; eso decide entre raíz honda y tapar con hojas."})
     if not exp.get("siembras", {}).get("yuca"):
         out.append({"clave": "parcela", "texto": "Cuándo sembraste la yuca", "cambia": "Mueve el mes en que la cama queda libre para lo siguiente."})
     if not exp.get("prioridades"):

@@ -4,6 +4,7 @@ import datetime as dt
 import json
 import math
 import sqlite3
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -121,32 +122,41 @@ ORNL = {  # producto: (banda, escala, relleno, unidad, celda)
 }
 
 
+PARCIAL: dict = {}  # (var, lat, lon) → lo que ya bajó mientras la serie completa sigue en camino
+_cerrojo = threading.Lock()
+
+
 def ornl(var: str, lat: float, lon: float, desde: str = "2000-01-01") -> dict:
     prod, banda, escala, relleno, unidad, celda = ORNL[var]
-    fechas, _, _ = _get(f"{ORNL_URL}/{prod}/dates", {"latitude": lat, "longitude": lon}, 24)
+    # ponytail: las fechas de los compuestos MODIS son las mismas en todo el planeta; pedirlas siempre en el mismo punto
+    # las saca de caché (ORNL tarda ~45 s solo en esta lista). Si un píxel no tiene una fecha, el subset la omite.
+    fechas, _, _ = _get(f"{ORNL_URL}/{prod}/dates", {"latitude": 8.1, "longitude": -80.98}, 24)
     fechas = [d for d in fechas["dates"] if d["calendar_date"] >= desde]
     tramos = [fechas[i:i + 10] for i in range(0, len(fechas), 10)]  # la API acepta hasta 10 fechas por llamada
+    reciente = tramos[-1] if tramos else None
+    tramos.reverse()  # lo más nuevo primero: en un minuto ya hay un año para mostrar
+    prog = PARCIAL[(var, lat, lon)] = {"filas": [], "hechos": 0, "total": len(tramos)}
 
-    def pedir(tr):
-        ttl = 24 if tr is tramos[-1] else NUNCA
-        return _get(f"{ORNL_URL}/{prod}/subset", {"latitude": lat, "longitude": lon, "band": banda,
-                    "startDate": tr[0]["modis_date"], "endDate": tr[-1]["modis_date"],
-                    "kmAboveBelow": 0, "kmLeftRight": 0}, ttl, timeout=180)
+    def filas_de(j):
+        # MOD16 usa 32761–32767 para casos sin cálculo (urbano, agua, sin vegetación): todos son «sin dato»
+        return [{"fecha": s["calendar_date"], "valor": None if (x := s["data"][0]) == relleno or (relleno > 30000 and x >= relleno) else round(x * escala, 4)}
+                for s in j.get("subset", [])]
 
     def seguro(tr):  # un tramo caído (ORNL da 503 seguido) no tumba la serie: queda el hueco y se reintenta otro día
         try:
-            return pedir(tr)
+            r = _get(f"{ORNL_URL}/{prod}/subset", {"latitude": lat, "longitude": lon, "band": banda,
+                     "startDate": tr[0]["modis_date"], "endDate": tr[-1]["modis_date"],
+                     "kmAboveBelow": 0, "kmLeftRight": 0}, 24 if tr is reciente else NUNCA, timeout=180)
         except httpx.HTTPError:
-            return {"subset": []}, "", 0
+            r = {"subset": []}, "", 0
+        with _cerrojo:
+            prog["filas"] = sorted(prog["filas"] + filas_de(r[0]), key=lambda f: f["fecha"])
+            prog["hechos"] += 1
+        return r
 
-    with ThreadPoolExecutor(3) as ex:  # ponytail: 3 hilos para no saturar ORNL; ~50 s por tramo
+    with ThreadPoolExecutor(3) as ex:  # ponytail: 3 hilos para no saturar ORNL; ~45 s por tramo de 10 fechas
         res = list(ex.map(seguro, tramos))
-    filas = []
-    for j, _, _ in res:
-        for s in j.get("subset", []):
-            x = s["data"][0]
-            # MOD16 usa 32761–32767 para casos sin cálculo (urbano, agua, sin vegetación): todos son «sin dato»
-            filas.append({"fecha": s["calendar_date"], "valor": None if x == relleno or (relleno > 30000 and x >= relleno) else round(x * escala, 4)})
+    filas = prog["filas"]
     t = max((r[2] for r in res), default=time.time())
     return {"meta": _meta(f"{prod} ({banda}) vía ORNL DAAC", celda, f"{ORNL_URL}/{prod}/subset", t, unidad), "datos": filas}
 

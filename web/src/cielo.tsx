@@ -88,14 +88,16 @@ function Nino({ lugar, desde }: { lugar: Lugar; desde: number }) {
 }
 
 function Verdor({ lugar, desde }: { lugar: Lugar; desde: number }) {
-  if (!lugar.ndvi) return <Cargando texto="Bajando 26 años de imágenes MODIS de tu punto. La primera vez tarda unos minutos." />
+  if (!lugar.ndvi) return <Cargando texto="Pidiendo las imágenes MODIS de tu punto. Lo más reciente llega en un par de minutos; los 26 años completos tardan unos 15, y se guardan para la próxima." />
   const u = lugar.ndvi.ultimo
   const f = lugar.fuentes.ndvi
   return (
     <>
       {u && <p className="titular"><span className="cifra">{u.valor.toFixed(2)}</span><span>de verdor (NDVI) el {fecha(u.fecha)}. De 0 a 1: más alto, más verde.</span></p>}
       <NdviMeses meses={lugar.ndvi.meses} desde={desde} />
-      <p className="nota">Promedio de cada mes desde el año 2000, con {lugar.ndvi.n_validos} imágenes sin nubes. Ese píxel de 250 m mezcla techos, calles y árboles: el suelo bajo tu cacao lo ve tu foto, no el satélite.</p>
+      {lugar.ndvi.progreso
+        ? <p className="nota" role="status">Ya llegaron {lugar.ndvi.n_total} imágenes, las más nuevas primero ({Math.round(100 * lugar.ndvi.progreso[0] / lugar.ndvi.progreso[1])} % de 26 años). El promedio se completa solo.</p>
+        : <p className="nota">Promedio de cada mes desde el año 2000, con {lugar.ndvi.n_validos} imágenes sin nubes. Ese píxel de 250 m mezcla techos, calles y árboles: el suelo bajo tu cacao lo ve tu foto, no el satélite.</p>}
       {f && <Fuente titulo={`Consultado ${f.consultado}`}>{f.producto}</Fuente>}
     </>
   )

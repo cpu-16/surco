@@ -8,7 +8,7 @@ export type Estrategia = {
   id: string; nombre: string; aplica_a: string; tira: Muestra[]; arboles: Muestra[]; meses_desnudo: number; desnudo_cama: number; desnudo_arboles: number
   n_kg_ha: [number, number] | null
   agua: { demanda_seca_mm: number; deficit_normal_mm: number; deficit_nino_mm: number }
-  razon: string; evidencia: { id: string; titulo: string; url: string }[]
+  razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string }[]
   beneficios: string[]; vacios: string[]; riesgos: string[]; ajustes: string[]
 }
 export type Comparacion = { estrategias: Estrategia[]; faltan: { clave: string; texto: string; cambia: string }[]; lectura: string[] }
@@ -118,6 +118,9 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
       </p>
 
       <p className="razon">{e.razon}</p>
+      {!!e.plantas?.length && (
+        <p className="nota plantas">{e.plantas.map((p, i) => <span key={p.cientifico}>{i ? ' · ' : ''}{p.nombre} <i>({p.cientifico})</i></span>)}. Con el nombre científico la encuentras aunque en tu país le digan distinto.</p>
+      )}
 
       <div className="numeros">
         <div><span className="cifra">{e.desnudo_cama + e.desnudo_arboles}</span><span>{e.desnudo_cama + e.desnudo_arboles === 1 ? 'mes' : 'meses'} de suelo desnudo, sumando cama y árboles</span></div>

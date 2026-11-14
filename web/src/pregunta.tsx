@@ -13,7 +13,10 @@ const w = window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechR
 const Reconocer = w.SpeechRecognition ?? w.webkitSpeechRecognition
 
 const SUGERENCIAS = ['¿Qué siembro primero?', '¿Y si llueve menos este verano?', '¿Por qué no frijol?', '¿Por qué mis piñas no crecen?']
-const NOMBRES: Record<string, string> = { cultivos: 'Cultivos', siembras: 'Siembras', riego: 'Riego', prioridades: 'Lo que te importa', infiltracion_min: 'Minutos de la lata' }
+/** País del celular (es-PA → PA) para que la conversación use las palabras de allá. */
+const region = () => { try { return new Intl.Locale(navigator.language).region ?? 'PA' } catch { return 'PA' } }
+
+const NOMBRES: Record<string, string> = { cultivos: 'Cultivos', siembras: 'Siembras', riego: 'Riego', prioridades: 'Lo que te importa', infiltracion_min: 'Minutos de la lata', charcos: 'Charcos después de un aguacero' }
 
 export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
   exp: Expediente; lugar: Lugar | null; comp: Comparacion | null; cambiar: (p: Partial<Expediente>) => void; enLinea: boolean
@@ -32,7 +35,7 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
     const historia = [...msgs, { de: 'tu' as const, texto: t }]
     setMsgs(historia); setTexto(''); setOcupado(true)
     try {
-      const r = await pedir<Respuesta>('/api/ia/pregunta', { method: 'POST', body: JSON.stringify({ historia, expediente: sinImagenes(exp), comparacion: comp, lugar: resumenLugar(lugar) }) })
+      const r = await pedir<Respuesta>('/api/ia/pregunta', { method: 'POST', body: JSON.stringify({ historia, expediente: { ...sinImagenes(exp), pais: region() }, comparacion: comp, lugar: resumenLugar(lugar) }) })
       setMsgs([...historia, { de: 'surco', texto: r.respuesta, fuentes: r.fuentes }])
       if (r.propuesta && Object.keys(r.propuesta).length) setPropuesta(r.propuesta)
     } catch (e) {

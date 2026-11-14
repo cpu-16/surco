@@ -1,7 +1,8 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { animate, AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { local, type Expediente, type Foto, type Lugar, type TipoFoto } from './api'
 import { medir } from './canopeo'
+import { GuiaLata } from './guia'
 import { Fuente, Hoja, Icono } from './ui'
 
 type Props = { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }
@@ -17,6 +18,14 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
   const [buscando, setBuscando] = useState(false)
   const [aviso, setAviso] = useState('')
   const alternar = (v: string) => cambiar({ cultivos: exp.cultivos.includes(v) ? exp.cultivos.filter((x) => x !== v) : [...exp.cultivos, v] })
+  const [otro, setOtro] = useState('')
+  const propios = exp.cultivos.filter((c) => !CULTIVOS.some(([k]) => k === c))
+  const agregar = (e: FormEvent) => {
+    e.preventDefault()
+    const v = otro.trim().toLowerCase()
+    if (v && !exp.cultivos.includes(v)) cambiar({ cultivos: [...exp.cultivos, v] })
+    setOtro('')
+  }
   const ubicar = () => {
     if (!navigator.geolocation) return setAviso('Este navegador no da la ubicación.')
     setBuscando(true); setAviso('')
@@ -44,7 +53,20 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
       <h2 className="sub">¿Qué tienes sembrado?</h2>
       <div className="chips">
         {CULTIVOS.map(([k, n]) => <button key={k} className="chip" aria-pressed={exp.cultivos.includes(k)} onClick={() => alternar(k)}>{n}</button>)}
+        <AnimatePresence initial={false}>
+          {propios.map((c) => (
+            <motion.button key={c} className="chip" aria-pressed="true" onClick={() => alternar(c)} aria-label={`Quitar ${c}`}
+              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}>
+              {c[0].toUpperCase() + c.slice(1)}<Icono n="cerrar" t={14} />
+            </motion.button>
+          ))}
+        </AnimatePresence>
       </div>
+      <form className="otro" onSubmit={agregar}>
+        <input value={otro} onChange={(e) => setOtro(e.target.value)} maxLength={40} enterKeyHint="done"
+          placeholder="¿Otro? Ej.: ají, mango, culantro" aria-label="Escribe otro cultivo" />
+        <button className="boton claro" disabled={!otro.trim()}>Agregar</button>
+      </form>
 
       {exp.cultivos.includes('yuca') && (
         <Siembra valor={exp.siembras.yuca ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, yuca: v } })} />
@@ -240,16 +262,26 @@ export function Agua({ exp, cambiar }: Props) {
   }
   const cancelar = () => { setInicio(null); local.quitar(LLAVE_LATA) }
 
+  const [lata, setLata] = useState(() => exp.infiltracion_min != null || inicio != null)
+  const CHARCOS = [['si', 'Sí, quedan charcos'], ['no', 'No, se seca rápido'], ['nose', 'No me he fijado']] as const
+
   return (
     <>
-      <ol className="receta">
-        <li><b>Una lata sin fondo ni tapa</b>, de unos 15 cm de ancho.</li>
-        <li><b>Entiérrala 7 a 8 cm</b> en la cama, golpeando una tablita encima.</li>
-        <li><b>Echa casi 2 tazas de agua</b> (450 mL) y espera a que se vaya. Eso moja el suelo.</li>
-        <li><b>Echa otras 2 tazas y toca Empezar.</b> Para cuando la tierra ya no brille.</li>
-      </ol>
-      <button className="enlace" onClick={() => setComo(true)}>Cómo hacerla bien, paso a paso</button>
+      <p className="pregunta-grande">Al día siguiente de un aguacero fuerte, ¿quedan charcos en la cama?</p>
+      <div className="chips">
+        {CHARCOS.map(([k, n]) => <button key={k} className="chip" aria-pressed={exp.charcos === k} onClick={() => cambiar({ charcos: exp.charcos === k ? null : k })}>{n}</button>)}
+      </div>
+      <p className="nota">Con eso basta para seguir. La prueba de la lata es opcional: mide lo mismo con reloj.</p>
 
+      <button className="boton claro lata-abrir" onClick={() => setLata(!lata)} aria-expanded={lata}>
+        <Icono n="gota" />{lata ? 'Ocultar la prueba de la lata' : 'Quiero medirlo con una lata'}
+      </button>
+      <AnimatePresence initial={false}>
+        {lata && (
+          <motion.div key="lata" className="lata" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
+      <GuiaLata />
+      <p className="nota desliza">Desliza para ver los 6 pasos · <button className="enlace" onClick={() => setComo(true)}>Más detalles</button></p>
       <Reloj inicio={inicio} />
       <div className="acciones centro">
         {inicio
@@ -264,6 +296,9 @@ export function Agua({ exp, cambiar }: Props) {
       </label>
 
       {exp.infiltracion_min != null && exp.infiltracion_min >= 0 && <Escala min={exp.infiltracion_min} />}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Hoja abierta={como} cerrar={() => setComo(false)} titulo="La prueba de la lata">
         <ol className="receta larga">
@@ -275,7 +310,7 @@ export function Agua({ exp, cambiar }: Props) {
           <li><b>La segunda vez es la que cuenta.</b> Repite con otros 450 mL y toca «Empezar a medir». Cuando ya no quede agua y la tierra deje de brillar, toca «Listo».</li>
           <li><b>Si puedes,</b> hazla también en otro punto, por ejemplo debajo de un árbol. Pon el tiempo de la cama aquí.</li>
         </ol>
-        <p className="nota">Es la prueba de infiltración de la guía del USDA (Soil Quality Test Kit, 1999), hecha con una lata en vez del anillo de metal.</p>
+        <p className="nota">Es la prueba de infiltración de la guía del USDA (Soil Quality Test Kit, 1999), hecha con una lata en vez del anillo de metal. <a href="https://www.fao.org/fileadmin/user_upload/GSP/GSDP/Field_exercises/New_Format_ES/P04-Infiltration-ES.pdf" target="_blank" rel="noreferrer">La FAO la explica con fotos</a> (Doctores de Suelos, ejercicio P05).</p>
       </Hoja>
     </>
   )

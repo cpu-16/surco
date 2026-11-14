@@ -66,6 +66,10 @@ def lugar(lat: float = Query(...), lon: float = Query(...)):
         out["fuentes"]["ndvi"] = ndvi["meta"]
     else:
         out["pendiente"].append("ndvi")
+        pn, pf = nasa.PARCIAL.get(("ndvi", lat, lon)), nasa.PARCIAL.get(("fiabilidad", lat, lon))
+        if pn and pn["filas"]:  # mientras baja la serie de 26 años, lo que ya llegó (lo más nuevo primero)
+            out["ndvi"] = motor.ndvi_estacional(pn["filas"], pf["filas"] if pf and pf["filas"] else None)
+            out["ndvi"]["progreso"] = [pn["hechos"], pn["total"]]
     for var, desde in (("et", "2018-01-01"), ("pet", "2018-01-01"), ("lst", "2018-01-01")):
         s = _en_fondo((var, lat, lon), nasa.ornl, var, lat, lon, desde)
         if s:

@@ -16,7 +16,7 @@ const PASOS: Paso[] = [
   { id: 'patio', corto: 'Tu patio', titulo: '¿Dónde está y qué siembras?', listo: (e) => e.cultivos.length > 0 },
   { id: 'cielo', corto: 'El cielo', titulo: 'Lo que ve la NASA sobre tu patio', listo: () => true },
   { id: 'fotos', corto: 'Tus fotos', titulo: 'El suelo que ves tú', listo: (e) => e.fotos.length >= 2 },
-  { id: 'agua', corto: 'El agua', titulo: 'La prueba de la lata', listo: (e) => e.infiltracion_min != null },
+  { id: 'agua', corto: 'El agua', titulo: '¿El agua entra o se queda arriba?', listo: (e) => e.infiltracion_min != null || !!e.charcos },
   { id: 'importa', corto: 'Lo tuyo', titulo: '¿Qué te importa más?', listo: (e) => e.prioridades.length > 0 },
   { id: 'anio', corto: 'Tu año', titulo: 'Así le iría a tu suelo', listo: () => true },
   { id: 'conversa', corto: 'Conversa', titulo: 'Pregunta o compártelo', listo: () => true },
