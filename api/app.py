@@ -1,4 +1,5 @@
 """API de la herramienta. Uso: uv run uvicorn app:app --port 8787"""
+import datetime as dt
 import json
 import secrets
 import sqlite3
@@ -11,6 +12,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import earthdata
 import motor
 import nasa
 
@@ -61,6 +63,22 @@ def lugar(lat: float = Query(...), lon: float = Query(...)):
             out["fuentes"][var] = s["meta"]
         else:
             out["pendiente"].append(var)
+    # Con cuenta Earthdata: lluvia IMERG de los últimos días y el pedido de AppEEARS (HLS, SMAP, ECOSTRESS, NASADEM)
+    if earthdata.hay_cuenta():
+        hoy = dt.date.today()
+        im = _en_fondo(("imerg", lat, lon, hoy, time.time() // 10800), earthdata.imerg, lat, lon, hoy - dt.timedelta(days=60), hoy)
+        if im and im["dias"]:
+            out["reciente_imerg"] = motor.reciente([{"fecha": d["fecha"], "PRECTOTCORR": d["lluvia"]} for d in im["dias"]])
+            out["fuentes"]["imerg"] = im["meta"]
+        else:
+            out["pendiente"].append("imerg")
+        ae = _en_fondo(("appeears", lat, lon, time.time() // 600), earthdata.appeears, lat, lon)
+        if ae:
+            out["appeears"] = motor.resumen_appeears(ae)
+        else:
+            out["pendiente"].append("appeears")
+    else:
+        out["sin_cuenta"] = True
     return out
 
 

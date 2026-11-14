@@ -62,7 +62,7 @@ export default function App() {
   }, [exp.lat, exp.lon])
 
   // la comparación se recalcula con cada dato de campo
-  const claveComp = JSON.stringify({ ...exp, fotos: exp.fotos.map((f) => [f.tipo, f.cobertura, f.descripcion]) })
+  const claveComp = JSON.stringify({ ...exp, fotos: exp.fotos.map((f) => [f.tipo, f.cobertura, f.hojarasca]) })
   useEffect(() => {
     if (!lugar) return
     const datos = { ...exp, fotos: exp.fotos.map(({ miniatura: _m, ...f }) => f) }
@@ -81,6 +81,15 @@ export default function App() {
     }
     window.addEventListener('surco-propuesta', f)
     return () => window.removeEventListener('surco-propuesta', f)
+  }, [])
+
+  useEffect(() => {
+    const f = (ev: Event) => {
+      const { tipo, extra } = (ev as CustomEvent<{ tipo: TipoFoto; extra: Partial<Foto> }>).detail
+      setExp((e) => ({ ...e, fotos: e.fotos.map((x) => x.tipo === tipo ? { ...x, ...extra, hojarasca: x.hojarasca ?? extra.hojarasca } : x) }))
+    }
+    window.addEventListener('surco-foto', f)
+    return () => window.removeEventListener('surco-foto', f)
   }, [])
 
   // enlace compartido: el técnico abre el mismo expediente
@@ -187,6 +196,10 @@ function Comparar({ comp, desde }: { comp: Comparacion | null; desde: number }) 
   )
 }
 
+const claseInfil = (m: number) =>
+  ([[3, 'muy rápida'], [10, 'rápida'], [30, 'moderadamente rápida'], [100, 'moderada'], [300, 'moderadamente lenta'], [1000, 'lenta'], [40000, 'muy lenta']] as const)
+    .find(([lim]) => m < lim)?.[1] ?? 'casi nula'
+
 function Leyenda() {
   const items: [keyof typeof COLOR, string][] = [['desnudo', 'Desnudo'], ['baja', 'Poco tapado o acolchado'], ['media', 'Medio tapado'], ['alta', 'Bien tapado']]
   return (
@@ -200,6 +213,8 @@ function Leyenda() {
 function LoQueVes({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expediente>) => void }) {
   const [midiendo, setMidiendo] = useState<TipoFoto | null>(null)
   const [mascara, setMascara] = useState<Record<string, string>>({})
+  // ponytail: la respuesta de la IA llega después; se pega a la foto vigente de ese tipo, sin pisar otras
+  const setFotoIA = (tipo: TipoFoto, extra: Partial<Foto>) => window.dispatchEvent(new CustomEvent('surco-foto', { detail: { tipo, extra } }))
   const tomar = async (tipo: TipoFoto, archivo?: File) => {
     if (!archivo) return
     setMidiendo(tipo)
@@ -211,7 +226,7 @@ function LoQueVes({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expe
       // la IA describe la foto; la cobertura ya está medida y no la toca
       const fd = new FormData(); fd.append('foto', r.jpeg, 'foto.jpg'); fd.append('tipo', tipo)
       fetch('/api/ia/foto', { method: 'POST', body: fd }).then((x) => x.ok ? x.json() : null).then((j) => {
-        if (j?.descripcion) cambiar({ fotos: [...exp.fotos.filter((f) => f.tipo !== tipo), { ...foto, descripcion: j.descripcion }] })
+        if (j?.descripcion) setFotoIA(tipo, { descripcion: j.descripcion, hojarasca: j.hojarasca })
       }).catch(() => { /* sin IA queda la medición */ })
     } finally { setMidiendo(null) }
   }
@@ -233,7 +248,18 @@ function LoQueVes({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expe
               </div>
             )}
             {foto && <p><span className="cifra">{foto.cobertura}%</span> del suelo tapado por planta verde <span className="fuente">método Canopeo</span></p>}
-            {foto?.descripcion && <p className="nota">{foto.descripcion}</p>}
+            {foto?.descripcion && <p className="nota">Lo que se ve: {foto.descripcion}</p>}
+            {foto && (f.tipo === 'perennes' || f.tipo === 'cama') && (
+              <div style={{ margin: '0.6rem 0' }}>
+                <p style={{ marginBottom: '0.3rem' }}>¿Hay hojarasca o rastrojo seco tapando el suelo?{foto.hojarasca && foto.descripcion ? ' (sugerido por la foto, corrígelo si no es así)' : ''}</p>
+                <div className="chips">
+                  {(['mucha', 'poca', 'nada'] as const).map((h) => (
+                    <button key={h} className="chip" aria-pressed={foto.hojarasca === h}
+                      onClick={() => cambiar({ fotos: exp.fotos.map((x) => x.tipo === f.tipo ? { ...x, hojarasca: h } : x) })}>{h[0].toUpperCase() + h.slice(1)}</button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="fila">
               <label className="boton claro">
                 {midiendo === f.tipo ? 'Midiendo…' : foto ? 'Cambiar foto' : 'Tomar foto'}
@@ -245,12 +271,13 @@ function LoQueVes({ exp, cambiar }: { exp: Expediente; cambiar: (p: Partial<Expe
         )
       })}
       <div id="infiltracion" style={{ margin: '1.2rem 0' }}>
-        <h3>La prueba del litro de agua</h3>
-        <p className="nota">Haz un hoyo de unos 20 cm en la cama de yuca, échale 1 litro de agua y mide cuántos minutos tarda en desaparecer.</p>
-        <label>Minutos:{' '}
-          <input type="number" inputMode="decimal" min="0" max="600" step="0.5" style={{ width: '6em', padding: '0.4em' }}
+        <h3>La prueba de la lata con agua</h3>
+        <p className="nota">Es la prueba de infiltración del USDA, hecha con una lata. Quítale el fondo y la tapa a una lata de unos 15 cm de ancho y entiérrala 7 a 8 cm en la cama de yuca. Echa casi dos tazas de agua (450 mL) y espera a que se vaya. Después echa otras dos tazas y mide con el cronómetro cuántos minutos tarda esta segunda vez.</p>
+        <label>Minutos de la segunda vez:{' '}
+          <input type="number" inputMode="decimal" min="0" max="2000" step="0.5" style={{ width: '6em', padding: '0.4em' }}
             value={exp.infiltracion_min ?? ''} onChange={(e) => cambiar({ infiltracion_min: e.target.value === '' ? null : Number(e.target.value) })} />
         </label>
+        {exp.infiltracion_min != null && <p>Según la tabla del USDA, el agua entra de forma <strong>{claseInfil(exp.infiltracion_min)}</strong>.</p>}
       </div>
       <div id="riego">
         <h3>¿Riegas en verano?</h3>

@@ -80,13 +80,15 @@ a { color: var(--lluvia); }
 .estrategia { margin: 1.6rem 0; }
 .fila-tira { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 0.3rem; align-items: center; margin-top: 3px; }
 .etq { font: 600 0.85rem/1 var(--display); color: var(--tinta-2); }
-.muestra[data-medido='1'] { box-shadow: inset 0 0 0 2px var(--papel), inset 0 0 0 4px var(--tinta); }
+.muestra { position: relative; }
+.muestra[data-medido='1']::after { content: ''; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--papel); box-shadow: 0 0 0 1.5px var(--tinta); }
 .abrir { font-weight: 700; color: var(--lluvia); margin-top: 0.6rem; }
 .abrir::before { content: '+ '; }
 details[open] .abrir::before { content: '− '; }
 .leyenda { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.85rem; color: var(--tinta-2); margin: 0.8rem 0; }
 .leyenda i { display: inline-block; width: 0.9em; height: 1.1em; border-radius: var(--radio-muestra); vertical-align: -0.2em; margin-right: 0.35em; }
-.leyenda i.medido { box-shadow: inset 0 0 0 2px var(--papel), inset 0 0 0 4px var(--tinta); background: var(--brote); }
+.leyenda i.medido { background: var(--brote); position: relative; }
+.leyenda i.medido::after { content: ''; position: absolute; top: 2px; right: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--papel); box-shadow: 0 0 0 1px var(--tinta); }
 .estrategia > summary { list-style: none; cursor: pointer; }
 .estrategia > summary::-webkit-details-marker { display: none; }
 .campos { display: grid; gap: 0.9rem; margin-top: 0.9rem; padding-left: 0.9rem; border-left: 3px solid var(--linea); }

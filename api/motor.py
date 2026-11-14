@@ -109,6 +109,17 @@ from pathlib import Path
 _D = Path(__file__).parent / "datos"
 AGRO = json.loads((_D / "cultivos.json").read_text())
 ESTR = json.loads((_D / "estrategias.json").read_text())["estrategias"]
+AGRO["fuentes"].update({  # verificadas el 14-nov-2026 (investigacion/verificacion-suelo.md)
+    "USDA": {"titulo": "USDA-NRCS, Soil Quality Test Kit Guide (1999): prueba de infiltración y tabla 3", "url": "https://www.govinfo.gov/content/pkg/GOVPUB-A57-PURL-gpo113056/pdf/GOVPUB-A57-PURL-gpo113056.pdf"},
+    "F56M": {"titulo": "FAO-56, capítulo 10: efecto del acolchado orgánico en la evaporación", "url": "https://www.fao.org/4/X0490E/x0490e0g.htm"},
+    "OSEI": {"titulo": "Osei et al. 2010, coberturas leguminosas contra Meloidogyne (J. Nematology)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3380490/"},
+})
+# Clases de infiltración USDA (tabla 3), en minutos por pulgada de agua
+CLASES_INFIL = [(3, "muy rápida"), (10, "rápida"), (30, "moderadamente rápida"), (100, "moderada"), (300, "moderadamente lenta"), (1000, "lenta"), (40000, "muy lenta")]
+
+
+def clase_infiltracion(minutos: float) -> str:
+    return next((n for lim, n in CLASES_INFIL if minutos < lim), "impermeable")
 NIVEL = {"desnudo": 0, "baja": 1, "media": 2, "alta": 3}
 NOMBRES = {"yuca": "Yuca", "caupi": "Caupí", "camote": "Camote", "canavalia": "Canavalia", "maiz": "Maíz", "guandu": "Guandú",
            "mani_forrajero": "Maní forrajero", "frijol_comun": "Frijol", "zapallo": "Zapallo", "mucuna": "Mucuna"}
@@ -188,8 +199,8 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
             elif hoj == "poca" and NIVEL[cob] < 1:
                 cob = "baja"
             if cob != "desnudo":
-                for a in arboles:
-                    a.update(nombre="lo que tienes hoy", cobertura=cob, medido=True)
+                for k, a in enumerate(arboles):  # se mide este mes; los demás se suponen iguales hasta la próxima foto
+                    a.update(nombre="hojarasca" if hoj in ("mucha", "poca") else "plantas", cobertura=cob, medido=k == 0)
                 ajustes.append(f"Tu foto debajo de los árboles midió {pct}% de planta verde"
                                + (f" y dijiste que hay {hoj} hojarasca" if hoj else "")
                                + ". Ya no se cuenta como suelo desnudo.")
@@ -210,12 +221,17 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
         desn_cama = sum(m["cobertura"] == "desnudo" for m in tira)
         desn_arb = sum(a["cobertura"] == "desnudo" for a in arboles)
         riesgos = list(e["riesgos"])
-        if infil is not None and infil >= 60:
-            riesgos.append("Tu prueba de la lata dio infiltración lenta: el agua se queda arriba. Piña y camote sufren con encharcamiento; considera sembrar en camellón.")
-            if e["id"] == "guandu_mani":
-                ajustes.append(f"Tu suelo dejó entrar el agua muy despacio ({infil:g} minutos). La raíz profunda del guandú es lo que más ayuda a abrirlo.")
-        elif infil is not None and infil < 5:
-            ajustes.append(f"El agua entró rápido ({infil:g} minutos): el suelo drena bien pero guarda poca humedad. Tapar el suelo pesa más en el verano.") if e["huecos"] == "acolchado" else None
+        if infil is not None:
+            clase = clase_infiltracion(infil)
+            if infil >= 100:
+                riesgos.append(f"Tu prueba de la lata dio infiltración {clase} ({infil:g} minutos por pulgada): el agua se queda arriba. "
+                               "Piña y camote sufren con encharcamiento; considera sembrar en camellón.")
+                if e["id"] == "guandu_mani":
+                    ajustes.append(f"El agua entró {clase} en tu suelo ({infil:g} minutos). La raíz profunda del guandú es la que más puede ayudar a abrirlo.")
+            elif infil < 10 and e["huecos"] == "acolchado":
+                ajustes.append(f"El agua entró {clase} ({infil:g} minutos): drena bien pero guarda poca humedad. "
+                               "Tapar el suelo pesa más en el verano: el acolchado reduce la evaporación ~5 % por cada 10 % de suelo cubierto (FAO-56).")
+        evid = e["evidencia"] + (["USDA"] if infil is not None else []) + (["F56M"] if e["huecos"] == "acolchado" else [])
         res.append({
             "id": e["id"], "nombre": e["nombre"], "aplica_a": "cama y árboles",
             "tira": tira, "arboles": arboles, "meses_desnudo": desn_cama + desn_arb,
@@ -226,7 +242,7 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
                      "deficit_normal_mm": deficit(None), "deficit_nino_mm": deficit(pct_nino)},
             "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"] + ([] if exp.get("siembras", {}).get("yuca") else ["Se supuso que la yuca se sembró en mayo de 2026."]),
             "riesgos": riesgos, "ajustes": [a for a in ajustes if a],
-            "evidencia": [{"id": k, "titulo": AGRO["fuentes"][k]["titulo"], "url": AGRO["fuentes"][k]["url"]} for k in e["evidencia"] if k in AGRO["fuentes"]],
+            "evidencia": [{"id": k, "titulo": AGRO["fuentes"][k]["titulo"], "url": AGRO["fuentes"][k]["url"]} for k in dict.fromkeys(evid) if k in AGRO["fuentes"]],
         })
     return {"estrategias": res, "faltan": faltan(exp), "lectura": lectura(res, prior)}
 
@@ -265,7 +281,7 @@ def faltan(exp):
     if "cama" not in f:
         out.append({"clave": "foto_cama", "texto": "Foto del suelo de la cama de yuca", "cambia": "Mide cuánto suelo está tapado este mes."})
     if exp.get("infiltracion_min") is None:
-        out.append({"clave": "infiltracion", "texto": "La prueba de la lata con agua", "cambia": "Dice si el agua entra o se queda arriba; eso decide entre raíz profunda y acolchado."})
+        out.append({"clave": "infiltracion", "texto": "La prueba de la lata con agua", "cambia": "Dice si el agua entra o se queda arriba (método del USDA); eso decide entre raíz profunda y acolchado."})
     if not exp.get("siembras", {}).get("yuca"):
         out.append({"clave": "parcela", "texto": "Cuándo sembraste la yuca", "cambia": "Mueve el mes en que la cama queda libre para lo siguiente."})
     if not exp.get("prioridades"):
@@ -276,3 +292,28 @@ def faltan(exp):
 if __name__ == "__main__":
     assert round(lluvia_efectiva(100)) == 84 and round(lluvia_efectiva(300)) == 155
     print("ok")
+
+
+def resumen_appeears(ae: dict) -> dict:
+    """Lo que AppEEARS devolvió para el punto, ya resumido: NDVI de 30 m reciente, humedad de raíz SMAP por mes contra su
+    promedio 2015-hoy, estrés ECOSTRESS y elevación."""
+    s = ae.get("series", {})
+    hls = sorted([x for k in ("HLSL30_VI.020", "HLSS30_VI.020") for x in s.get(k, []) if -1 <= x["valor"] <= 1], key=lambda x: x["fecha"])
+    smap = s.get("SPL4SMGP.008", [])
+    por_mes, actual = {}, {}
+    for x in smap:
+        if x["valor"] < 0:
+            continue
+        por_mes.setdefault(int(x["fecha"][5:7]), []).append(x["valor"])
+    ult = smap[-1]["fecha"][:7] if smap else None
+    rec = [x["valor"] for x in smap if ult and x["fecha"].startswith(ult) and x["valor"] >= 0]
+    m = int(ult[5:7]) if ult else None
+    esi = [x for x in s.get("ECO_L4T_ESI.002", []) if 0 <= x["valor"] <= 2]
+    dem = s.get("NASADEM_NC.001", [])
+    return {
+        "hls_ndvi": hls[-24:], "hls_n": len(hls),
+        "smap": {"mes": ult, "actual": round(mean(rec), 3) if rec else None,
+                 "promedio_mes": round(mean(por_mes[m]), 3) if m in por_mes else None,
+                 "meses": [{"mes": k, "media": round(mean(v), 3)} for k, v in sorted(por_mes.items())]},
+        "ecostress_esi": esi[-12:], "elevacion_m": dem[0]["valor"] if dem else None, "tarea": ae.get("tarea"), "consultado": ae.get("consultado"),
+    }

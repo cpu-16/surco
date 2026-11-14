@@ -12,6 +12,16 @@ const ESCALAS = [
   { id: 'power', nombre: 'NASA POWER', lado_m: 55000, color: '#a04b2c', nota: '0.5°: clima regional' },
 ] as const
 
+// Capas de GIBS (NASA) en su fecha más reciente; «default» le pide a GIBS el último día disponible
+const GIBS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best'
+const CAPAS = [
+  { id: 'ninguna', nombre: 'Calles', capa: '', nivel: 0, ext: '' },
+  { id: 'color', nombre: 'Foto de satélite de ayer', capa: 'VIIRS_NOAA20_CorrectedReflectance_TrueColor', nivel: 9, ext: 'jpeg' },
+  { id: 'lluvia', nombre: 'Lluvia IMERG', capa: 'IMERG_Precipitation_Rate', nivel: 6, ext: 'png' },
+  { id: 'humedad', nombre: 'Humedad del suelo SMAP', capa: 'SMAP_L4_Analyzed_Root_Zone_Soil_Moisture', nivel: 6, ext: 'png' },
+  { id: 'verdor', nombre: 'Verdor VIIRS', capa: 'VIIRS_NOAA20_NDVI_8Day', nivel: 8, ext: 'png' },
+] as const
+
 function cuadro(lat: number, lon: number, lado_m: number) {
   const dlat = lado_m / 2 / 111320, dlon = lado_m / 2 / (111320 * Math.cos((lat * Math.PI) / 180))
   return [[lon - dlon, lat - dlat], [lon + dlon, lat - dlat], [lon + dlon, lat + dlat], [lon - dlon, lat + dlat], [lon - dlon, lat - dlat]]
@@ -21,6 +31,13 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
   const div = useRef<HTMLDivElement>(null)
   const mapa = useRef<import('maplibre-gl').Map | null>(null)
   const [sel, setSel] = useState<(typeof ESCALAS)[number]['id']>('modis')
+  const [capa, setCapa] = useState<(typeof CAPAS)[number]['id']>('ninguna')
+  useEffect(() => {
+    const m = mapa.current
+    if (!m) return
+    const aplicar = () => CAPAS.forEach((c) => c.capa && m.setLayoutProperty(c.id, 'visibility', c.id === capa ? 'visible' : 'none'))
+    if (m.isStyleLoaded()) aplicar(); else m.once('load', aplicar)
+  }, [capa])
 
   useEffect(() => {
     let vivo = true
@@ -33,6 +50,10 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
           version: 8,
           sources: {
             osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' },
+            ...Object.fromEntries(CAPAS.filter((c) => c.capa).map((c) => [c.id, {
+              type: 'raster' as const, tileSize: 256, maxzoom: c.nivel, attribution: 'NASA GIBS',
+              tiles: [`${GIBS}/${c.capa}/default/default/GoogleMapsCompatible_Level${c.nivel}/{z}/{y}/{x}.${c.ext}`],
+            }])),
             escalas: {
               type: 'geojson',
               data: {
@@ -43,6 +64,7 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
           },
           layers: [
             { id: 'osm', type: 'raster', source: 'osm' },
+            ...CAPAS.filter((c) => c.capa).map((c) => ({ id: c.id, type: 'raster' as const, source: c.id, layout: { visibility: 'none' as const }, paint: { 'raster-opacity': c.id === 'color' ? 1 : 0.75 } })),
             { id: 'relleno', type: 'fill', source: 'escalas', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.12 } },
             { id: 'borde', type: 'line', source: 'escalas', paint: { 'line-color': ['get', 'color'], 'line-width': 2.5 } },
           ],
@@ -73,6 +95,10 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
             {x.nombre}
           </button>
         ))}
+      </div>
+      <p className="nota" style={{ marginBottom: 0 }}>Capa de la NASA encima, la más reciente:</p>
+      <div className="chips">
+        {CAPAS.map((c) => <button key={c.id} className="chip" aria-pressed={capa === c.id} onClick={() => setCapa(c.id)}>{c.nombre}</button>)}
       </div>
       <p className="nota">{e.nota}. Un píxel más grande que tu parcela promedia todo lo que hay alrededor: casas, calles y árboles.</p>
     </div>

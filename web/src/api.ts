@@ -19,7 +19,7 @@ export type Lugar = {
   pendiente: string[]
 }
 
-export type Foto = { id: string; tipo: TipoFoto; fecha: string; cobertura: number; descripcion?: string; miniatura: string }
+export type Foto = { id: string; tipo: TipoFoto; fecha: string; cobertura: number; descripcion?: string; hojarasca?: 'mucha' | 'poca' | 'nada' | null; miniatura: string }
 export type TipoFoto = 'cama' | 'perennes' | 'pina' | 'general'
 export type Expediente = {
   id?: string

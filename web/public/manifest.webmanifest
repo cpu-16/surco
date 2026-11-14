@@ -1,0 +1,15 @@
+{
+  "name": "Surco: el año de tu suelo",
+  "short_name": "Surco",
+  "description": "Compara maneras de sembrar tu parcela según lo que le hacen al suelo, con datos de la NASA y lo que ves en tu terreno.",
+  "lang": "es-PA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f2ec",
+  "theme_color": "#f1f2ec",
+  "icons": [
+    { "src": "/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icono-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
