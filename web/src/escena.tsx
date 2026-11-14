@@ -1,17 +1,25 @@
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react'
+import { AnimatePresence, motion, useReducedMotion, type Transition } from 'motion/react'
 import { L } from './i18n'
+import './escena.css'
 
-/* La idea de la app en una escena: el mismo año sobre dos pedazos de suelo.
-   Verano (dic–abr): el pelado se agrieta, el tapado guarda la humedad bajo las hojas.
-   Lluvias (may–nov): al pelado el aguacero le arrastra la tierra; en el tapado el agua entra y las matas crecen.
-   Arriba pasa el satélite: es lo que la app lee de la NASA. */
+/* La idea de la app en un dibujo: el mismo año sobre UN terreno, partido en dos mitades y visto en corte.
+   Izquierda, suelo pelado: en verano se agrieta y se seca por dentro; con el aguacero salpica, el agua corre
+   por encima arrastrando tierra hacia el borde y casi nada entra.
+   Derecha, tapado con hojas: el agua entra y baja por el perfil, que se oscurece con la humedad y las raíces;
+   en verano la humedad se guarda bajo las hojas y en lluvias las matas crecen.
+   En medio, un pluviómetro marca la misma lluvia para las dos mitades. Arriba cruza un satélite: es la NASA mirando.
+
+   Vista: corte frontal con un filo del terreno detrás. A 320–480 px de ancho lo que cuenta la idea está bajo
+   tierra (grietas, frente de humedad, raíces) y necesita todo el ancho; un isométrico gastaría la mitad del alto
+   en la cara de arriba y aplastaría el perfil en una diagonal. */
 
 const NOMBRE_MES = L(['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
   ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
 const esSeco = (m: number) => m <= 3 || m === 11
-const SUELO = 128
-const muelle = { type: 'spring', bounce: 0, duration: 0.6 } as const
+/* Forma aproximada de la lluvia mensual en el Pacífico de Panamá (relativa al mes más lluvioso). Solo mueve el
+   nivel del pluviómetro: no es un dato que la app muestre. */
+const LLUVIA_REL = [0.06, 0.03, 0.04, 0.2, 0.66, 0.7, 0.56, 0.64, 0.72, 0.92, 0.8, 0.3]
 
 export function useMes(paso = 850) {
   const quieto = useReducedMotion()
@@ -24,76 +32,621 @@ export function useMes(paso = 850) {
   return mes
 }
 
+/* ------------------------------------------------------------------ geometría (se calcula una sola vez) */
+
+type P = [number, number]
+const W = 320, H = 220
+const V = { x0: 6, y0: 6, x1: 314, y1: 200, r: 8 } // ventana del marco
+const MEDIO = 160
+const f = (n: number) => Math.round(n * 100) / 100
+const linea = (p: P[]) => p.map(([x, y], i) => `${i ? 'L' : 'M'}${f(x)} ${f(y)}`).join('')
+const cerrada = (p: P[]) => linea(p) + 'Z'
+const rango = (a: number, b: number, paso: number) => { const r: number[] = []; for (let x = a; x < b - 1e-6; x += paso) r.push(x); r.push(b); return r }
+const suave = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t
+function azar(semilla: number) {
+  let a = semilla >>> 0
+  return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
+}
+/** puntos de una curva cuadrática */
+const curva = (a: P, c: P, b: P, n = 10): P[] => Array.from({ length: n + 1 }, (_, i) => {
+  const t = i / n, u = 1 - t
+  return [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]]
+})
+/** contorno relleno alrededor de una línea, con el grueso de w0 a w1: raíces, tallos, grietas. Termina en punta, no en corte. */
+function ahusado(p: P[], w0: number, w1: number) {
+  const largos = [0]
+  for (let i = 1; i < p.length; i++) largos.push(largos[i - 1] + Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]))
+  const total = largos[largos.length - 1] || 1
+  const a: P[] = [], b: P[] = []
+  p.forEach((q, i) => {
+    const s = p[Math.max(0, i - 1)], e = p[Math.min(p.length - 1, i + 1)]
+    const tx = e[0] - s[0], ty = e[1] - s[1], n = Math.hypot(tx, ty) || 1
+    const w = lerp(w0, w1, largos[i] / total) / 2
+    a.push([q[0] - (ty / n) * w, q[1] + (tx / n) * w]); b.push([q[0] + (ty / n) * w, q[1] - (tx / n) * w])
+  })
+  return cerrada([...a, ...b.reverse()])
+}
+
+/* El terreno baja un poco hacia la izquierda: por ahí se va el agua que no entra. */
+const ys = (x: number) => 110 - 0.02 * x
+const BANDA = 9 // lo que se ve del terreno detrás del corte
+const yb = (x: number) => ys(x) - BANDA
+const rugoso = (x: number) => (0.55 * Math.sin(x * 0.71) + 0.4 * Math.sin(x * 1.93 + 0.6)) * (1 - suave(MEDIO - 16, MEDIO, x))
+const SURCO = 19 // donde el agua que escurre ya abrió una zanja, junto al borde
+const zanja = (x: number) => 4.6 * Math.exp(-(((x - SURCO) / 8.5) ** 2))
+const sup = (x: number) => ys(x) + rugoso(x) + zanja(x) // superficie en el corte: costrosa del lado pelado, lisa bajo las hojas
+const yA = (x: number) => ys(x) + 23 + 9 * suave(120, 200, x) + 1.1 * Math.sin(x / 21) + 0.7 * Math.sin(x / 8.3 + 1.3) // fin de la capa de arriba: más delgada donde se la lleva el agua
+const XS = rango(-2, 322, 2)
+const ABAJO = 204
+
+const D_CORTE = cerrada([...XS.map((x): P => [x, sup(x)]), [322, ABAJO], [-2, ABAJO]])
+const D_CAPA_A = cerrada([...XS.map((x): P => [x, sup(x)]), ...[...XS].reverse().map((x): P => [x, yA(x)])])
+const D_LIMITE_AB = linea(XS.map((x): P => [x, yA(x)]))
+const D_BANDA = cerrada([...XS.map((x): P => [x, yb(x)]), ...[...XS].reverse().map((x): P => [x, sup(x) + 0.2])])
+const D_CIELO = cerrada([[-2, -2], [322, -2], ...[...XS].reverse().map((x): P => [x, sup(x)])])
+const D_CANTO_PELADO = linea(rango(-2, MEDIO - 2, 2).map((x): P => [x, sup(x) - 0.3]))
+
+/* Lomas al fondo: la lejana lisa, la cercana con copas de árboles. */
+const D_LOMA_LEJOS = cerrada([[-2, 150], ...rango(-2, 322, 6).map((x): P => [x, 80 - 6 * Math.sin(x / 47 + 0.8) - 3 * Math.sin(x / 19)]), [322, 150]])
+const D_LOMA_CERCA = (() => {
+  const p: P[] = [[-2, 150]]
+  for (const x of rango(-2, 322, 3)) p.push([x, 93 - 3.4 * Math.sin(x / 31 + 2) - 1.6 * Math.abs(Math.sin(x / 4.6)) - 1.2 * Math.abs(Math.sin(x / 2.3 + 1))])
+  p.push([322, 150])
+  return cerrada(p)
+})()
+
+/* Grietas del verano: cuñas en el corte que siguen como líneas sobre el terreno, hacia el fondo. */
+const FUGA: P = [MEDIO, 20] // punto de fuga del terreno
+const FUGA_X = MEDIO
+const haciaFondo = (x: number, h: number): P => { const y0 = sup(x); return [x + ((FUGA[0] - x) * h) / (y0 - FUGA[1]), y0 - h] }
+const GRIETAS = [
+  { x: 23, w: 3.8, d: 17, j: 1.2 }, { x: 54, w: 4.6, d: 23, j: -1.4 }, { x: 87, w: 3.2, d: 15, j: 1 },
+  { x: 119, w: 4.8, d: 21, j: -1.1 }, { x: 145, w: 2.8, d: 11, j: 0.8 },
+].map(({ x, w, d, j }, i) => {
+  const r = azar(11 + i)
+  const lados = (s: 1 | -1) => [0, 0.22, 0.45, 0.7].map((t): P => [x + j * t * 2 + s * (w / 2) * Math.pow(1 - t, 0.85) + (r() - 0.5) * 0.7 * t, sup(x) + d * t - (t === 0 ? 0.6 : 0)])
+  const izq = lados(-1), der = lados(1)
+  const punta: P = [x + j * 2, sup(x) + d]
+  const cuña = cerrada([...izq, punta, ...der.reverse()])
+  const labio = linea([izq[0], izq[1], izq[2]])
+  // ramitas finas que salen de la cuña y terminan en punta
+  const rama = (t: number, s: 1 | -1, largo: number) => {
+    const a: P = [x + j * t * 2 + s * (w / 2) * Math.pow(1 - t, 0.85) * 0.8, sup(x) + d * t]
+    return ahusado(curva(a, [a[0] + s * largo * 0.5, a[1] + largo * 0.25], [a[0] + s * largo, a[1] + largo * 0.7], 6), 0.9, 0)
+  }
+  const ramas = [rama(0.35, i % 2 ? 1 : -1, 5 + r() * 2), rama(0.55, i % 2 ? -1 : 1, 4 + r() * 2)]
+  // sobre el terreno: la grieta se angosta al alejarse
+  const arriba: P[] = [0, 3, 6, BANDA].map((h, k) => { const q = haciaFondo(x, h); return [q[0] + (k === 1 || k === 2 ? (r() - 0.5) * 2.4 : 0), q[1]] })
+  return { x, cuña, labio, ramas, arriba, wTop: w }
+})
+const BANDA_GRIETAS = GRIETAS.map((g) => ahusado(g.arriba, g.wTop * 0.75, 0.5))
+/* grietas que cruzan de una línea a la otra: terminan sobre ellas */
+const enLinea = (p: P[], h: number): P => { const k = h / BANDA * (p.length - 1), i = Math.min(p.length - 2, Math.floor(k)), t = k - i; return [lerp(p[i][0], p[i + 1][0], t), lerp(p[i][1], p[i + 1][1], t)] }
+const BANDA_CRUCES = GRIETAS.slice(0, -1).flatMap((g, i) => {
+  const h = i % 2 ? 6.4 : 3.2
+  const a = enLinea(g.arriba, h), b = enLinea(GRIETAS[i + 1].arriba, h + (i % 2 ? -0.8 : 0.9))
+  const out = [ahusado(curva(a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 0.9], b, 8), 0.75, 0.75)]
+  if (i % 2 === 0) { const c = enLinea(g.arriba, 7.6), e = enLinea(GRIETAS[i + 1].arriba, 7.2); out.push(ahusado(curva(c, [(c[0] + e[0]) / 2, c[1] + 0.5], e, 8), 0.5, 0.5)) }
+  return out
+})
+/* láminas de suelo apretado entre grietas (estructura laminar del suelo pelado) */
+const LAMINAS = [[29, 49, 9], [60, 83, 12], [92, 115, 7.5], [124, 141, 10], [36, 50, 14.5], [96, 113, 13]].map(([a, b, h]) =>
+  linea(rango(a, b, 2).map((x): P => [x, sup(x) + h + 0.4 * Math.sin(x / 3)])))
+
+/* Hojarasca: hojas secas en corte sobre la mitad derecha, en tres filas; y sobre el terreno, achatadas por la distancia. */
+type HojaSeca = { x: number; y: number; l: number; g: number; a: number; tono: 1 | 2 | 3 | 4; curva?: boolean }
+const HOJARASCA: HojaSeca[] = (() => {
+  const r = azar(7), out: HojaSeca[] = []
+  for (const [fila, dy, tonos] of [[0, -1.4, [1, 4, 1]], [1, -3.7, [2, 4, 1, 3]], [2, -5.9, [3, 2, 3, 4]]] as const) {
+    for (let x = 163 + fila * 3.2; x < 318; x += 7.2 + r() * 3) {
+      out.push({ x, y: ys(x) + dy + (r() - 0.5) * 0.7, l: 11 + r() * 5, g: 2.2 + r() * 1, a: (r() - 0.5) * 16, tono: tonos[Math.floor(r() * tonos.length)], curva: fila === 2 && r() < 0.3 })
+    }
+  }
+  return out
+})()
+const hojaSecaD = (h: HojaSeca) => {
+  const { l, g } = h
+  if (h.curva) return `M${f(-l / 2)} 0Q0 ${f(-g * 2.2)} ${f(l / 2)} 0Q0 ${f(-g * 1.1)} ${f(-l / 2)} 0Z` // hoja enrollada: media luna
+  return `M${f(-l / 2)} 0C${f(-l / 4)} ${f(-g)} ${f(l / 4)} ${f(-g)} ${f(l / 2)} 0C${f(l / 4)} ${f(g * 0.8)} ${f(-l / 4)} ${f(g * 0.8)} ${f(-l / 2)} 0Z`
+}
+const HOJARASCA_FONDO = (() => {
+  const r = azar(5), out: { x: number; y: number; rx: number; ry: number; a: number; tono: number }[] = []
+  for (let k = 0; k < 34; k++) {
+    const h = 1 + r() * (BANDA - 1.6), x = 165 + r() * 152, prof = 1 - h / BANDA
+    out.push({ x, y: ys(x) - h, rx: 1.6 + prof * 2.8 + r(), ry: 0.5 + prof * 0.7, a: (r() - 0.5) * 30, tono: 1 + Math.floor(r() * 4) })
+  }
+  return out.sort((a, b) => a.y - b.y)
+})()
+
+/* Charcos y marcas del agua que corre sobre el lado pelado */
+const CHARCOS = [[28, 2.4, 7], [66, 5.6, 5], [104, 3.4, 8], [138, 6.4, 4.5]].map(([x, h, rx]) => { const [cx, cy] = haciaFondo(x, h); return { cx, cy, rx: rx * (1 - h / 22), ry: 0.75 } })
+
+/* Lámina de agua que escurre por el borde del corte hacia la izquierda, más gruesa y más turbia abajo. */
+const grueso = (x: number) => 1.5 + 3.4 * Math.pow(Math.max(0, (150 - x) / 146), 1.1)
+/** tope del agua: una lámina que engorda hacia el borde y llena la zanja */
+const agua = (x: number) => Math.min(ys(x) - grueso(x) * suave(156, 136, x), sup(x) - 0.3)
+const D_ESCURRE = (() => {
+  const xs = rango(-2, 152, 2)
+  return cerrada([...xs.map((x): P => [x, agua(x)]), [154, sup(154)], ...[...xs].reverse().map((x): P => [x, sup(x) + 0.35])])
+})()
+const D_ESCURRE_BRILLO = linea(rango(-2, 140, 2).map((x): P => [x, agua(x) + 0.4]))
+/* la zanja sigue hacia el fondo, y los hilos de agua turbia bajan a ella */
+const D_ZANJA_FONDO = ahusado([0, 3, 6, BANDA].map((h) => { const [x, y] = [SURCO + ((FUGA_X - SURCO) * h) / 90, ys(SURCO) - h]; return [x, y] as P }), 9, 2.5)
+const HILOS = [[44, 7.6], [76, 5.2], [104, 8.2], [132, 4]].map(([x0, h]) => ahusado(curva([x0 + ((FUGA_X - x0) * h) / 90, ys(x0) - h], [lerp(x0, SURCO, 0.45), ys(x0) - h * 0.2], [SURCO + 3, ys(SURCO) - 0.8], 12), 0.5, 2.2))
+
+/* Suelo: piedras, manchas de hierro, grumos y poros */
+const PIEDRAS = [[18, 178, 4.2, 2.8], [71, 189, 5.5, 3.3], [131, 166, 3.4, 2.4], [196, 186, 5, 3], [252, 193, 3.6, 2.5], [300, 171, 4.4, 2.9], [104, 196, 3.2, 2.1], [226, 164, 2.6, 1.9], [44, 158, 2.8, 1.9], [281, 150, 3, 2], [168, 156, 2.4, 1.7]]
+const MANCHAS = (() => {
+  const r = azar(3)
+  return Array.from({ length: 24 }, (_, k) => {
+    const x = 4 + r() * 312, y = 146 + r() * 54, rx = 2.4 + r() * 4.6, ry = 1.1 + r() * 1.9
+    const d = cerrada(Array.from({ length: 9 }, (_, i): P => { const a = (i / 9) * Math.PI * 2, q = 0.72 + r() * 0.42; return [x + Math.cos(a) * rx * q, y + Math.sin(a) * ry * q] }))
+    return { d, tono: (['esc-mancha', 'esc-mancha-luz', 'esc-mancha-ocre'] as const)[k % 3] }
+  })
+})()
+const CONCRECIONES = (() => { const r = azar(9); return Array.from({ length: 26 }, () => { const x = 4 + r() * 312; return { x, y: lerp(yA(x) + 4, 199, r()), r: 0.35 + r() * 0.45 } }) })()
+const GRUMOS = (() => {
+  const r = azar(21), out: string[] = []
+  for (let k = 0; k < 26; k++) {
+    const x = 166 + r() * 146, y = lerp(ys(x) + 3, yA(x) - 2, r()), rr = 1.1 + r() * 1.3
+    out.push(cerrada(Array.from({ length: 7 }, (_, i): P => { const a = (i / 7) * Math.PI * 2, q = rr * (0.75 + r() * 0.4); return [x + Math.cos(a) * q, y + Math.sin(a) * q * 0.8] })))
+  }
+  return out
+})()
+const POROS = (() => {
+  const r = azar(33), out: { x: number; y: number; r: number }[] = []
+  for (let k = 0; k < 18; k++) { const x = 164 + r() * 150; out.push({ x, y: lerp(ys(x) + 3, yA(x) + 10, r()), r: 0.25 + r() * 0.3 }) }
+  for (let k = 0; k < 7; k++) { const x = 10 + r() * 140; out.push({ x, y: lerp(sup(x) + 4, yA(x), r()), r: 0.3 + r() * 0.3 }) }
+  return out
+})()
+
+/* Lombriz en su galería (mitad tapada): la galería baja hasta el subsuelo */
+const LOMBRIZ_CUERPO: P[] = [...curva([247, ys(247) + 17], [252, ys(252) + 11], [258, ys(258) + 16], 8), ...curva([258, ys(258) + 16], [264, ys(264) + 21.5], [270, ys(270) + 15.5], 8).slice(1)]
+const LOMBRIZ_GALERIA = ahusado([...curva([241, ys(241) + 0.5], [240, ys(240) + 12], [247, ys(247) + 17], 8), ...LOMBRIZ_CUERPO.slice(1), ...curva([270, ys(270) + 15.5], [276, ys(276) + 12], [278, ys(278) + 30], 10).slice(1)], 3.4, 1.2)
+const LOMBRIZ_ANILLOS = LOMBRIZ_CUERPO.slice(2, -2).map((q, i, arr) => {
+  const s = arr[Math.max(0, i - 1)], e = arr[Math.min(arr.length - 1, i + 1)], tx = e[0] - s[0], ty = e[1] - s[1], n = Math.hypot(tx, ty) || 1
+  const w = 1.15
+  return linea([[q[0] - (ty / n) * w, q[1] + (tx / n) * w], [q[0] + (ty / n) * w, q[1] - (tx / n) * w]])
+})
+
+/* Raíces: raíz principal y laterales que terminan en punta. Del lado pelado se quedan cortas y de lado, bajo la costra. */
+function raices(x: number, y: number, hondo: number, ancho: number, semilla: number) {
+  const r = azar(semilla), out: string[] = []
+  const fin: P = [x + (r() - 0.5) * 4, y + hondo]
+  out.push(ahusado(curva([x, y], [x + (r() - 0.5) * 5, y + hondo * 0.5], fin, 14), 1.5, 0))
+  const n = 5
+  for (let i = 0; i < n; i++) {
+    const t = 0.1 + (i / n) * 0.7, s = i % 2 ? 1 : -1
+    const a: P = [lerp(x, fin[0], t), y + hondo * t]
+    const largo = ancho * (1 - t * 0.6) * (0.75 + r() * 0.4)
+    const b: P = [a[0] + s * largo, a[1] + largo * (0.35 + r() * 0.4)]
+    out.push(ahusado(curva(a, [a[0] + s * largo * 0.55, a[1] + 0.5], b, 10), 0.9, 0))
+    const m: P = [lerp(a[0], b[0], 0.55), lerp(a[1], b[1], 0.45)]
+    out.push(ahusado(curva(m, [m[0] + s * 2, m[1] + 2], [m[0] + s * (2.5 + r() * 2), m[1] + 4 + r() * 2], 6), 0.5, 0))
+  }
+  return out
+}
+const RAICES_TAPADO = [[190, 34, 13, 41], [238, 40, 15, 43], [287, 31, 12, 47]].flatMap(([x, h, w, s]) => raices(x, ys(x) + 0.5, h, w, s))
+const RAICES_PELADO = [[52, 7, 9, 51], [116, 8, 10, 53]].flatMap(([x, h, w, s]) => raices(x, sup(x) + 0.5, h, w, s))
+
+/* Frente de humedad del lado tapado: más hondo bajo las matas y la galería, donde el agua baja más rápido. */
+const lobulos = (x: number) => [190, 238, 287, 266, 214].reduce((s, c, i) => s + (i > 2 ? 0.6 : 1) * Math.exp(-(((x - c) / 12) ** 2)), 0)
+const D_HUMEDO = (() => {
+  const xs = rango(155, 322, 1.5)
+  const hondo = (x: number) => (52 + 12 * lobulos(x) + 1.4 * Math.sin(x / 4.1) + 1.6 * Math.sin(x / 9.7 + 2)) * Math.sqrt(suave(155, 184, x))
+  return cerrada([...xs.map((x): P => [x, ys(x) - 0.2]), ...[...xs].reverse().map((x): P => [x, ys(x) + Math.max(0.5, hondo(x))])])
+})()
+/* La piel mojada del lado pelado: el agua apenas entra unos milímetros */
+const D_PIEL = (() => {
+  const xs = rango(-2, 160, 2)
+  return cerrada([...xs.map((x): P => [x, sup(x) - 0.2]), ...[...xs].reverse().map((x): P => [x, sup(x) + (5.2 + 1 * Math.sin(x / 6.3) + zanja(x) * 0.6) * (1 - suave(146, 160, x))])])
+})()
+
+/* ------------------------------------------------------------------ piezas */
+
+type Hoja = { s: number; lado: 1 | -1; ang: number; l: number; a: number }
+const MATA_GRANDE: Hoja[] = [
+  { s: 0.26, lado: -1, ang: -16, l: 12, a: 5 }, { s: 0.42, lado: 1, ang: -26, l: 13, a: 5.3 }, { s: 0.58, lado: -1, ang: -34, l: 11.5, a: 4.8 },
+  { s: 0.74, lado: 1, ang: -42, l: 10, a: 4.3 }, { s: 0.88, lado: -1, ang: -56, l: 7, a: 3.1 }, { s: 1, lado: 1, ang: -70, l: 5, a: 2.2 },
+]
+const MATA_MUSTIA: Hoja[] = [
+  { s: 0.38, lado: -1, ang: 12, l: 7, a: 2.7 }, { s: 0.6, lado: 1, ang: 6, l: 7.5, a: 2.8 }, { s: 0.82, lado: -1, ang: -16, l: 5.5, a: 2.2 }, { s: 1, lado: 1, ang: -40, l: 3.8, a: 1.6 },
+]
+function Mata({ x, y, alto, inclina, hojas, espejo = false }: { x: number; y: number; alto: number; inclina: number; hojas: Hoja[]; espejo?: boolean }) {
+  const tallo = curva([x, y], [x + inclina * 0.2, y - alto * 0.55], [x + inclina, y - alto], 12)
+  const en = (s: number) => tallo[Math.round(s * (tallo.length - 1))]
+  return (
+    <g>
+      {hojas.map((h, i) => {
+        const [px, py] = en(h.s), lado = espejo ? -h.lado : h.lado
+        const peciolo = 2.2, rad = (h.ang * Math.PI) / 180
+        const bx = px + lado * Math.cos(rad) * peciolo, by = py + Math.sin(rad) * peciolo
+        const { l, a } = h
+        return (
+          <g key={i}>
+            <path className="esc-peciolo" d={`M${f(px)} ${f(py)}L${f(bx)} ${f(by)}`} />
+            <g transform={`translate(${f(bx)} ${f(by)}) scale(${lado} 1) rotate(${h.ang})`}>
+              <path className="esc-hoja-a" d={`M0 0C${f(l * 0.25)} ${f(-a)} ${f(l * 0.7)} ${f(-a * 0.85)} ${f(l)} 0Z`} />
+              <path className="esc-hoja-b" d={`M0 0C${f(l * 0.25)} ${f(a)} ${f(l * 0.7)} ${f(a * 0.85)} ${f(l)} 0Z`} />
+              <path className="esc-nervio" d={`M0 0L${f(l)} 0`} />
+            </g>
+          </g>
+        )
+      })}
+      <path className="esc-tallo" d={ahusado(tallo, 2.1, 0.7)} />
+    </g>
+  )
+}
+
+/** Satélite: cuerpo con manta térmica, dos paneles con celdas, antena y sensor mirando abajo. Centrado en 0,0. */
+function Satelite() {
+  const panel = (x0: number) => (
+    <g>
+      <rect className="esc-panel" x={x0} y={-2.6} width={11} height={5.2} rx={0.5} />
+      {[1, 2, 3].map((k) => <path key={k} className="esc-celda" d={`M${f(x0 + (11 * k) / 4)} -2.6V2.6`} />)}
+      <path className="esc-celda" d={`M${x0} 0H${x0 + 11}`} />
+    </g>
+  )
+  return (
+    <g>
+      <path className="esc-brazo" d="M-15.5 0H-4.5M4.5 0H15.5" />
+      {panel(-26.5)}{panel(15.5)}
+      <rect className="esc-sat-oro" x={-4.5} y={-4} width={9} height={8} rx={1} />
+      <rect className="esc-sat-oro-sombra" x={1.2} y={-4} width={3.3} height={8} rx={0.6} />
+      <path className="esc-celda-oscura" d="M-4.5 -1.2H4.5M-4.5 1.6H4.5" />
+      <path className="esc-brazo" d="M0 -4V-6.2" />
+      <path className="esc-antena" d="M-2.6 -6.4Q0 -8.4 2.6 -6.4Z" />
+      <rect className="esc-sensor" x={-1.6} y={4} width={3.2} height={1.8} rx={0.4} />
+    </g>
+  )
+}
+
+/** Pluviómetro sobre su estaca: un tubo con escala; el agua sube con la lluvia del mes. */
+const PLUV = { x: MEDIO, y0: 74, y1: 98, r: 3.5 }
+function Pluviometro({ nivel, transicion }: { nivel: number; transicion: Transition }) {
+  const { x, y0, y1, r } = PLUV
+  const marcas = rango(y0 + 2, y1 - 1, 2).map((y, i) => <path key={y} className={i % 5 === 0 ? 'esc-marca-mayor' : 'esc-marca'} d={`M${x + r} ${f(y)}h${i % 5 === 0 ? -2.2 : -1.2}`} />)
+  return (
+    <g>
+      {/* estaca de madera: cara de frente y un canto con luz */}
+      <rect className="esc-madera" x={x - 1.8} y={y0 + 1} width={3.6} height={ys(x) - y0 - 0.5} />
+      <rect className="esc-madera-luz" x={x - 1.8} y={y0 + 1} width={0.9} height={ys(x) - y0 - 0.5} />
+      {/* tubo de vidrio */}
+      <rect className="esc-vidrio" x={x - r} y={y0} width={r * 2} height={y1 - y0} rx={0.8} />
+      <motion.rect className="esc-agua-tubo" x={x - r + 0.5} y={y0 + 1} width={r * 2 - 1} height={y1 - y0 - 1.5} style={{ originY: 1 }}
+        initial={false} animate={{ scaleY: Math.max(0.03, nivel) }} transition={transicion} />
+      <rect className="esc-vidrio-luz" x={x - r + 0.8} y={y0 + 0.8} width={1} height={y1 - y0 - 1.6} rx={0.5} />
+      <rect className="esc-vidrio-sombra" x={x + r - 1.4} y={y0 + 0.8} width={0.9} height={y1 - y0 - 1.6} rx={0.45} />
+      {marcas}
+      <rect className="esc-vidrio-borde" x={x - r} y={y0} width={r * 2} height={y1 - y0} rx={0.8} />
+      {/* embudo y aro */}
+      <path className="esc-embudo" d={`M${x - 5.6} ${y0 - 4.6}L${x + 5.6} ${y0 - 4.6}L${x + r} ${y0 + 0.4}L${x - r} ${y0 + 0.4}Z`} />
+      <path className="esc-embudo-sombra" d={`M${x + 2.4} ${y0 - 4.6}L${x + 5.6} ${y0 - 4.6}L${x + r} ${y0 + 0.4}L${x + 1.6} ${y0 + 0.4}Z`} />
+      <ellipse className="esc-aro" cx={x} cy={y0 - 4.6} rx={5.6} ry={1.1} />
+      <ellipse className="esc-boca" cx={x} cy={y0 - 4.5} rx={4.4} ry={0.6} />
+      {/* base y abrazaderas */}
+      <rect className="esc-tapa" x={x - r - 0.4} y={y1 - 0.6} width={r * 2 + 0.8} height={2.2} rx={0.6} />
+      {[y0 + 6, y1 - 5].map((y) => (
+        <g key={y}>
+          <rect className="esc-abrazadera" x={x - r - 0.5} y={y} width={r * 2 + 1} height={1.6} rx={0.4} />
+          <circle className="esc-tornillo" cx={x - r + 0.6} cy={y + 0.8} r={0.42} />
+          <circle className="esc-tornillo" cx={x + r - 0.6} cy={y + 0.8} r={0.42} />
+        </g>
+      ))}
+    </g>
+  )
+}
+
+/* Lluvia: rayas a medio caer (así se entiende también el cuadro quieto) que bajan con un poco de viento. */
+const LLUVIA = (() => { const r = azar(17); return Array.from({ length: 22 }, (_, i) => ({ x: 12 + (i + r() * 0.8) * (296 / 22), y: 72 + r() * 26, d: -r() * 0.95, v: 0.85 + r() * 0.2 })) })()
+const SALPICA = [36, 70, 103, 137].map((x, i) => ({ x, y: agua(x), d: -i * 0.27 - 0.1 }))
+const GOTITAS: { dx: number; dy: number; r: number }[] = [{ dx: -6, dy: -5.5, r: 1 }, { dx: -2.4, dy: -8.4, r: 0.8 }, { dx: 2.8, dy: -7.8, r: 0.9 }, { dx: 6.2, dy: -5, r: 0.75 }, { dx: -0.4, dy: -10, r: 0.6 }]
+const CORRIENTE = [[30, 0], [48, -0.5], [76, -0.9], [102, -0.2], [126, -1.2], [60, -1.1], [112, -0.6]].map(([x, d]) => ({ x, d }))
+const ARRASTRE = [[18, 0, 1.1], [40, -1.1, 0.9], [63, -0.4, 1.2], [88, -1.8, 0.9], [112, -0.9, 1], [34, -2.2, 0.8], [74, -2.6, 0.9], [128, -1.5, 0.8], [96, -0.2, 0.7], [52, -1.7, 1]].map(([x, d, r]) => ({ x, d, r }))
+const ENTRA = [[176, 9, 0], [197, 21, -0.6], [214, 13, -1.3], [233, 29, -0.3], [250, 17, -1.9], [266, 27, -1], [283, 36, -2.2], [300, 12, -1.6]].map(([x, h, d]) => ({ x, y: ys(x) + h, d }))
+const FRENA = [[44, 0], [96, -0.9], [128, -1.6]].map(([x, d]) => ({ x, y: sup(x) + 1.4, d }))
+const VAPOR = [[36, 0], [78, -1.5], [122, -2.8]].map(([x, d]) => ({ x, y: yb(x) + 1, d }))
+const GOTA = 'M0 -2.1C0.7 -1 1.05 -0.2 1.05 0.45A1.05 1.05 0 0 1 -1.05 0.45C-1.05 -0.2 -0.7 -1 0 -2.1Z'
+
+/* Nubes: tres tonos (sombra abajo, cuerpo, luz arriba) hechos de círculos del mismo color, sin contorno. */
+type Nub = { c: [number, number, number][]; x0: number; x1: number; base: number }
+const NUBE_GRANDE: Nub = { c: [[102, 48, 6], [118, 45, 9], [136, 38, 15], [158, 33, 19], [182, 36, 17], [204, 41, 13], [224, 45, 9], [242, 48, 6]], x0: 96, x1: 248, base: 54 }
+const NUBE_CHICA: Nub = { c: [[30, 51, 5], [42, 47, 9], [56, 49, 7], [68, 52, 4]], x0: 25, x1: 72, base: 56 }
+/** Nube con volumen: la silueta recorta tres tonos. Luz arriba a la izquierda (de donde viene el sol), cuerpo, y la panza en sombra. */
+function Nube({ n, clip }: { n: Nub; clip: string }) {
+  const silueta = (dx: number, dy: number) => <>{n.c.map(([x, y, r], i) => <circle key={i} cx={x + dx} cy={y + dy} r={r} />)}<rect x={n.x0 + dx} y={n.base - 8 + dy} width={n.x1 - n.x0} height={8} rx={4} /></>
+  return (
+    <g>
+      <clipPath id={clip}>{silueta(0, 0)}</clipPath>
+      <g clipPath={`url(#${clip})`}>
+        <rect className="esc-nube-luz" x={n.x0 - 20} y={0} width={n.x1 - n.x0 + 40} height={n.base + 2} />
+        <g className="esc-nube">{silueta(1.6, 2.4)}</g>
+        <path className="esc-nube-sombra" d={`M${n.x0 - 2} ${n.base}V${n.base - 4.2}${rango(n.x0, n.x1, 4).map((x) => `L${x} ${f(n.base - 4.2 - 0.9 * Math.sin(x / 5))}`).join('')}V${n.base}Z`} />
+      </g>
+    </g>
+  )
+}
+
+/* ------------------------------------------------------------------ escena */
+
 export function Escena({ mes }: { mes: number }) {
   const seco = esSeco(mes)
+  const quieto = useReducedMotion()
+  const uid = 'e' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const id = (n: string) => `${uid}-${n}`
+  const url = (n: string) => `url(#${id(n)})`
+  const muelle: Transition = quieto ? { duration: 0 } : { type: 'spring', bounce: 0, duration: 0.9 }
+  const lento: Transition = quieto ? { duration: 0 } : { type: 'spring', bounce: 0, duration: 1.4 }
   // en lluvias las matas del lado tapado crecen mes a mes; en verano se quedan medianas bajo su capa de hojas
-  const crece = seco ? 0.4 : Math.min(1, 0.6 + (mes - 4) * 0.08)
+  const avance = seco ? 0 : Math.min(1, (mes - 4) / 6)
+  const crece = seco ? 0.64 : 0.74 + 0.26 * avance
+  const creceMustia = seco ? 0.62 : 0.72 + 0.08 * avance
+  const vez = (si: number, no: number) => (seco ? si : no)
+  const capa = (o: number, extra?: object) => ({ initial: false as const, animate: { opacity: o, ...extra }, transition: muelle })
+  const parar = (s: { d: number; v?: number }) => ({ animationDelay: `${s.d}s`, ...(s.v ? { animationDuration: `${s.v}s` } : {}) })
+
+  const etiqueta = (x: number, texto: ReactNode) => (
+    <g>
+      <text x={x} y={213.9} textAnchor="middle" className="esc-grabado-luz">{texto}</text>
+      <text x={x} y={213.3} textAnchor="middle" className="esc-grabado">{texto}</text>
+    </g>
+  )
+  const parada = (o: number, c: string, a = 1) => <stop offset={o} style={{ stopColor: c, stopOpacity: a }} />
+
   return (
-    <figure className="escena-fig">
-      <svg viewBox="0 0 320 190" role="img" aria-label={L('El mismo año en dos pedazos de suelo: el pelado se agrieta en verano y el aguacero le arrastra la tierra; el tapado con hojas guarda la humedad y las matas crecen.', 'The same year on two patches of soil: the bare one cracks in the dry season and heavy rain washes its soil away; the one covered with dry leaves keeps its moisture and the plants grow.')}>
-        {/* cielo */}
-        <rect x="0" y="0" width="320" height={SUELO + 6} rx="14" fill="var(--cielo-lluvia)" />
-        <motion.rect x="0" y="0" width="320" height={SUELO + 6} rx="14" fill="var(--cielo-seco)" initial={false} animate={{ opacity: seco ? 1 : 0 }} transition={muelle} />
-        <g className="satelite" aria-hidden="true">
-          <path d="M0 0 L-22 110 L22 110 Z" fill="var(--superficie)" opacity="0.18" />
-          <rect x="-5" y="-4" width="10" height="8" rx="1.5" fill="var(--tinta)" />
-          <rect x="-17" y="-2.5" width="10" height="5" fill="var(--lluvia)" />
-          <rect x="7" y="-2.5" width="10" height="5" fill="var(--lluvia)" />
-        </g>
-        <AnimatePresence>
-          {seco ? (
-            <motion.g key="sol" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={muelle} style={{ transformOrigin: '160px 46px' }}>
-              <g className="rayos" stroke="var(--seco)" strokeWidth="3" strokeLinecap="round">
-                {Array.from({ length: 8 }, (_, i) => <path key={i} d="M160 18v-8" transform={`rotate(${i * 45} 160 46)`} />)}
-              </g>
-              <circle cx="160" cy="46" r="17" fill="var(--seco)" />
-            </motion.g>
-          ) : (
-            <motion.g key="nube" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={muelle}>
-              <path d="M112 50a16 16 0 0 1 30-9 20 20 0 0 1 38 4 13 13 0 0 1 2 26h-66a12 12 0 0 1-4-21Z" fill="var(--nube)" />
-              <g className="lluvia-cae" stroke="var(--lluvia)" strokeWidth="2.5" strokeLinecap="round">
-                {[40, 70, 100, 130, 190, 220, 250, 280].map((x, i) => <path key={x} d={`M${x} 78l-3 9`} style={{ animationDelay: `${i * 110}ms` }} />)}
-              </g>
-            </motion.g>
-          )}
-        </AnimatePresence>
+    <figure className="escena-fig esc-fig" data-estacion={seco ? 'seco' : 'lluvia'}>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={L(
+        'Corte de un mismo terreno a lo largo del año, partido en dos. A la izquierda, suelo pelado: en verano se agrieta y se seca por dentro; con el aguacero salpica, el agua corre por encima llevándose la tierra y casi nada entra. A la derecha, el suelo tapado con hojas secas: el agua entra y moja el suelo hasta las raíces, en verano la humedad se guarda bajo las hojas y en lluvias las matas crecen. Un pluviómetro en medio marca la misma lluvia para las dos mitades y un satélite de la NASA pasa mirando.',
+        'Cross-section of one piece of land through the year, split in two. On the left, bare soil: in the dry season it cracks and dries inside; in heavy rain it splashes, the water runs off the top carrying soil away and almost none soaks in. On the right, the soil covered with dry leaves: the water soaks in down to the roots, in the dry season the moisture stays under the leaves, and in the rainy season the plants grow. A rain gauge in the middle shows the same rain on both halves, and a NASA satellite passes overhead, watching.')}>
+        <defs>
+          <clipPath id={id('ventana')}><rect x={V.x0} y={V.y0} width={V.x1 - V.x0} height={V.y1 - V.y0} rx={V.r} /></clipPath>
+          <clipPath id={id('cielo')}><path d={D_CIELO} /></clipPath>
+          <clipPath id={id('banda')}><path d={D_BANDA} /></clipPath>
+          <clipPath id={id('corte')}><path d={D_CORTE} /></clipPath>
+          <linearGradient id={id('capa-a')} gradientUnits="userSpaceOnUse" x1="0" x2={W} y1="0" y2="0">
+            {parada(0.44, 'var(--esc-a-pelado)')}{parada(0.56, 'var(--esc-a-tapado)')}
+          </linearGradient>
+          <linearGradient id={id('banda-g')} gradientUnits="userSpaceOnUse" x1="0" x2={W} y1="0" y2="0">
+            {parada(0.46, 'var(--esc-banda-pelado)')}{parada(0.54, 'var(--esc-banda-tapado)')}
+          </linearGradient>
+          <linearGradient id={id('bruma')} x1="0" x2="0" y1="0" y2="1">{parada(0, 'var(--fondo)', 0.45)}{parada(1, 'var(--fondo)', 0)}</linearGradient>
+          <linearGradient id={id('palidez')} gradientUnits="userSpaceOnUse" x1="0" x2="170" y1="0" y2="0">
+            {parada(0, 'var(--esc-polvo)', 0.42)}{parada(0.84, 'var(--esc-polvo)', 0.42)}{parada(1, 'var(--esc-polvo)', 0)}
+          </linearGradient>
+          <linearGradient id={id('humedo')} x1="0" x2="0" y1="0" y2="1">
+            {parada(0, 'var(--esc-humedo)', 0.66)}{parada(0.55, 'var(--esc-humedo)', 0.5)}{parada(0.84, 'var(--esc-humedo)', 0.4)}{parada(0.97, 'var(--esc-humedo)', 0.08)}{parada(1, 'var(--esc-humedo)', 0)}
+          </linearGradient>
+          <linearGradient id={id('piel')} x1="0" x2="0" y1="0" y2="1">{parada(0, 'var(--esc-piel)', 0.75)}{parada(1, 'var(--esc-piel)', 0)}</linearGradient>
+          <linearGradient id={id('escurre')} gradientUnits="userSpaceOnUse" x1="0" x2="152" y1="0" y2="0">
+            {parada(0, 'var(--esc-lodo)')}{parada(0.55, 'var(--esc-lodo-claro)')}{parada(1, 'var(--esc-agua-clara)')}
+          </linearGradient>
+          <linearGradient id={id('haz')} x1="0" x2="0" y1="0" y2="1">{parada(0, 'var(--esc-haz)', 0.5)}{parada(1, 'var(--esc-haz)', 0.12)}</linearGradient>
+          <linearGradient id={id('vapor')} x1="0" x2="0" y1="0" y2="1">{parada(0, 'var(--esc-vapor)', 0)}{parada(0.45, 'var(--esc-vapor)', 1)}{parada(1, 'var(--esc-vapor)', 0)}</linearGradient>
+          <linearGradient id={id('desvanece')} x1="0" x2="1" y1="0" y2="0">{parada(0, 'var(--esc-lamina)', 0)}{parada(0.25, 'var(--esc-lamina)', 1)}{parada(0.75, 'var(--esc-lamina)', 1)}{parada(1, 'var(--esc-lamina)', 0)}</linearGradient>
+          <linearGradient id={id('hondo')} x1="0" x2="0" y1="0" y2="1">{parada(0.3, 'var(--esc-sombra)', 0)}{parada(1, 'var(--esc-sombra)', 0.3)}</linearGradient>
+          <linearGradient id={id('sombra-marco')} x1="0" x2="0" y1="0" y2="1">{parada(0, 'var(--esc-sombra)', 0.22)}{parada(1, 'var(--esc-sombra)', 0)}</linearGradient>
+          <radialGradient id={id('halo')}>{parada(0, 'var(--seco)', 0.42)}{parada(0.45, 'var(--seco)', 0.16)}{parada(1, 'var(--seco)', 0)}</radialGradient>
+        </defs>
 
-        {/* suelo pelado */}
-        <rect x="0" y={SUELO} width="156" height={190 - SUELO} rx="6" fill="var(--laterita)" opacity="0.85" />
-        <motion.path d="M18 128l6 9-4 7M60 128l-3 8 6 6M104 128l5 10-5 5M138 128l-4 9" stroke="var(--humus)" strokeWidth="2" fill="none"
-          animate={{ opacity: seco ? 1 : 0, pathLength: seco ? 1 : 0 }} transition={muelle} />
-        <motion.g animate={{ opacity: seco ? 0 : 1 }} transition={muelle}>
-          <g className="salpica" fill="var(--laterita)">{[30, 72, 116].map((x) => <circle key={x} cx={x} cy={SUELO - 6} r="2.6" />)}</g>
-          <path className="arrastre" d="M150 136q-40 14-140 18" stroke="var(--humus)" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="6 7" />
-        </motion.g>
+        <g clipPath={url('ventana')}>
+          {/* ---------- cielo y lomas: lluvias debajo, verano encima, se funden */}
+          <rect className="esc-cielo-lluvia" x="0" y="0" width={W} height={H} />
+          <path className="esc-loma-lejos-lluvia" d={D_LOMA_LEJOS} />
+          <path className="esc-loma-cerca-lluvia" d={D_LOMA_CERCA} />
+          <motion.g {...capa(vez(1, 0))}>
+            <rect className="esc-cielo-seco" x="0" y="0" width={W} height={H} />
+            <path className="esc-loma-lejos-seco" d={D_LOMA_LEJOS} />
+            <path className="esc-loma-cerca-seco" d={D_LOMA_CERCA} />
+            <g transform="translate(112 40)">
+              <circle className="esc-anim esc-halo" r={34} fill={url('halo')} />
+              <g className="esc-rayos">{Array.from({ length: 16 }, (_, i) => <path key={i} d={i % 2 ? 'M0 -16v-2.2' : 'M0 -16v-4.2'} transform={`rotate(${i * 22.5})`} />)}</g>
+              <circle className="esc-sol" r={12.5} />
+              <circle className="esc-sol-luz" cx={-2} cy={-2} r={8.8} />
+            </g>
+          </motion.g>
 
-        {/* suelo tapado */}
-        <rect x="164" y={SUELO} width="156" height={190 - SUELO} rx="6" fill="var(--humus)" opacity="0.9" />
-        <motion.g animate={{ opacity: seco ? 0 : 1 }} transition={muelle}>
-          <g className="entra" stroke="var(--lluvia)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 6">
-            {[190, 236, 282].map((x) => <path key={x} d={`M${x} 134v30`} />)}
+          {/* ---------- satélite: cruza de vez en cuando con un haz tenue hacia el terreno */}
+          <g className="esc-anim esc-orbita">
+            <g transform="translate(236 15)">
+              <path className="esc-anim esc-haz" d={`M-1.4 6L-17 ${f(yb(236) - 15 + 1)}L17 ${f(yb(236) - 15 + 1)}L1.4 6Z`} fill={url('haz')} />
+              <Satelite />
+            </g>
           </g>
-        </motion.g>
-        <g fill="var(--hoja)">
-          {[184, 226, 268, 306].map((x, i) => (
-            <motion.g key={x} style={{ transformOrigin: `${x}px ${SUELO}px` }} initial={false} animate={{ scale: crece }} transition={{ type: 'spring', bounce: 0.3, duration: 0.7, delay: i * 0.05 }}>
-              <path d={`M${x} ${SUELO}v-34`} stroke="var(--hoja)" strokeWidth="3" />
-              <path d={`M${x} ${SUELO - 22}c0-10 7-16 17-16 0 10-7 16-17 16ZM${x} ${SUELO - 14}c0-8-6-13-14-13 0 8 6 13 14 13Z`} />
+
+          {/* ---------- nubes de lluvia */}
+          <motion.g {...capa(vez(0, 1), { y: vez(-6, 0) })}>
+            <g className="esc-anim esc-deriva"><Nube n={NUBE_CHICA} clip={id('nube-a')} /><Nube n={NUBE_GRANDE} clip={id('nube-b')} /></g>
+          </motion.g>
+
+          {/* ---------- el terreno detrás del corte */}
+          <path d={D_BANDA} fill={url('banda-g')} />
+          <g clipPath={url('banda')}>
+            <motion.path d={D_BANDA} className="esc-banda-polvo" {...capa(vez(1, 0))} />
+            <motion.path d={D_BANDA} className="esc-banda-mojada" {...capa(vez(0, 1))} />
+            {/* verano: el suelo pelado se cuartea */}
+            <motion.g className="esc-grieta" {...capa(vez(1, 0))}>
+              {BANDA_GRIETAS.map((d, i) => <path key={i} d={d} />)}
+              {BANDA_CRUCES.map((d, i) => <path key={'c' + i} d={d} />)}
+            </motion.g>
+            <path className="esc-zanja" d={D_ZANJA_FONDO} />
+            {/* lluvias: charcos y el agua corriendo hacia la izquierda, a la zanja */}
+            <motion.g {...capa(vez(0, 1))}>
+              <path className="esc-zanja-agua" d={D_ZANJA_FONDO} />
+              {HILOS.map((d, i) => <path key={'h' + i} className="esc-hilo" d={d} />)}
+              {CHARCOS.map((c, i) => (
+                <g key={i}>
+                  <ellipse className="esc-charco" cx={c.cx} cy={c.cy} rx={c.rx} ry={c.ry} />
+                  <path className="esc-charco-brillo" d={`M${f(c.cx - c.rx * 0.55)} ${f(c.cy - 0.2)}h${f(c.rx * 0.6)}`} />
+                </g>
+              ))}
+            </motion.g>
+            {HOJARASCA_FONDO.map((h, i) => <ellipse key={i} className={`esc-hojarasca-${h.tono}`} cx={h.x} cy={h.y} rx={h.rx} ry={h.ry} transform={`rotate(${f(h.a)} ${f(h.x)} ${f(h.y)})`} />)}
+            <path d={D_BANDA} fill={url('bruma')} />
+          </g>
+          {/* huella del satélite sobre el terreno: se mueve con él */}
+          <g className="esc-anim esc-orbita"><ellipse className="esc-anim esc-haz esc-huella" cx={236} cy={yb(236) + 3.6} rx={17} ry={2.4} /></g>
+
+          {/* matas de atrás, más chicas y pálidas por la distancia */}
+          <g className="esc-lejos">
+            {[[176, 5.5], [214, 6.5], [257, 5.2], [298, 6.2]].map(([x, h]) => (
+              <motion.g key={x} style={{ originX: 0.5, originY: 1 }} initial={false} animate={{ scale: crece }} transition={lento}>
+                <g transform={`translate(${x} ${f(ys(x) - h)}) scale(0.42) translate(${-x} ${f(-(ys(x) - h))})`}><Mata x={x} y={ys(x) - h} alto={36} inclina={1} hojas={MATA_GRANDE} espejo={x % 2 === 0} /></g>
+              </motion.g>
+            ))}
+          </g>
+          <g className="esc-lejos esc-mustia">
+            {[[30, 6], [84, 5], [133, 6.5]].map(([x, h]) => (
+              <motion.g key={x} style={{ originX: 0.5, originY: 1 }} initial={false} animate={{ scale: creceMustia }} transition={lento}>
+                <g transform={`translate(${x} ${f(sup(x) - h)}) scale(0.5) translate(${-x} ${f(-(sup(x) - h))})`}><Mata x={x} y={sup(x) - h} alto={17} inclina={0.6} hojas={MATA_MUSTIA} /></g>
+              </motion.g>
+            ))}
+          </g>
+
+          {/* verano: el lado pelado suelta su humedad al aire */}
+          <motion.g {...capa(vez(1, 0))}>
+            {VAPOR.map((v, i) => <path key={i} className="esc-anim esc-vaho" style={parar(v)} d={`M${v.x} ${f(v.y)}c-1.6 -2.6 1.6 -4.4 0 -7s1.6 -4.4 0 -7`} stroke={url('vapor')} />)}
+          </motion.g>
+
+          {/* ---------- el corte */}
+          <path className="esc-subsuelo" d={D_CORTE} />
+          <g clipPath={url('corte')}>
+            {MANCHAS.map((m, i) => <path key={i} className={m.tono} d={m.d} />)}
+            {CONCRECIONES.map((c, i) => <circle key={i} className="esc-concrecion" cx={c.x} cy={c.y} r={c.r} />)}
+            {PIEDRAS.map(([x, y, rx, ry], i) => (
+              <g key={i} transform={`translate(${x} ${y}) rotate(${(i * 23) % 40 - 20})`}>
+                <ellipse className="esc-piedra" rx={rx} ry={ry} />
+                <path className="esc-piedra-sombra" d={`M${f(rx)} 0A${f(rx)} ${f(ry)} 0 0 1 ${f(-rx * 0.55)} ${f(ry * 0.83)}Q${f(rx * 0.35)} ${f(ry * 0.45)} ${f(rx)} 0Z`} />
+                <path className="esc-piedra-luz" d={`M${f(-rx * 0.8)} ${f(-ry * 0.2)}Q${f(-rx * 0.55)} ${f(-ry * 0.85)} ${f(rx * 0.1)} ${f(-ry * 0.82)}Q${f(-rx * 0.45)} ${f(-ry * 0.45)} ${f(-rx * 0.8)} ${f(-ry * 0.2)}Z`} />
+              </g>
+            ))}
+            <rect x="0" y={110} width={W} height={92} fill={url('hondo')} />
+            <path d={D_CAPA_A} fill={url('capa-a')} />
+            <path className="esc-limite" d={D_LIMITE_AB} />
+            {/* pelado: más pálido en verano, apretado en láminas, con pocos poros */}
+            <motion.path d={D_CAPA_A} fill={url('palidez')} {...capa(vez(1, 0.35))} />
+            {LAMINAS.map((d, i) => <path key={i} className="esc-lamina" d={d} stroke={url('desvanece')} />)}
+            {/* tapado: grumos, poros y una lombriz en su galería */}
+            {GRUMOS.map((d, i) => <path key={i} className="esc-grumo" d={d} />)}
+            {POROS.map((p, i) => <circle key={i} className="esc-poro" cx={p.x} cy={p.y} r={p.r} />)}
+            <path className="esc-galeria" d={LOMBRIZ_GALERIA} />
+            <path className="esc-lombriz" d={linea(LOMBRIZ_CUERPO)} />
+            <path className="esc-lombriz-luz" d={linea(LOMBRIZ_CUERPO.slice(1, -1))} />
+            {LOMBRIZ_ANILLOS.map((d, i) => <path key={i} className={i === 5 || i === 6 ? 'esc-lombriz-collar' : 'esc-lombriz-anillo'} d={d} />)}
+            {/* el agua guardada / el agua que entra: el frente de humedad baja en lluvias */}
+            <motion.path d={D_HUMEDO} fill={url('humedo')} style={{ originY: 0 }} initial={false} animate={{ scaleY: vez(0.3, 1), opacity: vez(0.92, 1) }} transition={lento} />
+            <motion.path d={D_PIEL} fill={url('piel')} {...capa(vez(0, 1))} />
+            {/* raíces */}
+            <motion.g className="esc-raiz" style={{ originY: 0 }} initial={false} animate={{ scaleY: 0.78 + 0.22 * (crece - 0.64) / 0.36 }} transition={lento}>
+              {RAICES_TAPADO.map((d, i) => <path key={i} d={d} />)}
+            </motion.g>
+            <g className="esc-raiz esc-raiz-corta">{RAICES_PELADO.map((d, i) => <path key={i} d={d} />)}</g>
+            {/* la estaca del pluviómetro sigue bajo tierra */}
+            <path className="esc-madera" d={`M${MEDIO - 1.8} ${f(ys(MEDIO) - 1)}V${f(ys(MEDIO) + 24)}L${MEDIO} ${f(ys(MEDIO) + 28)}L${MEDIO + 1.8} ${f(ys(MEDIO) + 24)}V${f(ys(MEDIO) - 1)}Z`} />
+            <path className="esc-madera-luz" d={`M${MEDIO - 1.8} ${f(ys(MEDIO) - 1)}V${f(ys(MEDIO) + 24)}L${MEDIO - 0.9} ${f(ys(MEDIO) + 25.8)}V${f(ys(MEDIO) - 1)}Z`} />
+            {/* verano: grietas que bajan y se abren */}
+            <motion.g style={{ originY: 0 }} initial={false} animate={{ opacity: vez(1, 0), scaleY: vez(1, 0.4) }} transition={muelle}>
+              {GRIETAS.map((g, i) => (
+                <g key={i}>
+                  <path className="esc-grieta-fondo" d={g.cuña} />
+                  {g.ramas.map((d, k) => <path key={k} className="esc-grieta-fondo" d={d} />)}
+                  <path className="esc-labio" d={g.labio} />
+                </g>
+              ))}
+            </motion.g>
+            {/* lluvias: gotas que bajan del lado tapado; del lado pelado se quedan en la costra */}
+            <motion.g {...capa(vez(0, 1))}>
+              {ENTRA.map((g, i) => <g key={i} transform={`translate(${g.x} ${f(g.y)})`}><g className="esc-anim esc-entra" style={parar(g)}><path className="esc-gota" d={GOTA} /><circle className="esc-gota-brillo" cx={-0.35} cy={0.1} r={0.32} /></g></g>)}
+              {FRENA.map((g, i) => <g key={i} transform={`translate(${g.x} ${f(g.y)})`}><g className="esc-anim esc-frena" style={parar(g)}><path className="esc-gota" d={GOTA} transform="scale(0.8)" /></g></g>)}
+            </motion.g>
+          </g>
+
+          {/* ---------- la superficie en el corte */}
+          <path className="esc-canto-pelado" d={D_CANTO_PELADO} />
+          <path className="esc-canto-tapado" d={linea(rango(MEDIO - 2, 322, 2).map((x): P => [x, ys(x) - 0.2]))} />
+          {/* lluvias: lámina de agua turbia que corre hacia el borde llevándose la tierra */}
+          <motion.g {...capa(vez(0, 1))}>
+            <path d={D_ESCURRE} fill={url('escurre')} />
+            <path className="esc-escurre-brillo" d={D_ESCURRE_BRILLO} />
+            {CORRIENTE.map((c, i) => <path key={i} className="esc-anim esc-corre" style={parar(c)} d={`M${c.x + 4} ${f(agua(c.x + 4) + 0.9)}h-5`} />)}
+            {ARRASTRE.map((a, i) => <circle key={i} className="esc-anim esc-arrastra" style={parar(a)} cx={a.x + 6} cy={f((agua(a.x + 6) + sup(a.x + 6)) / 2 + 0.3)} r={a.r} />)}
+            {SALPICA.map((s, i) => (
+              <g key={i} transform={`translate(${s.x} ${f(s.y)})`}>
+                <ellipse className="esc-anim esc-anillo" style={parar(s)} rx={2.6} ry={0.6} />
+                {GOTITAS.map((g, k) => (
+                  <circle key={k} className="esc-anim esc-salpica" r={g.r} cx={f(g.dx * 0.55)} cy={f(g.dy)}
+                    style={{ animationDelay: `${s.d}s`, '--dx': `${f(g.dx * 0.45)}px`, '--dy': `${f(-g.dy)}px` } as CSSProperties} />
+                ))}
+              </g>
+            ))}
+          </motion.g>
+
+          {/* hojarasca en corte, en tres filas; las matas salen entre la segunda y la tercera */}
+          {HOJARASCA.filter((h) => h.y > ys(h.x) - 5).map((h, i) => (
+            <g key={i} transform={`translate(${f(h.x)} ${f(h.y)}) rotate(${f(h.a)})`}>
+              <path className={`esc-hojarasca-${h.tono}`} d={hojaSecaD(h)} />
+              {!h.curva && <path className="esc-hojarasca-nervio" d={`M${f(-h.l / 2)} 0L${f(h.l / 2)} 0`} />}
+            </g>
+          ))}
+          {[[190, 36, 1.5, false], [238, 40, -1.2, true], [287, 33, 2, false]].map(([x, alto, inc, esp]) => (
+            <motion.g key={x as number} style={{ originX: 0.5, originY: 1 }} initial={false} animate={{ scale: crece }} transition={lento}>
+              <Mata x={x as number} y={ys(x as number) - 1} alto={alto as number} inclina={inc as number} hojas={MATA_GRANDE} espejo={esp as boolean} />
             </motion.g>
           ))}
-        </g>
-        <g fill="var(--rastrojo)">{Array.from({ length: 13 }, (_, i) => <ellipse key={i} cx={170 + i * 11.5} cy={SUELO - 2 + (i % 2)} rx="7" ry="3" transform={`rotate(${(i * 37) % 30 - 15} ${170 + i * 11.5} ${SUELO})`} />)}</g>
+          <g className="esc-mustia">
+            {[[52, 0.6], [116, -0.5]].map(([x, inc]) => (
+              <motion.g key={x} style={{ originX: 0.5, originY: 1 }} initial={false} animate={{ scale: creceMustia }} transition={lento}>
+                <Mata x={x} y={sup(x)} alto={18} inclina={inc} hojas={MATA_MUSTIA} espejo={x > 100} />
+              </motion.g>
+            ))}
+          </g>
+          {HOJARASCA.filter((h) => h.y <= ys(h.x) - 5).map((h, i) => (
+            <g key={i} transform={`translate(${f(h.x)} ${f(h.y)}) rotate(${f(h.a)})`}>
+              <path className={`esc-hojarasca-${h.tono}`} d={hojaSecaD(h)} />
+              {!h.curva && <path className="esc-hojarasca-nervio" d={`M${f(-h.l / 2)} 0L${f(h.l / 2)} 0`} />}
+            </g>
+          ))}
 
-        <text x="78" y="182" textAnchor="middle" className="esc-etq">{L('Suelo pelado', 'Bare soil')}</text>
-        <text x="242" y="182" textAnchor="middle" className="esc-etq">{L('Tapado con hojas', 'Covered with dry leaves')}</text>
+          <Pluviometro nivel={LLUVIA_REL[mes]} transicion={lento} />
+
+          {/* ---------- la lluvia, por delante de todo lo que está sobre el suelo */}
+          <motion.g clipPath={url('cielo')} {...capa(vez(0, 1))}>
+            {LLUVIA.map((g, i) => <path key={i} className="esc-anim esc-cae" style={parar(g)} d={`M${f(g.x)} ${f(g.y)}l-1.3 6.2`} />)}
+          </motion.g>
+
+          <rect x={V.x0} y={V.y0} width={V.x1 - V.x0} height={10} fill={url('sombra-marco')} />
+        </g>
+
+        {/* ---------- el marco: una caja de muestra con su placa grabada */}
+        <path className="esc-marco" fillRule="evenodd" d={`M12 0H${W - 12}A12 12 0 0 1 ${W} 12V${H - 12}A12 12 0 0 1 ${W - 12} ${H}H12A12 12 0 0 1 0 ${H - 12}V12A12 12 0 0 1 12 0Z
+          M${V.x0 + V.r} ${V.y0}H${V.x1 - V.r}A${V.r} ${V.r} 0 0 1 ${V.x1} ${V.y0 + V.r}V${V.y1 - V.r}A${V.r} ${V.r} 0 0 1 ${V.x1 - V.r} ${V.y1}H${V.x0 + V.r}A${V.r} ${V.r} 0 0 1 ${V.x0} ${V.y1 - V.r}V${V.y0 + V.r}A${V.r} ${V.r} 0 0 1 ${V.x0 + V.r} ${V.y0}Z`} />
+        <path className="esc-marco-luz" d={`M0.6 12A11.4 11.4 0 0 1 12 0.6H${W - 12}A11.4 11.4 0 0 1 ${W - 0.6} 12`} />
+        {/* canto interior: sombra arriba e izquierda, luz abajo y derecha; se encuentran en las esquinas */}
+        <path className="esc-bisel-sombra" d={`M${V.x0 + 0.5} ${V.y1 - V.r}V${V.y0 + V.r}A${V.r - 0.5} ${V.r - 0.5} 0 0 1 ${V.x0 + V.r} ${V.y0 + 0.5}H${V.x1 - V.r}`} />
+        <path className="esc-bisel-luz" d={`M${V.x1 - V.r} ${V.y0 + 0.5}A${V.r - 0.5} ${V.r - 0.5} 0 0 1 ${V.x1 - 0.5} ${V.y0 + V.r}V${V.y1 - V.r}A${V.r - 0.5} ${V.r - 0.5} 0 0 1 ${V.x1 - V.r} ${V.y1 - 0.5}H${V.x0 + V.r}A${V.r - 0.5} ${V.r - 0.5} 0 0 1 ${V.x0 + 0.5} ${V.y1 - V.r}`} />
+        {/* la mitad, marcada en los dos travesaños */}
+        <path className="esc-muesca" d={`M${MEDIO} ${V.y1 + 0.6}v3.4M${MEDIO} ${V.y0 - 0.6}v-3`} />
+        {[13, W - 13].map((x) => (
+          <g key={x}>
+            <circle className="esc-tornillo-marco" cx={x} cy={210.5} r={2} />
+            <path className="esc-ranura" d={`M${x - 1.4} ${210.5 + 0.5}L${x + 1.4} ${210.5 - 0.5}`} />
+          </g>
+        ))}
+        {etiqueta((V.x0 + MEDIO) / 2 + 2, L('Suelo pelado', 'Bare soil'))}
+        {etiqueta((MEDIO + V.x1) / 2 - 2, L('Tapado con hojas', 'Covered with dry leaves'))}
       </svg>
       <figcaption>
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span key={mes} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ type: 'spring', bounce: 0, duration: 0.3 }}>
-            {NOMBRE_MES[mes]}
-          </motion.span>
-        </AnimatePresence>
+        <span className="esc-mes">
+          <AnimatePresence initial={false}>
+            <motion.span key={mes} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6, transition: { duration: 0.12 } }} transition={quieto ? { duration: 0 } : { type: 'spring', bounce: 0, duration: 0.3 }}>
+              {NOMBRE_MES[mes]}
+            </motion.span>
+          </AnimatePresence>
+        </span>
         <b>{seco ? L('verano', 'dry season') : L('lluvias', 'rainy season')}</b>
+        <span className="esc-anio" aria-hidden="true">
+          {NOMBRE_MES.map((_, i) => <i key={i} data-seco={esSeco(i)} data-actual={i === mes} />)}
+        </span>
       </figcaption>
     </figure>
   )

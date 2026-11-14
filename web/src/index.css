@@ -357,7 +357,7 @@ svg text { font-family: var(--display); fill: var(--tinta-2); }
 .bienvenida .escena-fig { flex: 1 1 auto; min-height: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; }
 .bienvenida .escena-fig svg { flex: 0 1 auto; min-height: 0; max-height: 100%; width: 100%; }
 .bienvenida-texto { flex: none; }
-.bienvenida h1 { font-size: clamp(1.9rem, min(9.5vw, 5.4dvh), 3rem); line-height: 0.98; letter-spacing: -0.01em; text-wrap: balance; }
+.bienvenida h1 { font-size: clamp(1.9rem, min(11vw, 6dvh), 3.2rem); line-height: 0.98; letter-spacing: -0.01em; text-wrap: balance; }
 .bienvenida-texto > p:not(.nota) { font-size: 1rem; line-height: 1.4; margin-top: 8px; text-wrap: pretty; }
 .bienvenida .boton.grande { width: 100%; margin: 16px 0 8px; }
 .bienvenida .nota { font-size: 0.85rem; margin: 0; text-align: center; }
@@ -439,25 +439,6 @@ fieldset.campo legend { padding: 0; margin-bottom: 0.35rem; }
 :root { --cielo-seco: #f1e3bd; --cielo-lluvia: #d3dfe4; --nube: #a9b9c3; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) { --cielo-seco: #2e2b1c; --cielo-lluvia: #1b272d; --nube: #50616b; } }
 :root[data-theme='dark'] { --cielo-seco: #2e2b1c; --cielo-lluvia: #1b272d; --nube: #50616b; }
-.escena-fig { margin: 1.6rem 0 0.9rem; }
-.escena-fig svg { display: block; width: 100%; height: auto; overflow: visible; }
-.escena-fig figcaption { display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.55rem; font: 600 1.25rem/1 var(--display); min-height: 1.3rem; overflow: hidden; }
-.escena-fig figcaption b { color: var(--tinta-2); font-weight: 500; }
-.esc-etq { font: 700 11px var(--texto); fill: #fff; }
-.satelite { animation: satelite 7s linear infinite; }
-@keyframes satelite { from { transform: translate(-30px, 14px); } to { transform: translate(350px, 14px); } }
-.rayos { transform-box: view-box; transform-origin: 160px 46px; animation: gira 14s linear infinite; }
-@keyframes gira { to { transform: rotate(1turn); } }
-.lluvia-cae path { animation: cae 0.9s linear infinite; }
-@keyframes cae { from { transform: translateY(-6px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(36px); opacity: 0; } }
-.salpica circle { animation: salta 0.9s var(--ease-out) infinite; }
-.salpica circle:nth-child(2) { animation-delay: 0.3s; } .salpica circle:nth-child(3) { animation-delay: 0.6s; }
-@keyframes salta { from { transform: translateY(2px); opacity: 1; } to { transform: translateY(-12px); opacity: 0; } }
-.arrastre { animation: corre 0.8s linear infinite; }
-@keyframes corre { to { stroke-dashoffset: 26; } }
-.entra path { animation: baja 0.9s linear infinite; }
-@keyframes baja { to { stroke-dashoffset: -20; } }
-@media (prefers-reduced-motion: reduce) { .satelite, .rayos, .lluvia-cae path, .salpica circle, .arrastre, .entra path { animation: none; } .satelite { transform: translate(250px, 14px); } }
 .icono-btn.idioma { font: 700 0.95rem/1 var(--display); letter-spacing: 0.04em; }
 
 /* ---- Registro ---- */
