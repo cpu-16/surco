@@ -39,12 +39,17 @@ The app walks through eight short steps:
 
 ## How it works
 
-```
-NASA POWER (climate) ─┐
-GPM IMERG (rain) ─────┤
-MODIS / VIIRS / HLS ──┼──► dry season of the place ─► month-by-month cover of each zone ─► bare months
-farmer's photo ───────┤      (rain < ½ ET₀)            (crop calendar, FAO-56 stages)        water deficit
-can test / puddles ───┘                                                                       work and first harvest
+```mermaid
+flowchart LR
+  POWER["NASA POWER<br/>climate"] --> SECA["Dry season of the place<br/>rain below ½ ET₀"]
+  IMERG["GPM IMERG<br/>rain"] --> SECA
+  SECA --> COB["Cover of each zone<br/>month by month"]
+  VERDE["MODIS · VIIRS · HLS<br/>greenness"] --> COB
+  FOTO["Farmer's photo<br/>green cover"] --> COB
+  COB --> PEL["Bare months"]
+  COB --> TRAB["Work and first harvest"]
+  SECA --> AGUA["Water deficit<br/>normal and El Niño years"]
+  LATA["Can test · puddles"] --> AGUA
 ```
 
 - **Dry season, per location.** A month is dry when its normal rain is below half the reference evapotranspiration (ET₀, FAO-56 with NASA POWER). This makes the same logic work in Panama, Guatemala's Dry Corridor, Kenya or India.
@@ -58,7 +63,7 @@ can test / puddles ───┘                                                 
 
 | Data | What we use it for | Resolution | Access |
 |---|---|---|---|
-| **GPM IMERG V07, daily (Early)** | Rain in the last 60 days, dry spells | 0.1° (~11 km), up to yesterday | NASA GES DISC through Giovanni (Earthdata Login) |
+| **GPM IMERG V07, daily (Early)** | Rain in the last 30 days, dry spells | 0.1° (~11 km), up to yesterday | NASA GES DISC through Giovanni (Earthdata Login) |
 | **NASA POWER, daily (AG community)** | Rain, temperature, humidity, wind, radiation, root-zone soil wetness, ET₀, normals and El Niño years | 0.5° × 0.625° (~55 km) | POWER API |
 | **MODIS MOD13Q1 NDVI** | Greenness through the year since 2000 | 250 m, 16 days | ORNL DAAC subset API |
 | **MODIS MOD16A2GF ET / PET** | Real evapotranspiration, where available | 500 m, 8 days | ORNL DAAC subset API |
