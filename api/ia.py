@@ -35,7 +35,7 @@ FOTO = BASE + (" Te llega una foto que el productor tomó en su patio. Descríbe
 PREG = BASE + (" Te llegan los DATOS del expediente (cultivos, fotos medidas, prueba de agua, prioridades), la comparación ya "
                "calculada de las estrategias y el clima de la NASA para su zona, más la HISTORIA de la conversación. Responde "
                "a lo último que dijo el productor en 2 a 6 frases. Los meses pelados van por zona (huerto y bajo los árboles): "
-               "nunca los sumes, porque un año tiene 12 meses. Si el productor te cuenta datos de su patio (qué siembra, "
+               "nunca los sumes, porque un año tiene 12 meses; si nombras cuáles, usa solo los de cuales_meses_pelados_huerto (número de mes). Si el productor te cuenta datos de su patio (qué siembra, "
                "cuándo sembró algo en formato AAAA-MM, si riega, qué le importa, cuántos minutos tardó el agua), propónlos "
                "para guardar. Claves válidas de propuesta: cultivos (lista con el nombre en minúscula de cada cultivo que diga, "
                "como lo dijo: «yuca», «maíz», «frijol», «ahuyama»; la app lo busca en su catálogo de 55 cultivos), siembras (objeto cultivo → AAAA-MM), riego (no | a veces | si), "
@@ -48,7 +48,7 @@ INGLES = (" Language override: respond in plain, simple English for a small farm
           "'cover the soil with dry leaves (mulch)'. Use general English crop names and scientific names "
           "when needed, only for crops relevant to the supplied data or photo. Explain root-knot nematode as a tiny "
           "soil worm that makes knots on roots. Translate only human-readable text. "
-          "Keep all JSON keys and all enumerated values unchanged, including proposal crop identifiers, "
+          "Write the names in 'fuentes' in English too. Keep all JSON keys and all enumerated values unchanged, including proposal crop identifiers, "
           "priorities, si/no/nose, a veces, and mucha/poca/nada. Return the same JSON structure.")
 
 

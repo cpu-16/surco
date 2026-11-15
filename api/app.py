@@ -275,7 +275,8 @@ async def ia_pregunta(c: Charla):
     comp = c.comparacion or {}
     # al asistente solo le llega lo calculado, sin las tiras mes a mes completas para no inflar el contexto
     resumen = [{k: e.get(k) for k in ("nombre", "detalle", "n_kg_ha", "familias", "agua", "razon", "beneficios", "vacios", "riesgos", "ajustes")}
-               | {"meses_pelados_huerto": e.get("desnudo_cama"), "meses_pelados_bajo_arboles": e.get("desnudo_arboles")}
+               | {"meses_pelados_huerto": e.get("desnudo_cama"), "meses_pelados_bajo_arboles": e.get("desnudo_arboles"),
+                  "cuales_meses_pelados_huerto": [m["mes"] for m in e.get("tira", []) if m.get("cobertura") == "desnudo"]}
                | {"meses": [f"{m['mes']}:{m.get('nombre') or 'desnudo'}/{m['cobertura']}" for m in e.get("tira", [])]}
                for e in comp.get("estrategias", [])]
     expediente = {**c.expediente, "pais": "PA" if ia.es_panama(c.expediente) else None,
