@@ -1,7 +1,7 @@
 import { idioma, L } from './i18n'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { pedir, sinImagenes, type Expediente, type Lugar } from './api'
+import { local, pedir, sinImagenes, type Expediente, type Lugar } from './api'
 import type { Comparacion } from './anio'
 import { Icono } from './ui'
 
@@ -34,7 +34,8 @@ const valor = (x: unknown) => L(x, VALORES_EN[String(x)] ?? x)
 export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
   exp: Expediente; lugar: Lugar | null; comp: Comparacion | null; cambiar: (p: Partial<Expediente>) => void; enLinea: boolean
 }) {
-  const [msgs, setMsgs] = useState<Msg[]>([])
+  const [msgs, setMsgs] = useState<Msg[]>(() => local.leer<Msg[]>('surco-chat') ?? [])
+  useEffect(() => { local.poner('surco-chat', msgs.slice(-40)) }, [msgs]) // ponytail: últimos 40 mensajes, sobra para un patio
   const [texto, setTexto] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [oyendo, setOyendo] = useState(false)

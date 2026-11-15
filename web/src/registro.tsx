@@ -29,7 +29,8 @@ function resultadoDe(comp: Comparacion | null, lugar: Lugar | null): Resultado |
 /** La línea de tiempo sale de lo que ya está guardado; no hay que llenarla a mano. */
 function linea(e: ExpRegistro, nombreCultivo: (c: string) => string, ajeno = false) {
   const items: { fecha: string; texto: string; quien?: string }[] = []
-  for (const [c, m] of Object.entries(e.siembras ?? {})) if (m) items.push({ fecha: m, texto: L(`Sembraste ${nombreCultivo(c).toLowerCase()} (${MES(m)})`, `You planted ${nombreCultivo(c).toLowerCase()} (${MES(m)})`) })
+  // «antes» (hace años) no tiene fecha para la línea de tiempo
+  for (const [c, m] of Object.entries(e.siembras ?? {})) if (/^\d{4}-\d{2}$/.test(m)) items.push({ fecha: m, texto: L(`Sembraste ${nombreCultivo(c).toLowerCase()} (${MES(m)})`, `You planted ${nombreCultivo(c).toLowerCase()} (${MES(m)})`) })
   const LUGAR: Record<string, string> = { cama: L('el huerto', 'the garden plot'), perennes: L('debajo de los árboles', 'under the trees'), pina: L('una planta', 'a plant'), general: L('el patio entero', 'the whole yard') }
   for (const f of e.fotos ?? []) {
     const suelo = f.tipo === 'cama' || f.tipo === 'perennes' // las otras son de consulta: lo verde de la foto no es suelo tapado

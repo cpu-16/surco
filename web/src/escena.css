@@ -116,10 +116,10 @@
 .esc-sat-oro-sombra { fill: color-mix(in srgb, var(--seco) 70%, black); }
 .esc-antena { fill: color-mix(in srgb, var(--superficie) 80%, white); stroke: var(--tinta-2); stroke-width: 0.4; }
 .esc-sensor { fill: color-mix(in srgb, var(--tinta) 85%, black); }
-.esc-orbita-sat, .esc-orbita-haz, .esc-orbita-huella { animation: 17s linear -15.6s infinite; }
-.esc-orbita-sat { animation-name: esc-orbita-sat; }
-.esc-orbita-haz { animation-name: esc-orbita-haz; }
-.esc-orbita-huella { animation-name: esc-orbita-huella; }
+/* con el nombre dentro de cada shorthand: sin nombre, el minificador lo dejaba en «animation: none» y el satélite no cruzaba */
+.esc-orbita-sat { animation: esc-orbita-sat 17s linear -15.6s infinite; }
+.esc-orbita-haz { animation: esc-orbita-haz 17s linear -15.6s infinite; }
+.esc-orbita-huella { animation: esc-orbita-huella 17s linear -15.6s infinite; }
 .esc-huella { fill: var(--esc-haz); }
 
 /* ---- el terreno de atrás ---- */

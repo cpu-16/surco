@@ -33,7 +33,6 @@ function useCatalogo() {
 /** Los que duran años no necesitan fecha de siembra; sin catálogo, se adivina por la lista corta. */
 const ARBOLES = new Set(['cacao', 'naranja', 'toronja', 'platano', 'mango', 'aguacate', 'limon', 'coco', 'cafe', 'banano', 'pina'])
 const esCorto = (c: string) => { const x = CATALOGO.find((k) => k.id === c); return x ? x.tipo === 'anual' : !ARBOLES.has(c) }
-const lista = (xs: string[]) => xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} ${L('y', 'and')} ${xs[xs.length - 1]}`
 export const nombreDe = (c: string) => CATALOGO.find((k) => k.id === c)?.nombre ?? CULTIVOS.find(([k]) => k === c)?.[1] ?? c[0].toUpperCase() + c.slice(1)
 
 /* ---------------- Paso 1: el patio ---------------- */
@@ -114,15 +113,13 @@ export function Patio({ exp, cambiar, lugar }: Props & { lugar: Lugar | null }) 
         <button className="boton claro" disabled={!otro.trim()}>{L('Agregar', 'Add')}</button>
       </form>
 
-      {cortos.length > 0 && (
+      {exp.cultivos.length > 0 && (
         <fieldset className="campo siembra">
           <legend>{L('¿Cuándo los sembraste?', 'When did you plant them?')}</legend>
-          {cortos.map((c) => (
-            <Siembra key={c} nombre={nombreDe(c)} valor={exp.siembras[c] ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, [c]: v } })} />
+          {[...cortos, ...largos].map((c) => (
+            <Siembra key={c} nombre={nombreDe(c)} antes={!esCorto(c)} valor={exp.siembras[c] ?? ''} poner={(v) => cambiar({ siembras: { ...exp.siembras, [c]: v } })} />
           ))}
-          <small className="nota">{largos.length > 0 && L(`Solo pregunto por los que se siembran y se cosechan en meses. ${lista(largos.map(nombreDe))} ${largos.length === 1 ? 'dura' : 'duran'} años, así que no hace falta la fecha. `,
-            `I only ask about crops you plant and harvest within months. ${lista(largos.map(nombreDe))} ${largos.length === 1 ? 'lasts' : 'last'} for years, so no date is needed. `)}
-          {L('Si dejas uno en blanco, calculo como si lo hubieras sembrado al empezar las lluvias.', "If you leave one blank, I'll count it as planted when the rains started.")}</small>
+          <small className="nota">{L('Si no te acuerdas, déjalo en blanco.', "If you don't remember, leave it blank.")}</small>
         </fieldset>
       )}
       <label className="campo">
@@ -137,8 +134,17 @@ const MESES_N = L(['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio
   ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'])
 
 /** Mes y año con dos listas: más claro que el selector de fecha en cualquier celular. */
-function Siembra({ nombre, valor, poner }: { nombre: string; valor: string; poner: (v: string) => void }) {
+function Siembra({ nombre, valor, poner, antes }: { nombre: string; valor: string; poner: (v: string) => void; antes: boolean }) {
   const hoy = new Date()
+  if (antes && valor === 'antes') return (
+    <div className="fila-siembra">
+      <span>{nombre}</span>
+      <select aria-label={L(`Año en que sembraste ${nombre}`, `Year you planted ${nombre}`)} value="antes" onChange={(e) => poner(e.target.value === 'antes' ? 'antes' : `${e.target.value}-05`)}>
+        <option value="antes">{L('Hace años', 'Years ago')}</option>
+        {[0, 1, 2, 3].map((k) => <option key={k} value={hoy.getFullYear() - k}>{hoy.getFullYear() - k}</option>)}
+      </select>
+    </div>
+  )
   const [a, m] = valor ? valor.split('-').map(Number) : [0, 0]
   const anos = [hoy.getFullYear(), hoy.getFullYear() - 1, hoy.getFullYear() - 2, hoy.getFullYear() - 3]
   const fijar = (na: number, nm: number) => poner(na && nm ? `${na}-${String(nm).padStart(2, '0')}` : '')
@@ -149,9 +155,10 @@ function Siembra({ nombre, valor, poner }: { nombre: string; valor: string; pone
         <option value="">{L('Mes', 'Month')}</option>
         {MESES_N.map((n, i) => <option key={n} value={i + 1}>{n[0].toUpperCase() + n.slice(1)}</option>)}
       </select>
-      <select aria-label={L(`Año en que sembraste ${nombre}`, `Year you planted ${nombre}`)} value={a || ''} onChange={(e) => fijar(Number(e.target.value), m || 5)}>
+      <select aria-label={L(`Año en que sembraste ${nombre}`, `Year you planted ${nombre}`)} value={a || ''} onChange={(e) => e.target.value === 'antes' ? poner('antes') : fijar(Number(e.target.value), m || 5)}>
         <option value="">{L('Año', 'Year')}</option>
         {anos.map((y) => <option key={y} value={y}>{y}</option>)}
+        {antes && <option value="antes">{L('Hace años', 'Years ago')}</option>}
       </select>
     </div>
   )

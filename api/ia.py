@@ -34,7 +34,8 @@ FOTO = BASE + (" Te llega una foto que el productor tomó en su patio. Descríbe
 
 PREG = BASE + (" Te llegan los DATOS del expediente (cultivos, fotos medidas, prueba de agua, prioridades), la comparación ya "
                "calculada de las estrategias y el clima de la NASA para su zona, más la HISTORIA de la conversación. Responde "
-               "a lo último que dijo el productor en 2 a 6 frases. Si el productor te cuenta datos de su patio (qué siembra, "
+               "a lo último que dijo el productor en 2 a 6 frases. Los meses pelados van por zona (huerto y bajo los árboles): "
+               "nunca los sumes, porque un año tiene 12 meses. Si el productor te cuenta datos de su patio (qué siembra, "
                "cuándo sembró algo en formato AAAA-MM, si riega, qué le importa, cuántos minutos tardó el agua), propónlos "
                "para guardar. Claves válidas de propuesta: cultivos (lista con el nombre en minúscula de cada cultivo que diga, "
                "como lo dijo: «yuca», «maíz», «frijol», «ahuyama»; la app lo busca en su catálogo de 55 cultivos), siembras (objeto cultivo → AAAA-MM), riego (no | a veces | si), "
@@ -79,10 +80,14 @@ def foto(jpeg: bytes, tipo: str, lang="es") -> dict:
     if not (jpeg[:3] == b"\xff\xd8\xff" and 1000 < len(jpeg) <= 3_000_000):
         raise ValueError("No es una foto JPEG")
     d = _claude(FOTO + (INGLES if lang == "en" else ""), [{"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(jpeg).decode()}},
-                       {"type": "text", "text": f"Tipo de foto según el productor: {tipo}"}])
+                       {"type": "text", "text": f"Lo que el productor quiso fotografiar: {TIPOS.get(tipo, tipo)}"}])
     hoj = d.get("hojarasca") if d.get("hojarasca") in ("mucha", "poca", "nada") else None
     return {"descripcion": str(d.get("descripcion", ""))[:400], "hojarasca": hoj, "senales": [str(s)[:120] for s in d.get("senales", [])][:5]}
 
+
+# Las claves internas de las fotos, dichas como las ve el productor en el paso 3.
+TIPOS = {"cama": "el suelo del huerto", "perennes": "el suelo debajo de los árboles o matas que duran años",
+         "pina": "una planta que le preocupa (cualquier cultivo)", "general": "el patio entero"}
 
 CLAVES = {"cultivos", "siembras", "riego", "prioridades", "infiltracion_min", "charcos"}
 

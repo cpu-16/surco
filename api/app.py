@@ -266,10 +266,12 @@ class Charla(Idioma):
 async def ia_pregunta(c: Charla):
     comp = c.comparacion or {}
     # al asistente solo le llega lo calculado, sin las tiras mes a mes completas para no inflar el contexto
-    resumen = [{k: e.get(k) for k in ("nombre", "meses_desnudo", "n_kg_ha", "familias", "agua", "razon", "beneficios", "vacios", "riesgos", "ajustes")}
+    resumen = [{k: e.get(k) for k in ("nombre", "detalle", "n_kg_ha", "familias", "agua", "razon", "beneficios", "vacios", "riesgos", "ajustes")}
+               | {"meses_pelados_huerto": e.get("desnudo_cama"), "meses_pelados_bajo_arboles": e.get("desnudo_arboles")}
                | {"meses": [f"{m['mes']}:{m.get('nombre') or 'desnudo'}/{m['cobertura']}" for m in e.get("tira", [])]}
                for e in comp.get("estrategias", [])]
-    expediente = {**c.expediente, "pais": "PA" if ia.es_panama(c.expediente) else None}
+    expediente = {**c.expediente, "pais": "PA" if ia.es_panama(c.expediente) else None,
+                  "fotos": [{**f, "tipo": ia.TIPOS.get(f.get("tipo"), f.get("tipo"))} for f in c.expediente.get("fotos", []) if isinstance(f, dict)]}
     ctx = {"expediente": expediente, "estrategias": resumen, "lectura": comp.get("lectura"), "clima_nasa": c.lugar,
            "pina_no_crece": motor.AGRO.get("piña_no_crece") if ia.es_panama(expediente) and "pina" in motor._seleccion(expediente)[0] else None}
     try:
