@@ -16,7 +16,7 @@ Built in 39 hours for the **NASA Space Apps Challenge 2026**, challenge **Field 
 
 ## Why
 
-- **Bare soil washes away.** Bare plots in Panama lose about 63 t of soil per hectare per year to erosion ([Estibaná, Agronomía Mesoamericana 2024](https://doi.org/10.15517/am.2024.59684)).
+- **Bare soil washes away.** In the Estibaná river sub-basin, in Panama, bare soil loses about 63 t per hectare per year to water erosion ([Castro-Villarreal et al., Agronomía Mesoamericana 2024](https://doi.org/10.15517/am.2024.59684)).
 - **Dry seasons are getting harder.** During El Niño 2023–24, Panama's Pacific side received 20–40 % less rain than normal (IMHPA).
 - **Few farmers get advice.** By our estimate from the 2024 Agricultural Census, only about 3 % of producers receive technical assistance. INEC does not publish this percentage, so treat it as approximate.
 
