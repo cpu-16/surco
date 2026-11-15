@@ -20,6 +20,13 @@ const verdor = (v: number) => v >= 0.7 ? L('Muy verde', 'Very green') : v >= 0.5
 const PESTANAS = [['lluvia', L('Lluvia', 'Rain')], ['nino', L('El Niño', 'El Niño')], ['verdor', L('Verdor', 'Greenness')], ['pixeles', L('Mapa', 'Map')]] as const
 type Pestana = (typeof PESTANAS)[number][0]
 
+/** Si las pestañas quedaron debajo de la cabecera fija, sube hasta verlas: el panel nuevo empieza ahí. */
+function verPestanas(seg: HTMLElement | null) {
+  const tope = document.querySelector('.cabecera')?.getBoundingClientRect().bottom ?? 0
+  const y = seg?.getBoundingClientRect().top ?? tope
+  if (y < tope + 8) scrollBy({ top: y - tope - 12, behavior: 'smooth' })
+}
+
 export default function Cielo({ lugar, desde }: { lugar: Lugar | null; desde: number }) {
   const [tab, setTab] = useState<Pestana>('lluvia')
   if (!lugar) return <Cargando texto={L('Leyendo 45 años de clima de la NASA para tu punto…', 'Reading 45 years of NASA weather for your spot…')} />
@@ -27,7 +34,7 @@ export default function Cielo({ lugar, desde }: { lugar: Lugar | null; desde: nu
     <>
       <div className="segmentos" role="tablist" aria-label={L('Datos de la NASA', 'NASA data')}>
         {PESTANAS.map(([k, n]) => (
-          <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>
+          <button key={k} role="tab" aria-selected={tab === k} onClick={(e) => { setTab(k); verPestanas(e.currentTarget.parentElement) }}>
             {tab === k && <motion.span layoutId="seg" className="seg-fondo" transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }} />}
             <span className="seg-texto">{n}</span>
           </button>

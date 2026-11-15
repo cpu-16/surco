@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { Comparacion } from './anio'
-import { enPanama, local, pedir, sinImagenes, type Expediente, type Ficha, type Lugar, type Resultado } from './api'
+import { EJEMPLO, enPanama, local, pedir, sinImagenes, type Expediente, type Ficha, type Lugar, type Resultado } from './api'
 import { cambiarIdioma, idioma, L } from './i18n'
 import { Cargando, fecha, Icono } from './ui'
 
@@ -31,11 +31,11 @@ function linea(e: ExpRegistro, nombreCultivo: (c: string) => string, ajeno = fal
   const items: { fecha: string; texto: string; quien?: string }[] = []
   // «antes» (hace años) no tiene fecha para la línea de tiempo
   for (const [c, m] of Object.entries(e.siembras ?? {})) if (/^\d{4}-\d{2}$/.test(m)) items.push({ fecha: m, texto: L(`Sembraste ${nombreCultivo(c).toLowerCase()} (${MES(m)})`, `You planted ${nombreCultivo(c).toLowerCase()} (${MES(m)})`) })
-  const LUGAR: Record<string, string> = { cama: L('el huerto', 'the garden plot'), perennes: L('debajo de los árboles', 'under the trees'), pina: L('una planta', 'a plant'), general: L('el patio entero', 'the whole yard') }
+  const LUGAR: Record<string, string> = { cama: L('Foto del huerto', 'Photo of the garden plot'), perennes: L('Foto de debajo de los árboles', 'Photo under the trees'), pina: L('Foto de una planta', 'Photo of a plant'), general: L('Foto del patio entero', 'Photo of the whole yard') }
   for (const f of e.fotos ?? []) {
     const suelo = f.tipo === 'cama' || f.tipo === 'perennes' // las otras son de consulta: lo verde de la foto no es suelo tapado
-    items.push({ fecha: f.fecha, texto: suelo ? L(`Foto de ${LUGAR[f.tipo]}: ${f.cobertura} % del suelo tapado por planta verde`, `Photo of ${LUGAR[f.tipo]}: ${f.cobertura}% of the soil covered by green plants`)
-      : L(`Foto de ${LUGAR[f.tipo]}${f.descripcion ? `: ${f.descripcion}` : ''}`, `Photo of ${LUGAR[f.tipo]}${f.descripcion ? `: ${f.descripcion}` : ''}`) })
+    items.push({ fecha: f.fecha, texto: suelo ? L(`${LUGAR[f.tipo]}: ${f.cobertura} % del suelo tapado por planta verde`, `${LUGAR[f.tipo]}: ${f.cobertura}% of the soil covered by green plants`)
+      : L(`${LUGAR[f.tipo]}${f.descripcion ? `: ${f.descripcion}` : ''}`, `${LUGAR[f.tipo]}${f.descripcion ? `: ${f.descripcion}` : ''}`) })
   }
   for (const n of e.notas ?? []) items.push({ fecha: n.fecha.slice(0, 10), texto: n.texto, quien: n.quien === 'tecnico' ? (n.nombre || L('Técnico', 'Advisor')) : ajeno ? L('Productor', 'Grower') : L('Tú', 'You') })
   if (e.resultado) items.push({ fecha: e.resultado.fecha, texto: L('Guardaste la comparación de ese día', 'You saved that day’s comparison') })
@@ -153,8 +153,24 @@ export function Registro({ exp, cambiar, comp, lugar, enLinea, nombreCultivo }: 
         <button className="boton fantasma" onClick={() => print()}>{L('Imprimir o guardar en PDF', 'Print or save as PDF')}</button>
         <button className="boton fantasma" onClick={descargar}>{L('Descargar los datos', 'Download the data')}</button>
       </div>
+
+      <h2 className="sub">{L('Empezar de nuevo', 'Start over')}</h2>
+      <p className="nota">{L('Borra de este celular el patio, las fotos, las notas y la conversación. Si guardaste tu enlace, sigue funcionando.',
+        'Clears the yard, photos, notes and chat from this phone. A link you already saved keeps working.')}</p>
+      <div className="acciones">
+        <button className="boton fantasma peligro" onClick={empezarDeNuevo}><Icono n="cerrar" />{L('Borrar y empezar de nuevo', 'Clear and start over')}</button>
+      </div>
     </div>
   )
+}
+
+/** Deja el celular como recién instalado, pero recuerda idioma, tema, bienvenida, catálogo y las claves de los enlaces. */
+function empezarDeNuevo() {
+  if (!confirm(L('¿Borro todo lo de este patio en el celular? No se puede deshacer.', 'Clear everything about this yard on this phone? This cannot be undone.'))) return
+  for (const k of ['surco-expediente', 'surco-lugar', 'surco-comp', 'surco-vistos', 'surco-chat', 'surco-lata-inicio']) local.quitar(k)
+  local.poner('surco-expediente', { ...EJEMPLO, nombre: L('Mi patio', 'My yard'), cultivos: [] })
+  history.replaceState(null, '', location.pathname + '#patio') // una sola recarga; replace + reload chocaban
+  location.reload()
 }
 
 function Linea({ exp, nombreCultivo, ajeno }: { exp: ExpRegistro; nombreCultivo: (c: string) => string; ajeno?: boolean }) {

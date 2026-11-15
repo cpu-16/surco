@@ -78,6 +78,7 @@ a { color: var(--lluvia); text-underline-offset: 0.18em; }
 .boton:disabled { opacity: 0.45; cursor: default; }
 .boton.claro { background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--linea); }
 .boton.fantasma { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--linea); }
+.boton.fantasma.peligro { color: var(--alerta); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--alerta) 45%, transparent); }
 .boton.agua { background: var(--lluvia); color: var(--superficie); }
 .boton.grande { min-height: 3.4rem; font-size: 1.08rem; padding-inline: 1.5em; }
 .boton.pildora { min-height: 2.4rem; padding: 0.3em 0.9em; font-size: 0.9rem; background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--linea); }
@@ -103,11 +104,11 @@ a { color: var(--lluvia); text-underline-offset: 0.18em; }
 /* ---------------- cabecera de material: el contenido pasa por debajo ---------------- */
 .cabecera {
   position: sticky; top: 0; z-index: 20; padding: max(0.5rem, env(safe-area-inset-top)) 1rem 0.7rem;
-  background: var(--material); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background: var(--fondo); /* sólida: con vidrio, el título que pasaba por debajo se veía encimado en el celular */
 }
 .cabecera::after { /* borde de desvanecido, no una raya */
   content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 14px; pointer-events: none;
-  background: linear-gradient(var(--material), transparent);
+  background: linear-gradient(var(--fondo), transparent);
 }
 .cabecera-fila, .surco { max-width: 34rem; margin-inline: auto; }
 .cabecera-fila { display: flex; align-items: center; gap: 0.4rem; }
@@ -146,9 +147,9 @@ a { color: var(--lluvia); text-underline-offset: 0.18em; }
 .barra {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; gap: 0.6rem;
   padding: 0.7rem max(1rem, calc((100vw - 34rem) / 2)) max(0.8rem, env(safe-area-inset-bottom));
-  background: var(--material); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background: var(--fondo); /* sólida: en el Samsung el texto de atrás se metía entre Atrás y Seguir */
 }
-.barra::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 16px; pointer-events: none; background: linear-gradient(transparent, var(--material)); }
+.barra::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 16px; pointer-events: none; background: linear-gradient(transparent, var(--fondo)); }
 .barra .boton:last-child:not(:first-child) { flex: 1; }
 
 /* ---------------- piezas ---------------- */
@@ -351,7 +352,8 @@ svg text { font-family: var(--display); fill: var(--tinta-2); }
 .burbuja { max-width: 88%; padding: 0.65rem 0.9rem; border-radius: 18px; }
 .burbuja p { margin: 0; white-space: pre-wrap; }
 .burbuja.tu { justify-self: end; border-bottom-right-radius: 5px; background: color-mix(in srgb, var(--hoja) 16%, var(--superficie)); }
-.burbuja.surco { justify-self: start; border-bottom-left-radius: 5px; background: var(--superficie); box-shadow: var(--sombra); }
+.burbuja.asistente { justify-self: start; border-bottom-left-radius: 5px; background: var(--superficie); box-shadow: var(--sombra); }
+.burbuja small { display: block; margin-top: 0.45rem; }
 .burbuja .enlace { min-height: 2.2rem; font-size: 0.88rem; }
 .pensando { display: flex; gap: 5px; padding: 0.9rem 1rem; }
 .pensando span { width: 7px; height: 7px; border-radius: 999px; background: var(--tinta-2); animation: pensar 1s ease-in-out infinite; }
@@ -398,9 +400,6 @@ svg text { font-family: var(--display); fill: var(--tinta-2); }
   .boton:active, .chip:active, .teja:active, .estrategia:active, .terron:active, .icono-btn:active { transform: none; }
   .terrones-carga span, .pensando span { animation: none; }
   .terrones-carga span { transform: none; background: var(--brote); opacity: 0.6; }
-}
-@media (prefers-reduced-transparency: reduce) {
-  .cabecera, .barra { background: var(--fondo); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
   :root { --linea: var(--tinta-2); }

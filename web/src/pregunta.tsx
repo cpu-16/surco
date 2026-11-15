@@ -77,7 +77,7 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
         {!msgs.length && <p className="nota">{L('Cuéntale de tu patio con tus palabras o pregunta. Responde con los números de los pasos anteriores y te dice cuando no sabe.', 'Tell it about your yard in your own words, or ask a question. It answers with the numbers from the earlier steps and tells you when it doesn’t know.')}</p>}
         <AnimatePresence initial={false}>
           {msgs.map((m, i) => (
-            <motion.div key={i} className={`burbuja ${m.de}`} initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+            <motion.div key={i} className={`burbuja ${m.de === 'tu' ? 'tu' : 'asistente'}`} initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: 'spring', bounce: 0, duration: 0.3 }}>
               <p>{m.texto}</p>
               {m.fuentes?.length ? <small className="nota">{L('Datos:', 'Data:')} {m.fuentes.join('; ')}</small> : null}
@@ -85,7 +85,7 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
             </motion.div>
           ))}
         </AnimatePresence>
-        {ocupado && <div className="burbuja surco pensando" aria-label={L('Pensando', 'Thinking')}><span /><span /><span /></div>}
+        {ocupado && <div className="burbuja asistente pensando" aria-label={L('Pensando', 'Thinking')}><span /><span /><span /></div>}
         <div ref={fin} />
       </div>
 
