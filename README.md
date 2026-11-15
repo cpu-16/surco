@@ -127,12 +127,7 @@ The assistant (step 7) needs a language-model CLI set in `CLAUDE_BIN`. Without i
 
 ## Use of AI (SI)
 
-Following the Space Apps rules, this is where AI was used:
-
-- **Code and text:** AI coding assistants helped write, review and test parts of the code and the interface copy. The team chose the problem, the approach, the field data and the final decisions. Every calculation is plain, deterministic code in `api/motor.py`.
-- **Images:** the welcome illustration is drawn in code (SVG) with AI assistance. The banner and the screenshot sheet in `docs/` are marked *SI-assisted*.
-- **Demo video and guide:** the video was edited in code with AI coding assistance. Both show real photos of a yard in Santiago de Veraguas and real screens of the app; no AI-generated images, footage or voice. The assistant answers shown are real output of the app. The music is synthesized in code.
-- **Inside the app:** the assistant in step 7 and the photo description use a large language model. It never produces the numbers.
+AI coding assistants helped write and review parts of the code and text. The team chose the problem, the approach, the field data and every decision, and every calculation is plain, deterministic code in `api/motor.py`. Inside the app, a language model only explains results in plain language and describes photos; it never produces the numbers. The banner and the screenshot sheet in `docs/` are marked *SI-assisted*.
 
 ## Team
 
