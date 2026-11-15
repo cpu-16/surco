@@ -40,6 +40,7 @@ The app walks through eight short steps:
 ## How it works
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#f8f9f3', 'primaryBorderColor': '#a5492a', 'primaryTextColor': '#20261c', 'lineColor': '#5d6553', 'fontFamily': 'system-ui, sans-serif'}}}%%
 flowchart LR
   POWER["NASA POWER<br/>climate"] --> SECA["Dry season of the place<br/>rain below ½ ET₀"]
   IMERG["GPM IMERG<br/>rain"] --> SECA
