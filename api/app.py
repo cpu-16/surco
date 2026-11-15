@@ -262,6 +262,14 @@ class Charla(Idioma):
     lugar: dict | None = None
 
 
+def _foto_ia(f: dict) -> dict:
+    """La foto con su nombre real; el verde de la planta o del patio entero no es suelo tapado, así que no se lo pasa."""
+    g = {**f, "tipo": ia.TIPOS.get(f.get("tipo"), f.get("tipo"))}
+    if f.get("tipo") not in ("cama", "perennes"):
+        g.pop("cobertura", None)
+    return g
+
+
 @app.post("/api/ia/pregunta")
 async def ia_pregunta(c: Charla):
     comp = c.comparacion or {}
@@ -271,7 +279,7 @@ async def ia_pregunta(c: Charla):
                | {"meses": [f"{m['mes']}:{m.get('nombre') or 'desnudo'}/{m['cobertura']}" for m in e.get("tira", [])]}
                for e in comp.get("estrategias", [])]
     expediente = {**c.expediente, "pais": "PA" if ia.es_panama(c.expediente) else None,
-                  "fotos": [{**f, "tipo": ia.TIPOS.get(f.get("tipo"), f.get("tipo"))} for f in c.expediente.get("fotos", []) if isinstance(f, dict)]}
+                  "fotos": [_foto_ia(f) for f in c.expediente.get("fotos", []) if isinstance(f, dict)]}
     ctx = {"expediente": expediente, "estrategias": resumen, "lectura": comp.get("lectura"), "clima_nasa": c.lugar,
            "pina_no_crece": motor.AGRO.get("piña_no_crece") if ia.es_panama(expediente) and "pina" in motor._seleccion(expediente)[0] else None}
     try:

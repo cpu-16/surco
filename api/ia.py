@@ -103,7 +103,7 @@ def es_panama(exp):
 def region(exp):
     if es_panama(exp):
         return (' Ubicación: Panamá según las coordenadas del expediente. Usa palabras panameñas y remite a MIDA/IDIAP; '
-                'en inglés explica sus nombres como ministerio de agricultura e instituto de investigación de Panamá.')
+                'en español di solo MIDA o IDIAP; en inglés explica sus nombres como ministerio de agricultura e instituto de investigación de Panamá.')
     return (' Ubicación fuera de Panamá o sin coordenadas. Remite a «el servicio de extensión agrícola de tu zona» '
             '(en inglés: your local agricultural extension service), sin regionalismos panameños ni instituciones panameñas. '
             'Ignora pais del expediente si contradice las coordenadas.')
