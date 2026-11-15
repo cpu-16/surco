@@ -114,7 +114,7 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
         <button className="icono-btn lleno" disabled={ocupado || !texto.trim() || !enLinea} aria-label={L('Enviar', 'Send')}><Icono n="enviar" /></button>
       </form>
       {msgs.length > 0 && !ocupado && (
-        <button className="boton fantasma" onClick={() => {
+        <button className="boton fantasma" style={{ marginTop: '0.8rem' }} onClick={() => {
           if (confirm(L('¿Borrar esta conversación? Tu patio, tus fotos y tus notas se quedan.', 'Delete this conversation? Your yard, photos and notes stay.'))) { setMsgs([]); setPropuesta(null) }
         }}>{L('Borrar la conversación', 'Delete the conversation')}</button>
       )}

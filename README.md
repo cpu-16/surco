@@ -2,6 +2,8 @@
 
 <p align="center">
   <a href="https://surco.ciberpty.com"><b>Open the app</b></a> ·
+  <a href="https://surco.ciberpty.com/demo.mp4"><b>30-second demo</b></a> ·
+  <a href="docs/GUIDE.md">How to use it (guide)</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#nasa-data">NASA data</a> ·
   <a href="#limitations">Limitations</a> ·
@@ -9,6 +11,8 @@
 </p>
 
 **Surco** (Spanish for *furrow*) tells a small farmer how many months a year the soil in their yard lies bare, and compares that with cheap changes that keep it covered: dry leaves, a crop rotation or a living cover. It joins NASA satellite data with what the farmer sees on the ground, in Spanish or English, with no account, and it keeps working without signal.
+
+**Demo video (30 s):** https://surco.ciberpty.com/demo.mp4 (also in the repo: [`web/public/demo.mp4`](web/public/demo.mp4)). **Illustrated guide, step by step:** [English](docs/GUIDE.md) · [Español](docs/GUIA.md).
 
 Built in 39 hours for the **NASA Space Apps Challenge 2026**, challenge **Field Shift: Adapting Farms with NASA Data**, by team **Best to my hometown** (Panama).
 
@@ -127,6 +131,7 @@ Following the Space Apps rules, this is where AI was used:
 
 - **Code and text:** AI coding assistants helped write, review and test parts of the code and the interface copy. The team chose the problem, the approach, the field data and the final decisions. Every calculation is plain, deterministic code in `api/motor.py`.
 - **Images:** the welcome illustration is drawn in code (SVG) with AI assistance. The banner and the screenshot sheet in `docs/` are marked *SI-assisted*.
+- **Demo video and guide:** real photos of a yard in Santiago de Veraguas and real screens of the app; no AI-generated images. The assistant answers shown are real output of the app. The music is synthesized in code.
 - **Inside the app:** the assistant in step 7 and the photo description use a large language model. It never produces the numbers.
 
 ## Team
