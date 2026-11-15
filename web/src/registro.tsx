@@ -167,7 +167,7 @@ export function Registro({ exp, cambiar, comp, lugar, enLinea, nombreCultivo }: 
 /** Deja el celular como recién instalado, pero recuerda idioma, tema, bienvenida, catálogo y las claves de los enlaces. */
 function empezarDeNuevo() {
   if (!confirm(L('¿Borro todo lo de este patio en el celular? No se puede deshacer.', 'Clear everything about this yard on this phone? This cannot be undone.'))) return
-  for (const k of ['surco-expediente', 'surco-lugar', 'surco-comp', 'surco-vistos', 'surco-chat', 'surco-lata-inicio']) local.quitar(k)
+  for (const k of ['surco-expediente', 'surco-lugar', 'surco-comp', 'surco-comp-es', 'surco-comp-en', 'surco-vistos', 'surco-chat', 'surco-lata-inicio']) local.quitar(k)
   local.poner('surco-expediente', { ...EJEMPLO, nombre: L('Mi patio', 'My yard'), cultivos: [] })
   history.replaceState(null, '', location.pathname + '#patio') // una sola recarga; replace + reload chocaban
   location.reload()

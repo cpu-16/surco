@@ -139,7 +139,7 @@ function Detalle({ e, orden }: { e: Estrategia; orden: number[] }) {
           const t = e.tira.find((x) => x.mes === m)
           if (!t) return <span key={m} className="muestra" />
           return (
-            <button key={m} className="muestra" aria-pressed={mes === m} style={{ background: COLOR[t.cobertura] }} onClick={() => setMes(mes === m ? null : m)}
+            <button key={m} className="muestra" data-cobertura={t.cobertura} aria-pressed={mes === m} style={{ background: COLOR[t.cobertura] }} onClick={() => setMes(mes === m ? null : m)}
               aria-label={`${MESES_LARGOS[m - 1]}: ${nombre(e.tira, m)}`}>{MESES[m - 1]}</button>
           )
         })}

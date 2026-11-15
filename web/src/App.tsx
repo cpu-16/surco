@@ -29,7 +29,7 @@ const IDS = PASOS.map((p) => p.id)
 // lo que el motor pide → el paso donde se resuelve
 const DONDE: Record<string, [number, TipoFoto?]> = { foto_cama: [2, 'cama'], foto_perennes: [2, 'perennes'], infiltracion: [3], parcela: [0], prioridades: [4] }
 
-const LLAVES = { exp: 'surco-expediente', lugar: 'surco-lugar', comp: 'surco-comp', vistos: 'surco-vistos', visto: 'surco-bienvenida' }
+const LLAVES = { exp: 'surco-expediente', lugar: 'surco-lugar', comp: `surco-comp-${idioma}`, vistos: 'surco-vistos', visto: 'surco-bienvenida' }
 type CacheLugar = { lat: number; lon: number; datos: Lugar }
 const cerca = (c: { lat: number; lon: number } | null, e: Expediente) => !!c && Math.abs(c.lat - e.lat) < 0.005 && Math.abs(c.lon - e.lon) < 0.005
 
