@@ -13,6 +13,7 @@ export type Lugar = {
   reciente_power: { hasta: string; dias: { fecha: string; lluvia: number }[]; lluvia_30d: number; normal_30d: number | null }
   reciente_imerg?: { hasta: string; dias: { fecha: string; lluvia: number }[]; racha_seca_dias: number; ultima_racha: { desde: string; hasta: string; dias: number } | null; lluvia_30d: number }
   lluvia_mensual: Record<string, number>
+  appeears?: { hls_ndvi: { fecha: string; valor: number }[]; hls_n: number; consultado?: string | null }
   pronostico?: { meta: Fuente; dias: { fecha: string; lluvia: number; prob: number | null }[]; total_7d: number; dias_con_lluvia: number } | null
   ndvi?: { meses: { mes: number; ndvi: number | null; n: number }[]; ultimo: { fecha: string; valor: number } | null; n_validos: number; n_total: number; serie?: { fecha: string; valor: number | null }[]; progreso?: [number, number] }
   et?: { fecha: string; valor: number | null }[]

@@ -139,8 +139,11 @@ function Verdor({ lugar, desde }: { lugar: Lugar; desde: number }) {
   if (!lugar.ndvi) return <Cargando texto={L('Pidiendo las imágenes MODIS de tu punto. Lo más reciente llega en un par de minutos; los 26 años completos tardan unos 15, y se guardan para la próxima.', 'Asking for the MODIS images of your spot. The newest ones arrive in a couple of minutes; all 26 years take about 15, and they are saved for next time.')} />
   const u = lugar.ndvi.ultimo
   const f = lugar.fuentes.ndvi
+  const h = lugar.appeears?.hls_ndvi.at(-1)
   return (
     <>
+      {/* Landsat + Sentinel (HLS) a 30 m: más cerca de tu patio y más reciente que MODIS; llega cuando AppEEARS termina */}
+      {h && <p className="titular"><span className="cifra palabra">{verdor(h.valor)}</span><span>{L(<>se veía tu patio de cerca (30 m, Landsat y Sentinel) el {fecha(h.fecha)}.</>, <>is how your yard looked up close (30 m, Landsat and Sentinel) on {fecha(h.fecha)}.</>)}</span></p>}
       {u && <p className="titular"><span className="cifra palabra">{verdor(u.valor)}</span><span>{L(<>se veía tu zona desde el satélite el {fecha(u.fecha)}.</>, <>is how your area looked from the satellite on {fecha(u.fecha)}.</>)}</span></p>}
       <NdviMeses meses={lugar.ndvi.meses} desde={desde} />
       {lugar.ndvi.progreso
