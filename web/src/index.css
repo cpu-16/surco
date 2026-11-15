@@ -292,6 +292,14 @@ svg text { font-family: var(--display); fill: var(--tinta-2); }
 .muestra[data-medido='1']::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--superficie); box-shadow: 0 0 0 1.5px var(--tinta); }
 .meses-eje { display: grid; grid-template-columns: 3.6em repeat(12, minmax(0, 1fr)); gap: 3px; column-gap: 3px; padding: 0.35rem calc(0.9rem + 1px) 0; font: 600 0.7rem/1 var(--display); color: var(--tinta-2); text-align: center; }
 .meses-eje > span:first-child { margin-right: 0.3rem; }
+.respuesta { display: grid; gap: 0.7rem; margin-bottom: 1.8rem; }
+.r-titulo { font: 700 1.3rem/1.1 var(--display); }
+.r-cifras { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.2rem; font-size: 1.05rem; }
+.r-cifras b { font: 700 2.4rem/1 var(--display); color: var(--laterita); margin-right: 0.15em; }
+.r-facil { font-size: 1.05rem; line-height: 1.4; }
+.antes-despues { display: grid; gap: 0.3rem; }
+.estrategia .meses-eje, .antes-despues .meses-eje { padding: 0; }
+.ad-zona { font: 600 0.9rem/1 var(--display); color: var(--tinta-2); margin-top: 0.45rem; }
 .afinar { margin-top: 1.4rem; display: grid; gap: 0.5rem; }
 .afinar .sub { margin-top: 0.4rem; }
 .pendiente { display: grid; gap: 0.15rem; text-align: left; padding: 0.8rem 0.95rem; border: 0; border-radius: 14px; background: var(--superficie-2); transition: transform 140ms var(--ease-out); }

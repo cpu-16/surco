@@ -28,21 +28,58 @@ export default function Anio({ comp, desde, viejo, irA, enLinea, panama }: { com
   if (!comp) return <Cargando texto={L('Calculando el año de tu suelo…', 'Working out your soil’s year…')} />
   const orden = ordenMeses(desde)
   const total = (e: Estrategia) => (e.desnudo_cama ?? 0) + e.desnudo_arboles
-  const mejor = Math.min(...comp.estrategias.map(total))
-  const hayMejor = comp.estrategias.some((e) => total(e) !== mejor)
+  const actual: Estrategia | undefined = comp.estrategias.find((e) => e.id === 'actual') ?? comp.estrategias[0]
+  // lo más fácil = lo que menos suelo pelado deja y, entre esas, la que menos trabajo da
+  const trabajo = (e: Estrategia) => e.labores ? e.labores.siembras + e.labores.tapar_hojas + e.labores.cortes : 99
+  const facil = !actual ? undefined : comp.estrategias.filter((e) => e !== actual).sort((a, b) => total(a) - total(b) || trabajo(a) - trabajo(b))[0] as Estrategia | undefined
+  const mejora = !!actual && !!facil && total(facil) < total(actual)
+  const huerto = !!actual && actual.tira.length > 0 && actual.desnudo_cama !== null
+  const meses = (n: number) => L(n === 1 ? 'mes' : 'meses', n === 1 ? 'month' : 'months')
+  const abrir = (e: Estrategia) => { setSel(e); setAbierta(true) }
   return (
     <>
       {viejo && <p className="aviso">{L('Sin señal: es el cálculo de la última vez. Se pone al día solo cuando vuelva.', 'Offline: this is the last calculation. It updates by itself when the signal comes back.')}</p>}
-      {comp.lectura.map((l, i) => <p key={i} className={i ? 'lectura-2' : 'lectura'}>{l}</p>)}
-      <Leyenda />
+
+      {/* la respuesta primero: cuánto queda pelado hoy y lo más fácil para taparlo */}
+      {actual && <section className="respuesta">
+        <p className="r-titulo">{L('Hoy tu suelo queda pelado', 'Today your soil is left bare')}</p>
+        <ul className="r-cifras">
+          {huerto && <li><b>{actual.desnudo_cama}</b> {L(`${meses(actual.desnudo_cama!)} al año en el huerto`, `${meses(actual.desnudo_cama!)} a year in the garden plot`)}</li>}
+          {actual.arboles.length > 0 && <li><b>{actual.desnudo_arboles}</b> {L(`${meses(actual.desnudo_arboles)} al año debajo de los árboles`, `${meses(actual.desnudo_arboles)} a year under the trees`)}</li>}
+        </ul>
+        {mejora && facil ? <>
+          <p className="r-facil">{L('Lo más fácil para taparlo:', 'The easiest way to cover it:')} <b>{facil.nombre}</b>. {total(facil) === 0
+            ? L('Así no queda pelado ningún mes.', 'That way it is never bare.')
+            : L(`Así baja a ${total(facil)} ${meses(total(facil))}.`, `That brings it down to ${total(facil)} ${meses(total(facil))}.`)}</p>
+          <div className="antes-despues">
+            <span className="meses-eje" aria-hidden="true"><span />{orden.map((m) => <span key={m}>{MESES[m - 1]}</span>)}</span>
+            {huerto && facil.tira.length > 0 && <>
+              <p className="ad-zona">{L('En el huerto', 'In the garden plot')}</p>
+              <Tira etq={L('Hoy', 'Today')} fila={actual.tira} orden={orden} retraso={0} />
+              <Tira etq={L('Con eso', 'With it')} fila={facil.tira} orden={orden} retraso={0.1} />
+            </>}
+            {actual.arboles.length > 0 && facil.arboles.length > 0 && <>
+              <p className="ad-zona">{L('Debajo de los árboles', 'Under the trees')}</p>
+              <Tira etq={L('Hoy', 'Today')} fila={actual.arboles} orden={orden} retraso={0.2} />
+              <Tira etq={L('Con eso', 'With it')} fila={facil.arboles} orden={orden} retraso={0.3} />
+            </>}
+          </div>
+          <Leyenda />
+          <button className="boton claro" onClick={() => abrir(facil)}>{L('Ver por qué y cuánto trabajo da', 'See why and how much work it takes')}</button>
+        </> : <p className="r-facil">{L('Ninguna de las otras maneras deja menos suelo pelado: lo que haces ya lo protege.', 'None of the other ways leaves less bare soil: what you do already protects it.')}</p>}
+      </section>}
+
+      {comp.estrategias.length > 0 && <h2 className="sub">{L(`Las ${comp.estrategias.length} maneras que comparé`, `The ${comp.estrategias.length} ways I compared`)}</h2>}
+      {comp.lectura.map((l, i) => <p key={i} className="lectura-2">{l}</p>)}
       <ul className="estrategias">
         {comp.estrategias.map((e, fila) => (
           <li key={e.id}>
-            <button className="estrategia" onClick={() => { setSel(e); setAbierta(true) }} aria-haspopup="dialog">
+            <button className="estrategia" onClick={() => abrir(e)} aria-haspopup="dialog">
               <span className="e-cab">
                 <span className="e-nombre">{e.nombre}</span>
-                {hayMejor && total(e) === mejor && <span className="sello">{L('Menos suelo desnudo', 'Least bare soil')}</span>}
+                {mejora && e === facil && <span className="sello">{L('La más fácil', 'Easiest')}</span>}
               </span>
+              {(e.tira.length > 0 || e.arboles.length > 0) && <span className="meses-eje" aria-hidden="true"><span />{orden.map((m) => <span key={m}>{MESES[m - 1]}</span>)}</span>}
               {e.tira.length > 0 && <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />}
               {e.arboles.length > 0 && <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />}
               <span className="e-pie">
@@ -54,7 +91,6 @@ export default function Anio({ comp, desde, viejo, irA, enLinea, panama }: { com
           </li>
         ))}
       </ul>
-      <div className="meses-eje" aria-hidden="true"><span />{orden.map((m) => <span key={m}>{MESES[m - 1]}</span>)}</div>
 
       {comp.faltan.length > 0 && (
         <div className="afinar">
@@ -96,7 +132,7 @@ function Tira({ etq, fila, orden, retraso }: { etq: string; fila: Muestra[]; ord
 }
 
 function Leyenda() {
-  const items: [keyof typeof COLOR, string][] = [['desnudo', L('Desnudo', 'Bare')], ['baja', L('Poco tapado', 'Barely covered')], ['media', L('Medio', 'Half covered')], ['alta', L('Bien tapado', 'Well covered')]]
+  const items: [keyof typeof COLOR, string][] = [['desnudo', L('Desnudo', 'Bare')], ['baja', L('Hojas secas o poco tapado', 'Dry leaves or barely covered')], ['media', L('Medio', 'Half covered')], ['alta', L('Bien tapado', 'Well covered')]]
   return (
     <div className="leyenda">
       {items.map(([k, t]) => <span key={k}><i style={{ background: COLOR[k] }} />{t}</span>)}
