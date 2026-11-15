@@ -137,7 +137,9 @@ Following the Space Apps rules, this is where AI was used:
 ## Team
 
 **Best to my hometown** · Panama
-Gilberto Ramos
+
+- Gilberto Ramos
+- Melanie Chen
 
 ## License
 
