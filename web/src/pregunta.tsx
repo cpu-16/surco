@@ -113,6 +113,11 @@ export default function Conversa({ exp, lugar, comp, cambiar, enLinea }: {
         {Reconocer && <button type="button" className="icono-btn" onClick={hablar} aria-pressed={oyendo} aria-label={oyendo ? L('Te escucho, toca para parar', 'I’m listening, tap to stop') : L('Hablar', 'Speak')} disabled={!enLinea}><Icono n="mic" /></button>}
         <button className="icono-btn lleno" disabled={ocupado || !texto.trim() || !enLinea} aria-label={L('Enviar', 'Send')}><Icono n="enviar" /></button>
       </form>
+      {msgs.length > 0 && !ocupado && (
+        <button className="boton fantasma" onClick={() => {
+          if (confirm(L('¿Borrar esta conversación? Tu patio, tus fotos y tus notas se quedan.', 'Delete this conversation? Your yard, photos and notes stay.'))) { setMsgs([]); setPropuesta(null) }
+        }}>{L('Borrar la conversación', 'Delete the conversation')}</button>
+      )}
 
     </>
   )
