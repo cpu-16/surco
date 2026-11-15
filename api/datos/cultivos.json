@@ -737,6 +737,7 @@
     },
     "guandu": {
       "nombre": "Guandú",
+      "nombre_general": "Gandul",
       "cientifico": "Cajanus cajan",
       "familia": "Fabaceae",
       "tipo": "perenne",
@@ -822,6 +823,7 @@
     },
     "caupi": {
       "nombre": "Frijol caupí (frijol Vigna)",
+      "nombre_general": "Caupí",
       "cientifico": "Vigna unguiculata",
       "familia": "Fabaceae",
       "tipo": "anual",
@@ -1337,6 +1339,7 @@
     },
     "camote": {
       "nombre": "Camote",
+      "nombre_general": "Batata",
       "cientifico": "Ipomoea batatas",
       "familia": "Convolvulaceae",
       "tipo": "anual",
@@ -1432,6 +1435,7 @@
     },
     "zapallo": {
       "nombre": "Zapallo",
+      "nombre_general": "Calabaza",
       "cientifico": "Cucurbita maxima (identidad del material por confirmar)",
       "familia": "Cucurbitaceae",
       "tipo": "anual",
@@ -1995,6 +1999,7 @@
     },
     "otoe": {
       "nombre": "Otoe",
+      "nombre_general": "Taro",
       "cientifico": "Colocasia esculenta",
       "familia": "Araceae",
       "tipo": "anual",
@@ -2062,6 +2067,7 @@
     },
     "banano": {
       "nombre": "Guineo / banano",
+      "nombre_general": "Banano",
       "cientifico": "Musa acuminata (grupo de cultivares)",
       "familia": "Musaceae",
       "tipo": "perenne",
@@ -2202,6 +2208,7 @@
     },
     "aji": {
       "nombre": "Ají / pimentón",
+      "nombre_general": "Pimiento dulce",
       "cientifico": "Capsicum annuum",
       "familia": "Solanaceae",
       "tipo": "anual",
@@ -2652,6 +2659,7 @@
     },
     "cebollina": {
       "nombre": "Cebollina",
+      "nombre_general": "Cebolla de verdeo",
       "cientifico": "Allium fistulosum",
       "familia": "Amaryllidaceae",
       "tipo": "anual",
@@ -2686,6 +2694,7 @@
     },
     "culantro": {
       "nombre": "Culantro",
+      "nombre_general": "Cilantro de hoja ancha",
       "cientifico": "Eryngium foetidum",
       "familia": "Apiaceae",
       "tipo": "anual",
@@ -2751,6 +2760,7 @@
     },
     "habichuela": {
       "nombre": "Habichuela / vainita",
+      "nombre_general": "Judía verde",
       "cientifico": "Phaseolus vulgaris",
       "familia": "Fabaceae",
       "tipo": "anual",
@@ -2811,6 +2821,7 @@
     },
     "naju": {
       "nombre": "Ñajú",
+      "nombre_general": "Okra",
       "cientifico": "Abelmoschus esculentus",
       "familia": "Malvaceae",
       "tipo": "anual",

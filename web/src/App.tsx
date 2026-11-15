@@ -21,7 +21,7 @@ const PASOS: Paso[] = [
   { id: 'fotos', corto: L('Tus fotos', "Your photos"), titulo: L('El suelo que ves tú', "The soil you see"), listo: (e) => fotosDe(e).filter((f) => f.tipo === 'cama' || f.tipo === 'perennes').every((f) => e.fotos.some((x) => x.tipo === f.tipo)) },
   { id: 'agua', corto: L('El agua', "Water"), titulo: L('¿El agua entra o se queda arriba?', "Does water soak in or stay on top?"), listo: (e) => e.infiltracion_min != null || !!e.charcos },
   { id: 'importa', corto: L('Lo tuyo', "Your needs"), titulo: L('¿Qué te importa más?', "What matters most to you?"), listo: (e) => e.prioridades.length > 0 },
-  { id: 'anio', corto: L('Tu año', "Your year"), titulo: L('Así le iría a tu suelo', "How your soil could do"), listo: () => true },
+  { id: 'anio', corto: L('Tu año', "Your year"), titulo: L('Tu suelo, mes por mes', 'Your soil, month by month'), listo: () => true },
   { id: 'conversa', corto: L('Conversa', "Chat"), titulo: L('Pregúntale al asistente', 'Ask the assistant'), listo: () => true },
   { id: 'registro', corto: L('Registro', 'Record'), titulo: L('Tu registro del patio', 'Your yard record'), listo: (e) => !!e.id },
 ]
@@ -67,7 +67,8 @@ export default function App() {
   const ir = useCallback((n: number, sub?: number) => {
     if (sub != null) setSubFoto(sub)
     if (n === actual.current) return
-    history.pushState(null, '', n < 0 ? location.pathname + location.search : `#${IDS[n]}`)
+    // instalada: los pasos no se apilan en el historial, así window.close() puede cerrar la app (Salir)
+    history[INSTALADA ? 'replaceState' : 'pushState'](null, '', n < 0 ? location.pathname + location.search : `#${IDS[n]}`)
     mover(n)
   }, [mover])
   useEffect(() => {
@@ -77,6 +78,14 @@ export default function App() {
     return () => removeEventListener('popstate', f)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mover])
+  // instalada y sin historial: el gesto de atrás del sistema vuelve al paso anterior; en el paso 1 cierra la app
+  useEffect(() => {
+    const CW = (window as Window & { CloseWatcher?: new () => { onclose: (() => void) | null; destroy(): void } }).CloseWatcher
+    if (!INSTALADA || !CW || paso <= 0) return
+    const w = new CW()
+    w.onclose = () => ir(paso - 1)
+    return () => w.destroy()
+  }, [paso, ir])
   useEffect(() => {
     if (paso < 0) return
     setVistos((v) => v.includes(IDS[paso]) ? v : [...v, IDS[paso]])
@@ -158,7 +167,7 @@ export default function App() {
             {!enLinea && <motion.span className="sin-senal" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>{L("Sin señal", "Offline")}</motion.span>}
           </AnimatePresence>
           <span className="espacio" />
-          <Instalar />
+          {INSTALADA ? <Salir /> : <Instalar />}
           <button className="icono-btn idioma" onClick={() => cambiarIdioma(idioma === 'en' ? 'es' : 'en')} aria-label={L('Switch to English', 'Cambiar a español')}>{idioma === 'en' ? 'ES' : 'EN'}</button>
           <BotonTema />
         </div>
@@ -261,6 +270,17 @@ function BotonTema() {
       <Icono n={efectivo === 'dark' ? 'sol' : 'luna'} />
     </button>
   )
+}
+
+/* ---------- salir: solo en la app instalada; si el sistema no deja cerrarla, se dice cómo ---------- */
+const INSTALADA = matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone === true
+function Salir() {
+  const [no, setNo] = useState(false)
+  const salir = () => { window.close(); setTimeout(() => { if (!document.hidden) { setNo(true); setTimeout(() => setNo(false), 5000) } }, 400) }
+  return <>
+    {no && <span className="sin-senal" role="status">{L('Ciérrala deslizándola en apps recientes', 'Swipe it away in recent apps')}</span>}
+    <button className="boton pildora" onClick={salir}><Icono n="salir" t={18} />{L('Salir', 'Exit')}</button>
+  </>
 }
 
 /* ---------- instalar: el aviso del navegador si existe; si no, cómo hacerlo en cada uno ---------- */

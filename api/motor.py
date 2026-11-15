@@ -1,6 +1,7 @@
 """Cálculos deterministas sobre las series NASA. La IA nunca calcula: solo lee lo que sale de aquí."""
 import datetime as dt
 from statistics import mean
+from ia import es_panama
 
 MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 # Niños fuertes con datos en POWER (desde 1981). Fuente: NOAA CPC, índice ONI.
@@ -165,7 +166,7 @@ def _mm(s):  # 'AAAA-MM' -> índice de mes absoluto
     return int(y) * 12 + int(m) - 1
 
 
-def _ocupa(cultivo, siembra_idx, corte_dias=None, lang="es"):
+def _ocupa(cultivo, siembra_idx, corte_dias=None, lang="es", panama=True):
     """Meses que ocupa un cultivo y su cobertura por etapa: inicial desnudo, desarrollo baja, media = la del cultivo, final baja."""
     c = AGRO["cultivos"][cultivo]
     dias = corte_dias or (max(c["ciclo_dias"]) if c.get("ciclo_dias") else 120)
@@ -180,7 +181,7 @@ def _ocupa(cultivo, siembra_idx, corte_dias=None, lang="es"):
         etapa = 0 if d < lim[0] else 1 if d < lim[1] else 2 if d < lim[2] else 3
         cob = ["desnudo", "baja", c.get("cobertura") or "media", "baja"][etapa]
         kcm = [kc["ini"], (kc["ini"] + kc["mid"]) / 2, kc["mid"], (kc["mid"] + kc["end"]) / 2][etapa]
-        out[siembra_idx + i] = {"cultivo": cultivo, "nombre": nombre_cultivo(cultivo, lang), "cobertura": cob, "kc": kcm}
+        out[siembra_idx + i] = {"cultivo": cultivo, "nombre": nombre_cultivo(cultivo, lang, panama), "cobertura": cob, "kc": kcm}
     return out
 
 
@@ -200,14 +201,18 @@ def buscar_cultivo(texto):
         return None
     texto = _normalizar(texto)
     for clave, c in AGRO['cultivos'].items():
-        if texto in {_normalizar(s) for s in [clave, c['nombre'], c['nombre_en'], *c['alias']]}:
+        if texto in {_normalizar(s) for s in [clave, c['nombre'], c['nombre_en'], c.get('nombre_general', c['nombre']), *c['alias']]}:
             return clave
     return None
 
 
-def nombre_cultivo(clave, lang='es'):
+def nombre_cultivo(clave, lang='es', panama=True):
     c = AGRO['cultivos'][clave]
-    return c['nombre_en'] if lang == 'en' else ('Frijol de bejuco' if clave == 'caupi' else c['nombre'].split(' / ')[0])
+    if lang == 'en':
+        return c['nombre_en']
+    if not panama:
+        return c.get('nombre_general', c['nombre']).split(' / ')[0]
+    return 'Frijol de bejuco' if clave == 'caupi' else c['nombre'].split(' / ')[0]
 
 
 
@@ -226,9 +231,9 @@ def _mes_humedo(idx, temporada):
     return next((i for i in range(idx, idx + 12) if i % 12 + 1 in temporada['meses_humedos']), None)
 
 
-def _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang):
+def _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang, panama=True):
     t = lambda es, en: _texto(es, en, lang)
-    nom = lambda c: nombre_cultivo(c, lang).lower()
+    nom = lambda c: nombre_cultivo(c, lang, panama).lower()
     nombres = _lista([nom(c) for c in cortos], lang)
     # Artículo solo para una planta: evita tratar una lista mixta como un singular.
     articulos = {'yuca': 'la ', 'papa': 'la ', 'zanahoria': 'la ', 'cebolla': 'la ',
@@ -310,6 +315,7 @@ ARBOLES = {'platano', 'banano', 'cacao', 'naranja', 'toronja', 'papaya', 'cafe',
 
 
 def _generar(exp, normales, i0, lang):
+    panama = es_panama(exp)
     t = lambda es, en: _texto(es, en, lang)
     conocidos, desconocidos = _seleccion(exp)
     cortos = [c for c in conocidos if AGRO['cultivos'][c]['tipo'] != 'perenne']
@@ -345,8 +351,8 @@ def _generar(exp, normales, i0, lang):
                         if i % 12 + 1 in (temporada['inicios_lluvias'] or temporada['meses_humedos'])]
             inicio = ventanas[-1] if ventanas else i0
             fecha = _fecha_mes(inicio, lang)
-            vacios.append(t(f'{nombre_cultivo(c, lang)}: sin fecha válida; se supone siembra en {fecha}.',
-                            f'{nombre_cultivo(c, lang)}: no valid planting date; assumed planted in {fecha}.'))
+            vacios.append(t(f'{nombre_cultivo(c, lang, panama)}: sin fecha válida; se supone siembra en {fecha}.',
+                            f'{nombre_cultivo(c, lang, panama)}: no valid planting date; assumed planted in {fecha}.'))
         # Si el registro es antiguo, conserva el último ciclo anual que empezó antes de hoy.
         periodo = max(12, len(_ocupa(c, inicio)))
         if inicio < i0:
@@ -362,14 +368,14 @@ def _generar(exp, normales, i0, lang):
         camas, pasos = [], []
         siguientes = []
         for c, inicio in inicios.items():
-            cama = _ocupa(c, inicio, lang=lang)
+            cama = _ocupa(c, inicio, lang=lang, panama=panama)
             pasos.append({'cultivo': c, 'siembra': inicio, 'existente': True})
             fin = max(cama) + 1
             periodo = max(12, len(cama))
             if id == 'rotar':
                 s = _ventana(fin, temporada)
                 if s is not None and s < i0 + 12:
-                    cultivo = _ocupa(leg, s, 80 if leg == 'canavalia' else None, lang)
+                    cultivo = _ocupa(leg, s, 80 if leg == 'canavalia' else None, lang, panama)
                     cama.update(cultivo)
                     paso = {'cultivo': leg, 'siembra': s}
                     if AGRO['cultivos'][leg]['tipo'] == 'cobertura':
@@ -380,14 +386,14 @@ def _generar(exp, normales, i0, lang):
                                 if AGRO['cultivos'][x]['familia'] not in {AGRO['cultivos'][c]['familia'], 'Fabaceae'})
                     s2 = _mes_humedo(max(cultivo) + 1, temporada)
                     if s2 is not None and s2 < i0 + 12:
-                        cama.update(_ocupa(otro, s2, lang=lang))
+                        cama.update(_ocupa(otro, s2, lang=lang, panama=panama))
                         pasos.append({'cultivo': otro, 'siembra': s2})
                     else:
                         s2 = None
                     siguientes.append((leg, s, otro, s2))
             else:
                 for s in range(inicio + periodo, i0 + 12, periodo):
-                    cama.update(_ocupa(c, s, lang=lang))
+                    cama.update(_ocupa(c, s, lang=lang, panama=panama))
                     pasos.append({'cultivo': c, 'siembra': s, 'repeticion': True})
                 if id == 'viva':
                     # En cada hueco libre: no arranca la comida ni pisa la próxima siembra.
@@ -395,7 +401,7 @@ def _generar(exp, normales, i0, lang):
                         if s not in cama and s % 12 + 1 in temporada['meses_humedos']:
                             libre = next((k for k in range(s, i0 + 12) if k in cama), i0 + 12)
                             corte = min(80, (libre - s) * 30.4) if viva != 'guandu' else (libre - s) * 30.4
-                            for k, v in _ocupa(viva, s, corte, lang).items():
+                            for k, v in _ocupa(viva, s, corte, lang, panama).items():
                                 if k < libre:
                                     cama[k] = v
                             pasos.append({'cultivo': viva, 'siembra': s, 'corte': max(k for k in cama if s <= k < libre) + 1, 'abono_verde': True})
@@ -412,8 +418,11 @@ def _generar(exp, normales, i0, lang):
             if not datos.get('ciclo_dias') and c not in perennes:
                 faltas.append(t('ciclo supuesto de 120 días', 'assumed 120-day cycle'))
             if faltas and c not in perennes:
-                vac.append(f'{nombre_cultivo(c, lang)}: ' + '; '.join(faltas) + '.')
-        nombre, razon, beneficios = _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang)
+                vac.append(f'{nombre_cultivo(c, lang, panama)}: ' + '; '.join(faltas) + '.')
+        nombre, razon, beneficios = _textos_estrategia(id, cortos, arboles, leg, viva, siguientes, lang, panama)
+        detalle = None
+        if id == 'actual':
+            nombre, detalle = nombre.split(': ', 1)
         if id == 'viva' and cortos and not any(p.get('abono_verde') for p in pasos):
             # el nombre no promete una planta que no entra en el calendario
             nombre = (t('Maní forrajero bajo los árboles; en el huerto no cabe cobertura viva este año', 'Forage peanut beneath the trees; living cover does not fit in the garden this year') if arboles
@@ -428,7 +437,7 @@ def _generar(exp, normales, i0, lang):
             riesgos.append(t('Canavalia y mucuna se proponen como abono verde, no como frijoles para cocinar.', 'Jack bean and velvet bean are proposed as green manure, not as cooking beans.'))
         if id == 'viva':
             riesgos.append(t('La cobertura viva compite por agua y luz; prueba primero un pedazo pequeño.', 'Living cover competes for water and light; try a small patch first.'))
-        estrategias.append({'id':id, 'nombre':nombre, 'razon':razon, 'cama':pasos, '_camas':camas,
+        estrategias.append({'id':id, 'nombre':nombre, 'detalle':detalle, 'razon':razon, 'cama':pasos, '_camas':camas,
             '_plantas':usados, '_desconocidos':desconocidos, '_tiene_arboles':bool(arboles),
             'huecos':'desnudo' if id=='actual' else 'acolchado',
             'arboles':'desnudo' if id=='actual' else 'mani_forrajero' if id=='viva' and arboles else 'acolchado',
@@ -484,6 +493,7 @@ def _primera_comida(pasos, i0):
 
 
 def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.date | None = None, lang="es") -> dict:
+    panama = es_panama(exp)
     t = lambda es, en: _texto(es, en, lang)
     hoy = hoy or dt.date.today()
     i0 = hoy.year * 12 + hoy.month - 1
@@ -555,18 +565,18 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
                              'Measured infiltration is slow; check drainage and consider raised beds.'))
         evid = e["evidencia"] + (["USDA"] if infil is not None else []) + (["F56M"] if e["huecos"] == "acolchado" else [])
         res.append({
-            "id": e["id"], "nombre": e["nombre"], "aplica_a": t("huerto y árboles", "garden plot and trees") if e["_tiene_arboles"] else t("huerto", "garden plot"),
+            "id": e["id"], "nombre": e["nombre"], **({"detalle": e["detalle"]} if e["id"] == "actual" else {}), "aplica_a": t("huerto y árboles", "garden plot and trees") if e["_tiene_arboles"] else t("huerto", "garden plot"),
             "tira": tira, "arboles": arboles, "meses_desnudo": (desn_cama or 0) + desn_arb,
             "desnudo_cama": desn_cama, "desnudo_arboles": desn_arb,
             "n_kg_ha": [sum(x[0] for x in n_fij), sum(x[1] for x in n_fij)] if n_fij else None,  # ponytail: solo para ordenar; la pantalla usa n_por_planta
-            "n_por_planta": [{"nombre": nombre_cultivo(c, lang), "kg_ha": AGRO["cultivos"][c]["fija_n_kg_ha"]}
+            "n_por_planta": [{"nombre": nombre_cultivo(c, lang, panama), "kg_ha": AGRO["cultivos"][c]["fija_n_kg_ha"]}
                              for c in presentes
                              if AGRO["cultivos"][c].get("fija_n_kg_ha")],
             "familias": len(familias),
             "agua": {"demanda_seca_mm": round(sum(m["kc"] * normal_por_mes[m["mes"]]["et0"] for m in seca)) if tira else None,
                      "deficit_normal_mm": deficit(None), "deficit_nino_mm": deficit(pct_nino)},
             # nombre científico al lado: en otro país la misma planta se llama distinto
-            "plantas": [{"nombre": nombre_cultivo(c, lang), "cientifico": AGRO["cultivos"][c]["cientifico"]}
+            "plantas": [{"nombre": nombre_cultivo(c, lang, panama), "cientifico": AGRO["cultivos"][c]["cientifico"]}
                         for c in e["_plantas"]] + [{"nombre": c, "cientifico": None} for c in e["_desconocidos"]],
             "razon": e["razon"], "beneficios": e["beneficios"], "vacios": e["vacios"],
             "comida_meses": _primera_comida(e['cama'], i0),

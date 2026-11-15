@@ -77,9 +77,6 @@ def imerg(lat: float, lon: float, desde: dt.date, hasta: dt.date, corrida="E") -
 
 CAPAS = [
     {"product": "HLSL30_VI.020", "layer": "NDVI"}, {"product": "HLSS30_VI.020", "layer": "NDVI"},
-    {"product": "SPL4SMGP.008", "layer": "Geophysical_Data_sm_rootzone"},
-    {"product": "ECO_L4T_ESI.002", "layer": "ESI"}, {"product": "ECO_L3T_JET.002", "layer": "ETdaily"},
-    {"product": "NASADEM_NC.001", "layer": "NASADEM_HGT"},
 ]
 
 
@@ -92,38 +89,52 @@ def _ae_cabecera():
     return {"Authorization": f"Bearer {r.json()['token']}"}
 
 
-def appeears(lat: float, lon: float, desde=f"{dt.date.today().year - 2}-01-01") -> dict | None:
-    # ponytail: 2 años y no desde 2015: la serie larga de HLS tardó horas en la cola de AppEEARS (14-nov); el pedido de Santiago desde 2015 sigue valiendo
-    """Series del punto si el pedido ya terminó; si no, lo lanza (o lo sigue esperando) y devuelve None."""
-    clave = f"appeears:{lat},{lon},{desde}"
+def appeears(lat: float, lon: float) -> dict | None:
+    """Consulta HLS; conserva el último resultado durante su renovación semanal."""
+    # ponytail: solo HLS y 180 días: seis capas y años de datos saturaban la cola de NASA.
+    clave = f"hls:{lat},{lon}"
     with _db() as c:
         c.execute("create table if not exists tareas(clave text primary key, id text, estado text, cuerpo text, t real)")
-        row = c.execute("select id, estado, cuerpo from tareas where clave=?", (clave,)).fetchone()
-        # un pedido viejo del mismo punto (con otra fecha de inicio) sirve igual: no lanzar otro detrás en la cola
-        row = row or c.execute("select id, estado, cuerpo, clave from tareas where clave like ?", (f"appeears:{lat},{lon},%",)).fetchone()
-        if row and len(row) == 4:
-            clave, row = row[3], row[:3]
-    if row and row[1] == "done":
-        return json.loads(row[2])
+        row = c.execute("select id, estado, cuerpo, t from tareas where clave=?", (clave,)).fetchone()
+    viejo = json.loads(row[2]) if row and row[2] else None
+    if row and row[1] == "done" and time.time() - row[3] <= 7 * 86400:
+        return viejo
+    try:
+        return _appeears_actualizar(lat, lon, clave, row, viejo)
+    except Exception:
+        if viejo is not None:
+            return viejo
+        raise
+
+
+def _appeears_actualizar(lat, lon, clave, row, viejo):
     h = _ae_cabecera()
-    if not row:
-        d0 = dt.date.fromisoformat(desde)
+    if not row or row[1] in ("done", "error", "failed", "killed"):
+        d0 = dt.date.today() - dt.timedelta(days=180)
         cuerpo = {"task_type": "point", "task_name": f"surco-{lat}-{lon}", "params": {
             "dates": [{"startDate": d0.strftime("%m-%d-%Y"), "endDate": dt.date.today().strftime("%m-%d-%Y")}],
             "layers": CAPAS, "coordinates": [{"latitude": lat, "longitude": lon, "category": "punto"}]}}
         r = httpx.post(f"{APPEEARS}/task", json=cuerpo, headers=h, timeout=60)
         r.raise_for_status()
         with _db() as c:
-            c.execute("insert or replace into tareas values (?,?,?,?,?)", (clave, r.json()["task_id"], "pending", None, time.time()))
-        return None
+            c.execute("insert or replace into tareas values (?,?,?,?,?)", (clave, r.json()["task_id"], "pending", json.dumps(viejo) if viejo is not None else None, time.time()))
+        return viejo
     tid = row[0]
-    if httpx.get(f"{APPEEARS}/task/{tid}", headers=h, timeout=60).json().get("status") != "done":
-        return None
+    r = httpx.get(f"{APPEEARS}/task/{tid}", headers=h, timeout=60)
+    r.raise_for_status()
+    estado = r.json().get("status", "pending")
+    if estado != "done":
+        with _db() as c:
+            c.execute("update tareas set estado=? where clave=?", (estado, clave))
+        return viejo
     series: dict[str, list] = {}
-    for f in httpx.get(f"{APPEEARS}/bundle/{tid}", headers=h, timeout=60).json()["files"]:
+    r = httpx.get(f"{APPEEARS}/bundle/{tid}", headers=h, timeout=60)
+    r.raise_for_status()
+    for f in r.json()["files"]:
         if not f["file_name"].endswith("results.csv"):
             continue
         r = httpx.get(f"{APPEEARS}/bundle/{tid}/{f['file_id']}", headers=h, timeout=300, follow_redirects=True)
+        r.raise_for_status()
         for fila in csv.DictReader(io.StringIO(r.text)):
             for k, v in fila.items():
                 for capa in CAPAS:
@@ -135,5 +146,5 @@ def appeears(lat: float, lon: float, desde=f"{dt.date.today().year - 2}-01-01") 
                             pass
     out = {"tarea": tid, "series": series, "consultado": dt.datetime.now().isoformat(timespec="minutes")}
     with _db() as c:
-        c.execute("update tareas set estado='done', cuerpo=? where clave=?", (json.dumps(out), clave))
+        c.execute("update tareas set estado='done', cuerpo=?, t=? where clave=?", (json.dumps(out), time.time(), clave))
     return out

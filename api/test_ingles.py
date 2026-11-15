@@ -25,7 +25,8 @@ def main():
         # la huella del español fijó la salida durante la traducción (14-nov); los cambios de reglas posteriores la mueven a propósito
         assert es == motor.comparar(*args) == motor.comparar(*args, lang='fr')
         en = motor.comparar(*args, lang='en')
-        assert en['estrategias'][0]['nombre'] == 'What you do now: cassava after cassava'
+        assert en['estrategias'][0]['nombre'] == 'What you do now'
+        assert en['estrategias'][0]['detalle'] == 'cassava after cassava'
         assert [e['id'] for e in en['estrategias']] == ['actual', 'tapar', 'rotar', 'viva']
         assert es['lectura'] != en['lectura']
         assert 'Con lo que escogiste' not in json.dumps(en['lectura'])
@@ -65,7 +66,7 @@ def main():
             expected = 'en' if lang == 'en' else 'es'
             r = client.post('/api/comparar', json={'expediente': {}, **fields})
             assert r.status_code == 200
-            assert r.json()['estrategias'][0]['nombre'] == ('What you do now: keep your existing plants' if expected == 'en' else 'Lo que haces hoy: conservar las plantas que ya tienes')
+            assert r.json()['estrategias'][0]['nombre'] == ('What you do now' if expected == 'en' else 'Lo que haces hoy')
             with patch.object(ia, 'foto', return_value={}) as mock:
                 assert client.post('/api/ia/foto', files={'foto': ('test.jpg', jpeg, 'image/jpeg')}, data=fields).status_code == 200
                 assert mock.call_args.args[-1] == expected

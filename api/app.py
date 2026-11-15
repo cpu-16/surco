@@ -16,6 +16,7 @@ from pydantic import BaseModel, field_validator
 import earthdata
 import motor
 import nasa
+import pronostico
 
 AQUI = Path(__file__).parent
 app = FastAPI(title="Patio API")
@@ -59,6 +60,11 @@ def lugar(lat: float = Query(...), lon: float = Query(...)):
            "normales": normales, "ninos": motor.ninos(p["dias"], normales), "reciente_power": motor.reciente(p["dias"]),
            "lluvia_mensual": {k: round(v) for k, v in motor.lluvia_mensual(p["dias"]).items() if k >= "2020-01"},
            "pendiente": []}
+    clave_pronostico = ("pronostico", lat, lon, dt.date.today(), time.time() // 10800)
+    out["pronostico"] = _en_fondo(clave_pronostico, pronostico.lluvia, lat, lon, pool=_rapido)
+    trabajo = _trabajos.get(clave_pronostico)
+    if out["pronostico"] is None and (trabajo is None or not trabajo.done()):
+        out["pendiente"].append("pronostico")
     ndvi = _en_fondo(("ndvi", lat, lon), nasa.ornl, "ndvi", lat, lon)
     fiab = _en_fondo(("fiabilidad", lat, lon), nasa.ornl, "fiabilidad", lat, lon)
     if ndvi and fiab:

@@ -53,6 +53,8 @@ function Lluvia({ lugar }: { lugar: Lugar }) {
   const dias = (im ?? lugar.reciente_power).dias.slice(-30)
   return (
     <>
+      {lugar.pronostico && <Pronostico p={lugar.pronostico} />}
+      <h3 className="cielo-sub">{L('Lo que ya llovió', 'Rain so far')}</h3>
       {im ? <Racha im={im} /> : (
         <p className="titular"><span className="cifra">{lugar.reciente_power.lluvia_30d}<small> mm</small></span><span>{L(<>de lluvia en 30 días, hasta el {fecha(lugar.reciente_power.hasta)}</>, <>of rain in 30 days, up to {fecha(lugar.reciente_power.hasta)}</>)}</span></p>
       )}
@@ -62,6 +64,23 @@ function Lluvia({ lugar }: { lugar: Lugar }) {
           : L('La lluvia diaria del satélite GPM está en camino; esto es NASA POWER, que reparte la lluvia en 55 km.', 'Daily rain from the GPM satellite is on its way; this is NASA POWER, which spreads the rain over 55 km.')}
       </p>
       {f && <Fuente titulo={L(`${f.producto}, consultado ${f.consultado}`, `${f.producto}, checked ${f.consultado}`)}>{FUENTE[im ? 'imerg' : 'power']}</Fuente>}
+    </>
+  )
+}
+
+/** Pronóstico de 7 días: lo que viene, para decidir cuándo sembrar o tapar. */
+function Pronostico({ p }: { p: NonNullable<Lugar['pronostico']> }) {
+  const dia = (f: string) => new Date(f + 'T12:00').toLocaleDateString(L('es-PA', 'en-US'), { weekday: 'short' }).replace('.', '')
+  const max = Math.max(10, ...p.dias.map((d) => d.lluvia))
+  return (
+    <>
+      <h3 className="cielo-sub">{L('Lo que viene', 'What is coming')}</h3>
+      <p className="titular"><span className="cifra">{p.total_7d}<small> mm</small></span>
+        <span>{L(`en los próximos 7 días; llueve ${p.dias_con_lluvia} ${p.dias_con_lluvia === 1 ? 'día' : 'días'}`, `in the next 7 days; rain on ${p.dias_con_lluvia} ${p.dias_con_lluvia === 1 ? 'day' : 'days'}`)}</span></p>
+      <div className="pron-dias" role="img" aria-label={p.dias.map((d) => `${dia(d.fecha)} ${d.lluvia} mm`).join(', ')}>
+        {p.dias.map((d) => <span key={d.fecha}><b>{d.lluvia >= 1 ? Math.round(d.lluvia) : ''}</b><i style={{ height: `${Math.max(3, (d.lluvia / max) * 70)}%` }} /><small>{dia(d.fecha)}</small></span>)}
+      </div>
+      <Fuente titulo={L(`${p.meta.producto}, consultado ${p.meta.consultado}`, `${p.meta.producto}, checked ${p.meta.consultado}`)}>{L('Es un pronóstico, no una medición: puede fallar. Se actualiza cada 3 horas.', 'It is a forecast, not a measurement: it can be wrong. It updates every 3 hours.')}</Fuente>
     </>
   )
 }

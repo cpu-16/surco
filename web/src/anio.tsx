@@ -11,17 +11,20 @@ export type Estrategia = {
   comida_meses?: number | null; labores?: { siembras: number; tapar_hojas: number; cortes: number }
   n_por_planta?: { nombre: string; kg_ha: [number, number] }[]
   agua: { demanda_seca_mm: number | null; deficit_normal_mm: number | null; deficit_nino_mm: number | null }
-  razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string | null }[]
+  detalle?: string; razon: string; evidencia: { id: string; titulo: string; url: string }[]; plantas?: { nombre: string; cientifico: string | null }[]
   beneficios: string[]; vacios: string[]; riesgos: string[]; ajustes: string[]
 }
 export type Comparacion = { estrategias: Estrategia[]; faltan: { clave: string; texto: string; cambia: string }[]; lectura: string[]; temporada?: { meses_secos: number[] } }
 
-const PASO_DE: Record<string, number> = { parcela: 1, foto_cama: 3, foto_perennes: 3, infiltracion: 4, prioridades: 5 }
 
 export const COLOR = { alta: 'var(--hoja)', media: 'var(--brote)', baja: 'var(--rastrojo)', desnudo: 'var(--laterita)' }
 
+// nombre corto para escoger con qué comparar; el largo va en la hoja de detalle
+const CORTO: Record<string, () => string> = { tapar: () => L('Hojas secas', 'Dry leaves'), rotar: () => L('Rotar cultivos', 'Rotate crops'), viva: () => L('Cobertura viva', 'Living cover') }
+const corto = (e: Estrategia) => CORTO[e.id]?.() ?? e.nombre
+
 export default function Anio({ comp, desde, viejo, irA, enLinea, panama }: { comp: Comparacion | null; desde: number; viejo: boolean; irA: (clave: string) => void; enLinea: boolean; panama: boolean }) {
-  const [sel, setSel] = useState<Estrategia | null>(null)
+  const [elegida, setElegida] = useState<string | null>(null)
   const [abierta, setAbierta] = useState(false)
   const cerrar = useCallback(() => setAbierta(false), [])
   if (!comp && !enLinea) return <p className="aviso">{L('Sin señal y todavía no hay un cálculo para este patio. Se hace solo cuando vuelva la señal.', 'Offline, and there is no calculation for this plot yet. It runs by itself when the signal comes back.')}</p>
@@ -29,80 +32,65 @@ export default function Anio({ comp, desde, viejo, irA, enLinea, panama }: { com
   const orden = ordenMeses(desde)
   const total = (e: Estrategia) => (e.desnudo_cama ?? 0) + e.desnudo_arboles
   const actual: Estrategia | undefined = comp.estrategias.find((e) => e.id === 'actual') ?? comp.estrategias[0]
-  // lo más fácil = lo que menos suelo pelado deja y, entre esas, la que menos trabajo da
+  const otras = comp.estrategias.filter((e) => e !== actual)
+  // por defecto: la que menos suelo pelado deja y, entre esas, la que menos trabajo da
   const trabajo = (e: Estrategia) => e.labores ? e.labores.siembras + e.labores.tapar_hojas + e.labores.cortes : 99
-  const facil = !actual ? undefined : comp.estrategias.filter((e) => e !== actual).sort((a, b) => total(a) - total(b) || trabajo(a) - trabajo(b))[0] as Estrategia | undefined
-  const mejora = !!actual && !!facil && total(facil) < total(actual)
-  const huerto = !!actual && actual.tira.length > 0 && actual.desnudo_cama !== null
+  const facil = [...otras].sort((a, b) => total(a) - total(b) || trabajo(a) - trabajo(b))[0] as Estrategia | undefined
+  const sel = otras.find((e) => e.id === elegida) ?? facil
   const meses = (n: number) => L(n === 1 ? 'mes' : 'meses', n === 1 ? 'month' : 'months')
-  const abrir = (e: Estrategia) => { setSel(e); setAbierta(true) }
+  const huerto = (e: Estrategia) => e.tira.length > 0 && e.desnudo_cama !== null
+  if (!actual) return <p className="aviso">{L('No hay cálculo para estos cultivos.', 'No calculation for these crops.')}</p>
   return (
     <>
       {viejo && <p className="aviso">{L('Sin señal: es el cálculo de la última vez. Se pone al día solo cuando vuelva.', 'Offline: this is the last calculation. It updates by itself when the signal comes back.')}</p>}
 
-      {/* la respuesta primero: cuánto queda pelado hoy y lo más fácil para taparlo */}
-      {actual && <section className="respuesta">
-        <p className="r-titulo">{L('Hoy tu suelo queda pelado', 'Today your soil is left bare')}</p>
-        <ul className="r-cifras">
-          {huerto && <li><b>{actual.desnudo_cama}</b> {L(`${meses(actual.desnudo_cama!)} al año en el huerto`, `${meses(actual.desnudo_cama!)} a year in the garden plot`)}</li>}
-          {actual.arboles.length > 0 && <li><b>{actual.desnudo_arboles}</b> {L(`${meses(actual.desnudo_arboles)} al año debajo de los árboles`, `${meses(actual.desnudo_arboles)} a year under the trees`)}</li>}
-        </ul>
-        {mejora && facil ? <>
-          <p className="r-facil">{L('Lo más fácil para taparlo:', 'The easiest way to cover it:')} <b>{facil.nombre}</b>. {total(facil) === 0
-            ? L('Así no queda pelado ningún mes.', 'That way it is never bare.')
-            : L(`Así baja a ${total(facil)} ${meses(total(facil))}.`, `That brings it down to ${total(facil)} ${meses(total(facil))}.`)}</p>
+      <section className="respuesta">
+        <p className="r-titulo">{total(actual) ? L('Hoy tu suelo queda pelado', 'Today your soil is left bare') : L('Hoy tu suelo no queda pelado ningún mes', 'Today your soil is never left bare')}</p>
+        {total(actual) > 0 && <ul className="r-cifras">
+          {huerto(actual) && <li><b>{actual.desnudo_cama}</b> {L(`${meses(actual.desnudo_cama!)} en el huerto`, `${meses(actual.desnudo_cama!)} in the garden plot`)}</li>}
+          {actual.arboles.length > 0 && <li><b>{actual.desnudo_arboles}</b> {L(`${meses(actual.desnudo_arboles)} bajo los árboles`, `${meses(actual.desnudo_arboles)} under the trees`)}</li>}
+        </ul>}
+        {actual.detalle && <p className="r-hoy">{L('Hoy:', 'Today:')} {actual.detalle}. <button className="enlace" onClick={() => irA('parcela')}>{L('¿Siembras otra cosa? Cámbialo', 'Grow something else? Change it')}</button></p>}
+
+        {sel && <>
+          <p className="r-pregunta">{L('Compáralo con', 'Compare it with')}</p>
+          <div className="opciones" role="radiogroup" aria-label={L('Compáralo con', 'Compare it with')}>
+            {otras.map((e) => <button key={e.id} className="chip" role="radio" aria-checked={e === sel} onClick={() => setElegida(e.id)}>{corto(e)}</button>)}
+          </div>
           <div className="antes-despues">
             <span className="meses-eje" aria-hidden="true"><span />{orden.map((m) => <span key={m}>{MESES[m - 1]}</span>)}</span>
-            {huerto && facil.tira.length > 0 && <>
-              <p className="ad-zona">{L('En el huerto', 'In the garden plot')}</p>
+            {huerto(actual) && sel.tira.length > 0 && <>
+              <p className="ad-zona">{L('Huerto', 'Garden plot')}</p>
               <Tira etq={L('Hoy', 'Today')} fila={actual.tira} orden={orden} retraso={0} />
-              <Tira etq={L('Con eso', 'With it')} fila={facil.tira} orden={orden} retraso={0.1} />
+              <Tira etq={corto(sel)} fila={sel.tira} orden={orden} retraso={0.1} key={'h' + sel.id} />
             </>}
-            {actual.arboles.length > 0 && facil.arboles.length > 0 && <>
-              <p className="ad-zona">{L('Debajo de los árboles', 'Under the trees')}</p>
+            {actual.arboles.length > 0 && sel.arboles.length > 0 && <>
+              <p className="ad-zona">{L('Bajo los árboles', 'Under the trees')}</p>
               <Tira etq={L('Hoy', 'Today')} fila={actual.arboles} orden={orden} retraso={0.2} />
-              <Tira etq={L('Con eso', 'With it')} fila={facil.arboles} orden={orden} retraso={0.3} />
+              <Tira etq={corto(sel)} fila={sel.arboles} orden={orden} retraso={0.3} key={'a' + sel.id} />
             </>}
           </div>
           <Leyenda />
-          <button className="boton claro" onClick={() => abrir(facil)}>{L('Ver por qué y cuánto trabajo da', 'See why and how much work it takes')}</button>
-        </> : <p className="r-facil">{L('Ninguna de las otras maneras deja menos suelo pelado: lo que haces ya lo protege.', 'None of the other ways leaves less bare soil: what you do already protects it.')}</p>}
-      </section>}
-
-      {comp.estrategias.length > 0 && <h2 className="sub">{L(`Las ${comp.estrategias.length} maneras que comparé`, `The ${comp.estrategias.length} ways I compared`)}</h2>}
-      {comp.lectura.map((l, i) => <p key={i} className="lectura-2">{l}</p>)}
-      <ul className="estrategias">
-        {comp.estrategias.map((e, fila) => (
-          <li key={e.id}>
-            <button className="estrategia" onClick={() => abrir(e)} aria-haspopup="dialog">
-              <span className="e-cab">
-                <span className="e-nombre">{e.nombre}</span>
-                {mejora && e === facil && <span className="sello">{L('La más fácil', 'Easiest')}</span>}
-              </span>
-              {(e.tira.length > 0 || e.arboles.length > 0) && <span className="meses-eje" aria-hidden="true"><span />{orden.map((m) => <span key={m}>{MESES[m - 1]}</span>)}</span>}
-              {e.tira.length > 0 && <Tira etq={L('Huerto', 'Garden plot')} fila={e.tira} orden={orden} retraso={fila * 0.12} />}
-              {e.arboles.length > 0 && <Tira etq={L('Árboles', 'Trees')} fila={e.arboles} orden={orden} retraso={fila * 0.12 + 0.06} />}
-              <span className="e-pie">
-                <span>{e.desnudo_cama === null && !e.arboles.length ? L('Sin cálculo para estos cultivos', 'No calculation for these crops') : L(<>Desnudo: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'mes' : 'meses'} el huerto</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> bajo los árboles</>}</>,
-                  <>Bare: {e.desnudo_cama !== null && <><b>{e.desnudo_cama}</b> {e.desnudo_cama === 1 ? 'month' : 'months'} in the garden plot</>}{e.desnudo_cama !== null && e.arboles.length > 0 && ', '}{e.arboles.length > 0 && <><b>{e.desnudo_arboles}</b> under the trees</>}</>)}</span>
-                <span className="ver">{L('Ver por qué', 'See why')}</span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+          <p className="r-facil">{total(sel) >= total(actual)
+            ? L('No deja menos suelo pelado que lo que haces hoy.', 'It does not leave less bare soil than what you do today.')
+            : total(sel) === 0 ? L(<>Así <b>ningún mes</b> queda pelado.</>, <>That way it is <b>never</b> bare.</>)
+            : L(<>Así queda pelado <b>{total(sel)}</b> {meses(total(sel))}.</>, <>That way it is bare <b>{total(sel)}</b> {meses(total(sel))}.</>)}
+            {sel === facil && total(sel) < total(actual) && L(' Es la que menos trabajo da.', ' It is the least work.')}</p>
+          <button className="boton claro" onClick={() => setAbierta(true)} aria-haspopup="dialog">{L('Cómo se hace', 'How to do it')}</button>
+        </>}
+      </section>
 
       {comp.faltan.length > 0 && (
         <div className="afinar">
-          <h2 className="sub">{L('Para afinar el cálculo', 'To make the numbers more exact')}</h2>
-          {comp.faltan.map((f) => (
-            <button key={f.clave} className="pendiente" onClick={() => irA(f.clave)} title={f.cambia}>
-              <span className="paso-chip">{L('Paso', 'Step')} {PASO_DE[f.clave] ?? ''}</span><b>{f.texto}</b>
-            </button>
-          ))}
+          <p className="r-pregunta">{L('Para afinarlo', 'To make it more exact')}</p>
+          <div className="opciones">{comp.faltan.map((f) => <button key={f.clave} className="chip" onClick={() => irA(f.clave)} title={f.cambia}>{f.texto}</button>)}</div>
         </div>
       )}
-      <p className="nota pie">{L(`Esto muestra patrones y posibilidades. La decisión es tuya, y conviene revisarla con un técnico agrícola de tu zona${panama ? ' (el MIDA o el IDIAP)' : ''}.`, 'This shows patterns and possibilities. The decision is yours, and it is worth going over it with a local farm advisor or extension officer.')}</p>
+      <details className="como">
+        <summary>{L('Cómo lo calculé', 'How I worked it out')}</summary>
+        {comp.lectura.map((l, i) => <p key={i} className="nota">{l}</p>)}
+      </details>
+      <p className="nota pie">{L(`La decisión es tuya; revísala con un técnico${panama ? ' del MIDA o el IDIAP' : ' agrícola de tu zona'}.`, 'The decision is yours; go over it with a local farm advisor.')}</p>
 
       <Hoja abierta={abierta} cerrar={cerrar} titulo={sel?.nombre ?? ''}>
         {sel && <Detalle e={sel} orden={orden} />}

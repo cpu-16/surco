@@ -37,7 +37,77 @@ def numerico(x):
     return x
 
 
+def fuentes_nuevas():
+    import tempfile
+    import time
+    import earthdata
+    import pronostico
+    from pathlib import Path
+    power = power_cache()
+    with tempfile.TemporaryDirectory() as carpeta, patch.object(nasa, 'DB', Path(carpeta) / 'cache.sqlite'):
+        fechas = [(dt.date.today() + dt.timedelta(days=i)).isoformat() for i in range(7)]
+        datos = {'daily': {'time': fechas, 'precipitation_sum': [0, .94, 1, 2.26, 3, 4, 5],
+                           'precipitation_probability_max': [None, 10, 20, 30, 40, 50, 60]}}
+        response = httpx.Response(200, json=datos, request=httpx.Request('GET', 'https://example.test'))
+        with patch.object(httpx, 'get', return_value=response) as get:
+            pr = pronostico.lluvia(8.1, -80.98)
+            assert pr['total_7d'] == 16 and pr['dias_con_lluvia'] == 5
+            assert pr['dias'][3]['lluvia'] == 2.3 and pr['dias'][0]['prob'] is None
+            assert len(pr['dias']) == 7 and pr['meta']['unidades'] == 'mm/día'
+            assert pronostico.lluvia(8.1, -80.98) == pr and get.call_count == 1
+            params = dict(httpx.URL(get.call_args.args[0]).params)
+            assert set(params) == {'latitude', 'longitude', 'daily', 'timezone', 'forecast_days'}
+            assert params['latitude'] == '8.1' and params['longitude'] == '-80.98'
+            assert get.call_args.kwargs['timeout'] == 10
+        with nasa._db() as c:
+            c.execute('update cache set consultado=?', (time.time() - 10801,))
+        with patch.object(httpx, 'get', side_effect=httpx.ReadTimeout('simulado')):
+            assert pronostico.lluvia(8.1, -80.98) is None
+        with patch.object(httpx, 'get', return_value=httpx.Response(200, json={'daily': {}}, request=response.request)):
+            assert pronostico.lluvia(8.1, -80.98) is None
+        with patch.object(app, '_en_fondo', return_value=None), patch.object(nasa, 'power', return_value=power), patch.object(earthdata, 'hay_cuenta', return_value=False), patch.object(app, '_trabajos', {}):
+            lugar = app.lugar(8.1, -80.98)
+            assert lugar['pronostico'] is None and 'pronostico' in lugar['pendiente']
+        with nasa._db() as c:
+            c.execute('create table tareas(clave text primary key, id text, estado text, cuerpo text, t real)')
+            c.execute('insert into tareas values (?,?,?,?,?)', ('appeears:8.1,-80.98,2015-01-01', 'viejo', 'processing', None, 0))
+        post_response = httpx.Response(200, json={'task_id': 'nuevo'}, request=response.request)
+        with patch.object(earthdata, '_ae_cabecera', return_value={}), patch.object(httpx, 'post', return_value=post_response) as post:
+            assert earthdata.appeears(8.1, -80.98) is None
+            params = post.call_args.kwargs['json']['params']
+            assert params['layers'] == [{'product': 'HLSL30_VI.020', 'layer': 'NDVI'}, {'product': 'HLSS30_VI.020', 'layer': 'NDVI'}]
+            assert params['dates'] == [{'startDate': (dt.date.today() - dt.timedelta(days=180)).strftime('%m-%d-%Y'), 'endDate': dt.date.today().strftime('%m-%d-%Y')}]
+            viejo = {'tarea': 'anterior', 'series': {'HLSL30_VI.020': [{'fecha': fechas[0], 'valor': .5}]}}
+            with nasa._db() as c:
+                c.execute("update tareas set estado='done', cuerpo=?, t=? where clave like 'hls:%'", (json.dumps(viejo), time.time() - 8 * 86400))
+            assert earthdata.appeears(8.1, -80.98) == viejo and post.call_count == 2
+            with patch.object(httpx, 'get', return_value=httpx.Response(200, json={'status': 'processing'}, request=response.request)):
+                assert earthdata.appeears(8.1, -80.98) == viejo and post.call_count == 2
+            responses = [httpx.Response(200, json={'status': 'done'}, request=response.request),
+                         httpx.Response(200, json={'files': [{'file_name': 'point-results.csv', 'file_id': 'csv'}]}, request=response.request),
+                         httpx.Response(200, text='Date,HLSL30_VI_020_NDVI\n2026-11-14,0.6\n', request=response.request)]
+            with patch.object(httpx, 'get', side_effect=responses):
+                nuevo = earthdata.appeears(8.1, -80.98)
+            assert nuevo['series']['HLSL30_VI.020'][0]['valor'] == .6
+            assert earthdata.appeears(8.1, -80.98) == nuevo and post.call_count == 2
+            with nasa._db() as c:
+                assert c.execute("select estado from tareas where id='viejo'").fetchone()[0] == 'processing'
+            resumen = motor.resumen_appeears(nuevo)
+            assert resumen['hls_n'] == 1 and resumen['smap']['actual'] is None
+            assert resumen['smap']['meses'] == [] and resumen['ecostress_esi'] == [] and resumen['elevacion_m'] is None
+    for lat, lon in ((14.8, -89.54), (-1.52, 37.26), (17.4, 78.5)):
+        exp = {**SANTIAGO, 'lat': lat, 'lon': lon, 'siembras': {'yuca': '2026-06'}}
+        es = motor.comparar(exp, normales({4,5,6,7,8,9,10,11}), [], HOY)
+        texto = ' '.join(e['nombre'] + ' ' + e['razon'] + ' ' + ' '.join(x.get('nombre') or '' for campo in ('tira', 'arboles', 'plantas') for x in e[campo]) for e in es['estrategias']).lower()
+        assert 'frijol de bejuco' not in texto and 'guandú' not in texto and 'camote' not in texto
+        assert 'gandul' in texto and 'caupí' in texto
+        en = json.dumps(motor.comparar(exp, normales({4,5,6,7,8,9,10,11}), [], HOY, lang='en')).lower()
+        assert 'cowpea' in en and 'pigeon pea' in en
+    print('OK: pronóstico y caché, HLS liviano y renovación, nombres regionales y detalle.')
+
+
 def main():
+    fuentes_nuevas()
     p = power_cache(); n = motor.clima_mensual(p['dias'])
     temp = motor.temporadas(n)
     print('Santiago POWER:', temp)
@@ -62,7 +132,7 @@ def main():
         assert es['version'] == '2026-11-15b'
         assert [e['id'] for e in es['estrategias']] == ['actual','tapar','rotar','viva']
         for e in es['estrategias']:
-            assert set(e) == campos
+            assert set(e) == campos | ({'detalle'} if e['id'] == 'actual' else set())
             assert len(e['tira']) == (12 if any(motor.AGRO['cultivos'][c]['tipo'] != 'perenne' for c in motor._seleccion(exp)[0]) else 0)
             assert all(set(m) >= {'mes','cultivo','nombre','cobertura','kc'} for m in e['tira'])
             assert all(x['cientifico'] for x in e['plantas'] if x['nombre'] != 'xyz')
@@ -145,7 +215,8 @@ def main():
             if cambio:
                 assert cambio['mes'] in humedos
     santiago = motor.comparar(SANTIAGO,n,ni,HOY)['estrategias']
-    assert santiago[0]['nombre'] == 'Lo que haces hoy: yuca tras yuca'
+    assert santiago[0]['nombre'] == 'Lo que haces hoy'
+    assert santiago[0]['detalle'] == 'yuca tras yuca'
     assert santiago[2]['nombre'] == 'Rotar: frijol de bejuco, luego camote'
     # sin fecha de siembra el guandú no cabe antes de la próxima yuca: el nombre no lo promete
     assert santiago[3]['nombre'] == 'Maní forrajero bajo los árboles; en el huerto no cabe cobertura viva este año'
@@ -157,8 +228,8 @@ def main():
     assert motor.nombre_cultivo('frijol_comun') == 'Frijol común'
     kexp = {'cultivos':['maiz','frijol_comun'],'siembras':{'maiz':'2026-10','frijol_comun':'2026-10'}}
     kr = motor.comparar(kexp,kenya,[],HOY)['estrategias'][2]
-    assert kr['razon'].count('frijol de bejuco en marzo de 2027') == 1
-    assert 'camote en octubre de 2027' in kr['razon']
+    assert kr['razon'].count('caupí en marzo de 2027') == 1
+    assert 'batata en octubre de 2027' in kr['razon']
     assert 'maíz en octubre de 2027' in kr['razon']
     # Si la siguiente ventana cae fuera del horizonte, no se siembra: quedan hojas.
     solo_nov = normales({11})
