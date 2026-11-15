@@ -53,7 +53,8 @@ export default function Mapa({ lat, lon }: { lat: number; lon: number }) {
             osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' },
             ...Object.fromEntries(CAPAS.filter((c) => c.capa).map((c) => [c.id, {
               type: 'raster' as const, tileSize: 256, maxzoom: c.nivel, attribution: 'NASA GIBS',
-              tiles: [`${GIBS}/${c.capa}/default/default/GoogleMapsCompatible_Level${c.nivel}/{z}/{y}/{x}.${c.ext}`],
+              // «default» en la foto diaria es HOY, que todavía no existe: GIBS da el mosaico negro. Se pide la de ayer (UTC).
+              tiles: [`${GIBS}/${c.capa}/default/${c.id === 'color' ? new Date(Date.now() - 864e5).toISOString().slice(0, 10) : 'default'}/GoogleMapsCompatible_Level${c.nivel}/{z}/{y}/{x}.${c.ext}`],
             }])),
             escalas: {
               type: 'geojson',
