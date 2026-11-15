@@ -530,10 +530,18 @@ def comparar(exp: dict, normales: list[dict], ninos_prom: list[dict], hoy: dt.da
                 arboles.append(a)
         if e['id'] == 'actual' and e['_tiene_arboles'] and 'perennes' in fotos:
             foto = fotos['perennes']
+            medida = _foto_cobertura(foto)
+            # La hojarasca y las plantas bajas bajo los árboles no desaparecen al mes siguiente: si la foto vio el suelo
+            # tapado (media o más), el resto del año se supone poco tapado, no pelado. Supuesto prudente: un nivel abajo.
+            resto = 'baja' if NIVEL[medida] >= NIVEL['media'] else None
             for idx, a in zip(horizonte, arboles):
                 if idx == _foto_mes(foto):
-                    a.update(cobertura=_foto_cobertura(foto), medido=True,
-                             nombre=t('hojarasca y plantas', 'leaf litter and plants'))
+                    a.update(cobertura=medida, medido=True, nombre=t('hojarasca y plantas', 'leaf litter and plants'))
+                elif resto:
+                    a.update(cobertura=resto, nombre=t('hojarasca, según tu foto', 'leaf litter, from your photo'))
+            if resto:
+                ajustes.append(t('Tu foto vio el suelo de debajo de los árboles tapado; el resto del año lo cuento como poco tapado, no pelado.',
+                                 'Your photo showed the soil under the trees covered; for the rest of the year I count it as lightly covered, not bare.'))
         # agua: lo que pide el cultivo de la cama contra la lluvia efectiva, en año normal y en uno como los Niños
         seca = [m for m in tira if m["mes"] in temporada["meses_secos"]]
 

@@ -161,7 +161,9 @@ def main():
     # Fotos y charcos conservan su efecto, incluso con infiltración rápida declarada.
     foto = {**SANTIAGO,'charcos':'si','infiltracion_min':2,'fotos':[{'tipo':'perennes','fecha':'2026-11-14','cobertura':5,'hojarasca':'mucha'},{'tipo':'cama','fecha':'2026-11-14','cobertura':45}]}
     r = motor.comparar(foto,n,ni,HOY)
-    assert r['estrategias'][0]['desnudo_arboles'] == 11
+    assert r['estrategias'][0]['desnudo_arboles'] == 0  # mucha hojarasca bajo los árboles: el resto del año, poco tapado
+    poca = {**foto, 'fotos': [{'tipo':'perennes','fecha':'2026-11-14','cobertura':5,'hojarasca':'poca'}]}
+    assert motor.comparar(poca,n,ni,HOY)['estrategias'][0]['desnudo_arboles'] == 11  # poca: solo el mes de la foto
     assert r['estrategias'][0]['arboles'][0]['medido']
     assert all(e['tira'][0]['medido'] and e['tira'][0]['cobertura'] == 'media' for e in r['estrategias'])
     assert any(r['estrategias'][3]['nombre'] in x for x in r['lectura'])
